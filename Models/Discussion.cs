@@ -4,13 +4,13 @@ namespace GlobalModels
 {
     public sealed class Discussion : IEquatable<Discussion>
     {
-        public int Discussionid { get; set; }
-        public string Movieid { get; set; }
+        public Guid Discussionid { get; set; }
+        public Guid Movieid { get; set; }
         public string Username { get; set; }
         public string Subject { get; set; }
         public string Topic { get; set; }
 
-        public Discussion(int discussionid, string movieid, string username, string subject, string topic)
+        public Discussion(Guid discussionid, Guid movieid, string username, string subject, string topic)
         {
             Discussionid = discussionid;
             Movieid = movieid;
