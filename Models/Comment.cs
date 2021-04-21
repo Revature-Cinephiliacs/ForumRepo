@@ -4,7 +4,7 @@ namespace GlobalModels
 {
     public sealed class Comment : IEquatable<Comment>
     {
-        public Guid Commentid { get; set; }
+        public Guid Commentid { get; set; } = Guid.NewGuid();
         public Guid Discussionid { get; set; }
         public string Username { get; set; }
         public string Text { get; set; }
@@ -65,7 +65,7 @@ namespace GlobalModels
 
         public override int GetHashCode()
         {
-            return Commentid;
+            return Commentid.GetHashCode();
         }
     }
 }
