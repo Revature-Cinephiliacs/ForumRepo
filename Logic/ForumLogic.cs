@@ -36,7 +36,7 @@ namespace BusinessLogic
         }
 
 
-        public async Task<List<Comment>> GetComments(int discussionid)
+        public async Task<List<Comment>> GetComments(Guid discussionid)
         {
             List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid);
             if (repoComments == null)
@@ -53,7 +53,7 @@ namespace BusinessLogic
             return comments;
         }
 
-        public async Task<List<Comment>> GetCommentsPage(int discussionid, int page)
+        public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page)
         {
             if (page < 1)
             {
@@ -114,15 +114,9 @@ namespace BusinessLogic
             setting.IntValue = pagesize;
             return await _repo.SetSetting(setting);
         }
-        
-        /// <summary>
-        /// Returns a list of every Discussion object whose Movieid is equal to
-        /// the movieid argument. Returns null if the movieid doesn't exist.
-        /// </summary>
-        /// <param name="movieid"></param>
-        /// <returns></returns>
+    
 
-        public async Task<List<Discussion>> GetDiscussions(string movieid)
+        public async Task<List<Discussion>> GetDiscussions(Guid movieid)
         {
             List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
             if (repoDiscussions == null)
@@ -145,14 +139,9 @@ namespace BusinessLogic
             }
             return discussions;
         }
-        /// <summary>
-        /// Returns the Discussion object whose Discussion ID is equal to the
-        /// discussionid argument.
-        /// </summary>
-        /// <param name="discussionid"></param>
-        /// <returns></returns>
+      
 
-        public async Task<Discussion> GetDiscussion(int discussionid)
+        public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
             Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid);
             if (repoDiscussion == null)
@@ -171,10 +160,7 @@ namespace BusinessLogic
             Discussion discussion = Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic);
             return discussion;
         }
-        /// <summary>
-        /// Returns a list of every topic's name.
-        /// </summary>
-        /// <returns></returns>
+     
 
         public async Task<List<string>> GetTopics()
         {
