@@ -150,7 +150,7 @@ namespace CineAPI.Controllers
                 Console.WriteLine("ForumController.CreateDiscussion() was called with invalid body data.");
                 return StatusCode(400);
             }
-
+            //Console.WriteLine(discussion.Discussionid);
             if (await _forumLogic.CreateDiscussion(discussion))
             {
                 return StatusCode(201);

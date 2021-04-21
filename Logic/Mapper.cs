@@ -15,7 +15,7 @@ namespace BusinessLogic
         public static Discussion RepoDiscussionToDiscussion(Repository.Models.Discussion
             repoDiscussion, Repository.Models.Topic topic)
         {
-            var discussion = new Discussion(repoDiscussion.DiscussionId, repoDiscussion.MovieId,
+            var discussion = new Discussion(Guid.Parse(repoDiscussion.DiscussionId), repoDiscussion.MovieId,
                 repoDiscussion.Username, repoDiscussion.Subject, topic.TopicName);
             return discussion;
         }
@@ -28,7 +28,7 @@ namespace BusinessLogic
         /// <returns></returns>
         public static Comment RepoCommentToComment(Repository.Models.Comment repoComment)
         {
-            var comment = new Comment(repoComment.CommentId, repoComment.DiscussionId,
+            var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId),
                 repoComment.Username, repoComment.CommentText, repoComment.IsSpoiler);
             return comment;
         }
@@ -44,6 +44,7 @@ namespace BusinessLogic
             NewDiscussion discussion)
         {
             var repoDiscussion = new Repository.Models.Discussion();
+            repoDiscussion.DiscussionId = Guid.NewGuid().ToString();
             repoDiscussion.MovieId = discussion.Movieid;
             repoDiscussion.Username = discussion.Username;
             repoDiscussion.Subject = discussion.Subject;
@@ -62,7 +63,8 @@ namespace BusinessLogic
         public static Repository.Models.Comment NewCommentToNewRepoComment(NewComment comment)
         {
             var repoComment = new Repository.Models.Comment();
-            repoComment.DiscussionId = comment.Discussionid;
+            repoComment.CommentId = Guid.NewGuid().ToString();
+            repoComment.DiscussionId = comment.Discussionid.ToString();
             repoComment.Username = comment.Username;
             repoComment.CommentText = comment.Text;
             repoComment.CreationTime = DateTime.Now;
