@@ -7,7 +7,12 @@ using Repository;
 
 namespace BusinessLogic
 {
-    public class ForumLogic : Interfaces.IForumLogic
+     /// <summary>
+     /// Implements the interface IForumLogic.
+     /// Methods are used to read and write objects in the repository.
+     /// Return appropriate response to calling methods
+     /// </summary>
+     public class ForumLogic : Interfaces.IForumLogic
     {
         private readonly RepoLogic _repo;
 
@@ -30,7 +35,8 @@ namespace BusinessLogic
             return await _repo.AddDiscussion(repoDiscussion, repoTopic);
         }
 
-        public async Task<List<Comment>> GetComments(int discussionid)
+
+        public async Task<List<Comment>> GetComments(Guid discussionid)
         {
             List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid);
             if (repoComments == null)
@@ -47,7 +53,7 @@ namespace BusinessLogic
             return comments;
         }
 
-        public async Task<List<Comment>> GetCommentsPage(int discussionid, int page)
+        public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page)
         {
             if (page < 1)
             {
@@ -108,8 +114,9 @@ namespace BusinessLogic
             setting.IntValue = pagesize;
             return await _repo.SetSetting(setting);
         }
+    
 
-        public async Task<List<Discussion>> GetDiscussions(string movieid)
+        public async Task<List<Discussion>> GetDiscussions(Guid movieid)
         {
             List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
             if (repoDiscussions == null)
@@ -132,8 +139,9 @@ namespace BusinessLogic
             }
             return discussions;
         }
+      
 
-        public async Task<Discussion> GetDiscussion(int discussionid)
+        public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
             Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid);
             if (repoDiscussion == null)
@@ -152,6 +160,7 @@ namespace BusinessLogic
             Discussion discussion = Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic);
             return discussion;
         }
+     
 
         public async Task<List<string>> GetTopics()
         {

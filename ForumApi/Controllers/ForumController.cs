@@ -41,7 +41,7 @@ namespace CineAPI.Controllers
         /// <param name="movieid"></param>
         /// <returns></returns>
         [HttpGet("discussions/{movieid}")]
-        public async Task<ActionResult<List<Discussion>>> GetDiscussions(string movieid)
+        public async Task<ActionResult<List<Discussion>>> GetDiscussions(Guid movieid)
         {
             List<Discussion> discussions = await _forumLogic.GetDiscussions(movieid);
             if (discussions == null)
@@ -62,7 +62,7 @@ namespace CineAPI.Controllers
         /// <param name="discussion"></param>
         /// <returns></returns>
         [HttpGet("discussion/{discussionid}")]
-        public async Task<ActionResult<Discussion>> GetDiscussion(int discussionid)
+        public async Task<ActionResult<Discussion>> GetDiscussion(Guid discussionid)
         {
             Discussion discussion = await _forumLogic.GetDiscussion(discussionid);
             if (discussion == null)
@@ -80,7 +80,7 @@ namespace CineAPI.Controllers
         /// <param name="discussionid"></param>
         /// <returns></returns>
         [HttpGet("comments/{discussionid}")]
-        public async Task<ActionResult<List<Comment>>> GetComments(int discussionid)
+        public async Task<ActionResult<List<Comment>>> GetComments(Guid discussionid)
         {
             List<Comment> comments = await _forumLogic.GetComments(discussionid);
             if (comments == null)
@@ -103,7 +103,7 @@ namespace CineAPI.Controllers
         /// <param name="page"></param>
         /// <returns></returns>
         [HttpGet("comments/{discussionid}/{page}")]
-        public async Task<ActionResult<List<Comment>>> GetCommentsPage(int discussionid, int page)
+        public async Task<ActionResult<List<Comment>>> GetCommentsPage(Guid discussionid, int page)
         {
             List<Comment> comments = await _forumLogic.GetCommentsPage(discussionid, page);
             if (comments == null)

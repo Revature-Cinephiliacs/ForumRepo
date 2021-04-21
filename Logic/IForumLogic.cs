@@ -18,7 +18,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="movieid"></param>
         /// <returns></returns>
-        public Task<List<Discussion>> GetDiscussions(string movieid);
+        public Task<List<Discussion>> GetDiscussions(Guid movieid);
 
         /// <summary>
         /// Returns the Discussion object whose Discussion ID is equal to the
@@ -26,7 +26,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="discussionid"></param>
         /// <returns></returns>
-        Task<Discussion> GetDiscussion(int discussionid);
+        Task<Discussion> GetDiscussion(Guid discussionid);
 
         /// <summary>
         /// Returns a list of every Comment object whose Discussionid is equal to
@@ -35,7 +35,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="discussionid"></param>
         /// <returns></returns>
-        public Task<List<Comment>> GetComments(int discussionid);
+        public Task<List<Comment>> GetComments(Guid discussionid);
 
         /// <summary>
         /// Returns Comments objects [n*(page-1), n*(page-1) + n] whose Discussionid
@@ -45,7 +45,7 @@ namespace BusinessLogic.Interfaces
         /// <param name="discussionid"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        public Task<List<Comment>> GetCommentsPage(int discussionid, int page);
+        public Task<List<Comment>> GetCommentsPage(Guid discussionid, int page);
 
         /// <summary>
         /// Sets the page size for comments.
