@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace Repository.Models
 {
+    /// <summary>
+    /// Repo Model -> Comment for database 
+    /// </summary>
     public partial class Comment
     {
         public string CommentId { get; set; }

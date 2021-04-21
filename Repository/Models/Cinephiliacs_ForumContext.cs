@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Repository.Models
 {
+    /// <summary>
+    /// Dbcontext for Forum Api database
+    /// </summary>
     public partial class Cinephiliacs_ForumContext : DbContext
     {
         public Cinephiliacs_ForumContext()

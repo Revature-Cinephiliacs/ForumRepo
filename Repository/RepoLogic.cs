@@ -17,6 +17,13 @@ namespace Repository
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// To save the comment into database
+        /// and Retun True is successfully save the comments 
+        /// Retunrs false if username or discussion ID doesn't exist 
+        /// </summary>
+        /// <param name="repoComment"></param>
+        /// <returns></returns>
         public async Task<bool> AddComment(Comment repoComment)
         {
             var userExists = UserExists(repoComment.Username);
@@ -39,6 +46,14 @@ namespace Repository
 
         }
 
+        /// <summary>
+        /// Saving Discussion into database
+        /// Return ture if saved succeffully 
+        /// Return false if user or movie doesn't exist  
+        /// </summary>
+        /// <param name="repoDiscussion"></param>
+        /// <param name="repoTopic"></param>
+        /// <returns></returns>
         public async Task<bool> AddDiscussion(Discussion repoDiscussion, Topic repoTopic)
         {
             var userExists = UserExists(repoDiscussion.Username);
