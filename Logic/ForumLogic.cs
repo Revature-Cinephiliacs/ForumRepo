@@ -116,7 +116,7 @@ namespace BusinessLogic
         }
     
 
-        public async Task<List<Discussion>> GetDiscussions(Guid movieid)
+        public async Task<List<Discussion>> GetDiscussions(string movieid)
         {
             List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
             if (repoDiscussions == null)

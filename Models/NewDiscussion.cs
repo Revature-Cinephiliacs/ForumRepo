@@ -7,7 +7,7 @@ namespace GlobalModels
     {
         [Required]
         [StringLength(20)]
-        public Guid Movieid { get; set; }
+        public string Movieid { get; set; }
 
         [Required]
         [StringLength(30)]
@@ -25,7 +25,7 @@ namespace GlobalModels
             
         }
 
-        public NewDiscussion(Guid movieid, string username, string subject, string topic)
+        public NewDiscussion(string movieid, string username, string subject, string topic)
         {
             Movieid = movieid;
             Username = username;
