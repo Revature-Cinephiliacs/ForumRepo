@@ -30,6 +30,7 @@ namespace BusinessLogic
         public async Task<bool> CreateDiscussion(NewDiscussion discussion)
         {
             var repoDiscussion = Mapper.NewDiscussionToNewRepoDiscussion(discussion);
+            Console.WriteLine(repoDiscussion.DiscussionId);
             var repoTopic = new Repository.Models.Topic();
             repoTopic.TopicName = discussion.Topic;
             return await _repo.AddDiscussion(repoDiscussion, repoTopic);
@@ -38,7 +39,7 @@ namespace BusinessLogic
 
         public async Task<List<Comment>> GetComments(Guid discussionid)
         {
-            List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid);
+            List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid.ToString());
             if (repoComments == null)
             {
                 Console.WriteLine("ForumLogic.GetComments() was called with a discussionid that doesn't exist.");
@@ -69,7 +70,7 @@ namespace BusinessLogic
                 return null;
             }
 
-            List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid);
+            List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid.ToString());
             if (repoComments == null)
             {
                 Console.WriteLine("ForumLogic.GetCommentsPage() was called with a discussionid that doesn't exist.");
@@ -129,6 +130,7 @@ namespace BusinessLogic
             foreach (var repoDiscussion in repoDiscussions)
             {
                 // Get the topic associated with this discussion
+                
                 Repository.Models.Topic topic = _repo.GetDiscussionTopic(repoDiscussion.DiscussionId);
                 if (topic == null)
                 {
@@ -143,7 +145,7 @@ namespace BusinessLogic
 
         public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
-            Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid);
+            Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());
             if (repoDiscussion == null)
             {
                 Console.WriteLine("ForumLogic.GetDiscussion() was called for an invalid discussionid.");
