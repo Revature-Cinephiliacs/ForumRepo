@@ -41,7 +41,7 @@ namespace CineAPI.Controllers
         /// <param name="movieid"></param>
         /// <returns></returns>
         [HttpGet("discussions/{movieid}")]
-        public async Task<ActionResult<List<Discussion>>> GetDiscussions(Guid movieid)
+        public async Task<ActionResult<List<Discussion>>> GetDiscussions(string movieid)
         {
             List<Discussion> discussions = await _forumLogic.GetDiscussions(movieid);
             if (discussions == null)
