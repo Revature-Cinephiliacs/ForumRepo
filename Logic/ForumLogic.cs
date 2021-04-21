@@ -62,7 +62,7 @@ namespace BusinessLogic
             }
 
             Repository.Models.Setting pageSizeSetting = _repo.GetSetting("commentspagesize");
-            int pageSize = pageSizeSetting.IntValue ?? default(int);
+            int pageSize = 1;//pageSizeSetting.IntValue ?? default(int);
             if (pageSize < 1)
             {
                 Console.WriteLine("ForumLogic.GetCommentsPage() was called but the commentspagesize is invalid");

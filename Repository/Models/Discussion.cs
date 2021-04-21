@@ -13,7 +13,7 @@ namespace Repository.Models
             DiscussionTopics = new HashSet<DiscussionTopic>();
         }
 
-        public int DiscussionId { get; set; }
+        public string DiscussionId { get; set; }
         public string MovieId { get; set; }
         public string Username { get; set; }
         public DateTime CreationTime { get; set; }
