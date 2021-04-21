@@ -6,7 +6,7 @@ namespace GlobalModels
     public sealed class NewComment
     {
         [Required]
-        public int Discussionid { get; set; }
+        public Guid Discussionid { get; set; }
 
         [Required]
         [StringLength(30)]
@@ -23,7 +23,7 @@ namespace GlobalModels
             
         }
 
-        public NewComment(int discussionid, string username, string text, bool isspoiler)
+        public NewComment(Guid discussionid, string username, string text, bool isspoiler)
         {
             Discussionid = discussionid;
             Username = username;
