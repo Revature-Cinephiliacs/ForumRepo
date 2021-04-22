@@ -57,8 +57,9 @@ namespace Repository
         public async Task<bool> AddDiscussion(Discussion repoDiscussion, Topic repoTopic)
         {
             var userExists = UserExists(repoDiscussion.Username);
-            if(!userExists)
+            if(!userExists || repoDiscussion.Username == null)
             {
+                
                 Console.WriteLine("RepoLogic.AddDiscussion() was called for a user that doesn't exist.");
                 return false;
             }
