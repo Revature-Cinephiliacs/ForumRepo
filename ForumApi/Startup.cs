@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Repository.Models;
+using BusinessLogic;
 
 namespace ForumApi
 {
@@ -45,6 +46,10 @@ namespace ForumApi
             services.AddDbContext<Cinephiliacs_ForumContext>(
                 options => options.UseSqlServer(myConnectionString)
             );
+
+            services.AddScoped<BusinessLogic.Interfaces.IForumLogic, ForumLogic>();
+            services.AddScoped<Repository.RepoLogic>();
+            //services.AddScoped<BusinessLogic.ForumLogic>();
 
             services.AddSwaggerGen(c =>
             {
