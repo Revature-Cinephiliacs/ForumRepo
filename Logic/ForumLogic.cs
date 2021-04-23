@@ -14,9 +14,9 @@ namespace BusinessLogic
     /// </summary>
     public class ForumLogic : Interfaces.IForumLogic
     {
-        private readonly RepoLogic _repo;
+        private readonly IRepoLogic _repo;
 
-        public ForumLogic(RepoLogic repo)
+        public ForumLogic(IRepoLogic repo)
         {
             _repo = repo;
         }

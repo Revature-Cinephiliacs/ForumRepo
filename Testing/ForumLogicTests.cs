@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using GlobalModels;
+using Comment = Repository.Models.Comment;
 
 namespace Testing
 {
@@ -65,8 +66,8 @@ namespace Testing
         //    var discussionId = Guid.NewGuid();
 
 
-        //    repoStub.Setup(repo => repo.GetMovieComments((It.IsAny<Task<Comment>()))
-        //        .ReturnsAsync((Repository.Models.Comment) null);
+        //    repoStub.Setup(repo => repo.GetMovieComments(It.IsAny<string>()))
+        //        .Returns((Repository.Models.Comment) null);
 
         //    var logic = new ForumLogic(repoStub.Object);
         //    // Act
