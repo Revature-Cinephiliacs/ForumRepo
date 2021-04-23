@@ -10,26 +10,32 @@ export class UserService {
   connection:string ="";
   loggedIn:any;
 
-  baseURL:string = "https://cinephiliacsapi.azurewebsites.net/";
+  baseURL:string = "https://localhost:5001/Forum/";
   constructor(private http:HttpClient) { }
 
-  getDiscussion(movieId:String){
-    return this.http.get( this.baseURL + "forum/discussions/"+movieId);
+  getDiscussion(movieId: String){
+    return this.http.get( this.baseURL + "discussions/"+movieId);
   }
 
   submitDiscussion(discussion:any){
-    return this.http.post( this.baseURL + "forum/discussion", discussion);
+    return this.http.post( this.baseURL + "discussion", discussion);
   }
 
   getDiscussionComments(discussionID:string){
-    return this.http.get( this.baseURL + "forum/comments/" + discussionID);
+    return this.http.get( this.baseURL + "comments/" + discussionID);
   }
 
-  postComment(newComment:any){
-    return this.http.post( this.baseURL + "Forum/comment",newComment);
+  postComment(newComment: any){
+    console.log(newComment);
+    return this.http.post( this.baseURL + "comment", newComment);
   }
 
-  getCurrentDiscussion(discussionID:string){
-    return this.http.get( this.baseURL + "forum/discussion/" + discussionID);
+  getCurrentDiscussion(discussionID: string){
+    console.log("here")
+    return this.http.get( this.baseURL + "discussion/" + discussionID);
+  }
+
+  getTopics(){
+    return this.http.get( this.baseURL + "topics");
   }
 }

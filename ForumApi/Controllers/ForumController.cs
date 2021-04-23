@@ -43,6 +43,7 @@ namespace CineAPI.Controllers
         [HttpGet("discussions/{movieid}")]
         public async Task<ActionResult<List<Discussion>>> GetDiscussions(string movieid)
         {
+            Console.WriteLine(movieid);
             List<Discussion> discussions = await _forumLogic.GetDiscussions(movieid);
             if (discussions == null)
             {
@@ -185,5 +186,33 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
         }
+
+        /// <summary>
+        /// Adds topic to db
+        /// takes string topic from UI
+        /// retuns success 201 or 400 if failed to save 
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        [HttpPost("topic/{topic}")]
+        public async Task<ActionResult> CreateTopic(string topic)
+        {
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("ForumController.CreateComment() was called with invalid body data.");
+                return StatusCode(400);
+            }
+
+            if (await _forumLogic.CreateTopic(topic))
+            {
+                return StatusCode(201);
+            }
+            else
+            {
+                return StatusCode(400);
+            }
+        }
+
+
     }
 }
