@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using GlobalModels;
 
 namespace CineAPI.Controllers
@@ -15,6 +16,17 @@ namespace CineAPI.Controllers
         public ForumController(IForumLogic forumLogic)
         {
             _forumLogic = forumLogic;
+        }
+
+        /// <summary>
+        /// Example of using authentication
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("users")]
+        [Authorize]
+        public async Task<ActionResult<List<User>>> GetExample()
+        {
+            return Ok(new { response = "success" });
         }
 
         /// <summary>
