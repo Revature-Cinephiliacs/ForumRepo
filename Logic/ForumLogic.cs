@@ -7,12 +7,12 @@ using Repository;
 
 namespace BusinessLogic
 {
-     /// <summary>
-     /// Implements the interface IForumLogic.
-     /// Methods are used to read and write objects in the repository.
-     /// Return appropriate response to calling methods
-     /// </summary>
-     public class ForumLogic : Interfaces.IForumLogic
+    /// <summary>
+    /// Implements the interface IForumLogic.
+    /// Methods are used to read and write objects in the repository.
+    /// Return appropriate response to calling methods
+    /// </summary>
+    public class ForumLogic : Interfaces.IForumLogic
     {
         private readonly RepoLogic _repo;
 
@@ -21,12 +21,26 @@ namespace BusinessLogic
             _repo = repo;
         }
 
+        /// <summary>
+        /// To post/save comment 
+        /// Takes Comments Objects as param
+        /// Returns true if saved successfully.
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
         public async Task<bool> CreateComment(NewComment comment)
         {
             var repoComment = Mapper.NewCommentToNewRepoComment(comment);
             return await _repo.AddComment(repoComment);
         }
 
+        /// <summary>
+        /// Method to Psot/save Duscussion 
+        /// Takes Discussion Object as Pareameter
+        /// Returns true if saved successfully.
+        /// </summary>
+        /// <param name="discussion"></param>
+        /// <returns></returns>
         public async Task<bool> CreateDiscussion(NewDiscussion discussion)
         {
             var repoDiscussion = Mapper.NewDiscussionToNewRepoDiscussion(discussion);
@@ -36,7 +50,13 @@ namespace BusinessLogic
             return await _repo.AddDiscussion(repoDiscussion, repoTopic);
         }
 
-
+        /// <summary>
+        /// Method to get all comments
+        /// Takes discussion id as param
+        /// Returns List of Comments  
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
         public async Task<List<Comment>> GetComments(Guid discussionid)
         {
             List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid.ToString());
@@ -54,6 +74,14 @@ namespace BusinessLogic
             return comments;
         }
 
+        /// <summary>
+        /// Method to get all comments/page
+        /// Takes Duscussion id & page (int) as paremeter
+        /// Returns list of comments  
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page)
         {
             if (page < 1)
@@ -102,6 +130,13 @@ namespace BusinessLogic
             return comments;
         }
 
+        /// <summary>
+        /// Method to set comments 
+        /// Takes number of pagesize as a parameter 
+        /// Retun true if succefully saved.
+        /// </summary>
+        /// <param name="pagesize"></param>
+        /// <returns></returns>
         public async Task<bool> SetCommentsPageSize(int pagesize)
         {
             if (pagesize < 1 || pagesize > 100)
@@ -115,8 +150,14 @@ namespace BusinessLogic
             setting.IntValue = pagesize;
             return await _repo.SetSetting(setting);
         }
-    
 
+        /// <summary>
+        /// Method for getting all dissussions for a specific movie 
+        /// Takes movieid as a parameter 
+        /// Returns the list if duscussion 
+        /// </summary>
+        /// <param name="movieid"></param>
+        /// <returns></returns>
         public async Task<List<Discussion>> GetDiscussions(string movieid)
         {
             List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
@@ -130,7 +171,7 @@ namespace BusinessLogic
             foreach (var repoDiscussion in repoDiscussions)
             {
                 // Get the topic associated with this discussion
-                
+
                 Repository.Models.Topic topic = _repo.GetDiscussionTopic(repoDiscussion.DiscussionId);
                 if (topic == null)
                 {
@@ -141,8 +182,15 @@ namespace BusinessLogic
             }
             return discussions;
         }
-      
 
+        /// <summary>
+        /// Method to get discussion by id
+        /// It takes discussion id as a pareameter send it to RepoLogic 
+        /// If duscussion id is null returns null
+        /// if RepoLogic returns Duscussion than returns that discussion.
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
         public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
             Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());
@@ -162,8 +210,12 @@ namespace BusinessLogic
             Discussion discussion = Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic);
             return discussion;
         }
-     
 
+        /// <summary>
+        /// Method to retrive all topics from the RepoLoic (DB)
+        /// if topic is null then returns null
+        /// </summary>
+        /// <returns>List<Topic></returns>
         public async Task<List<string>> GetTopics()
         {
             var repoTopics = await _repo.GetTopics();
