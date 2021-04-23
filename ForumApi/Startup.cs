@@ -48,7 +48,7 @@ namespace ForumApi
             );
 
             services.AddScoped<BusinessLogic.Interfaces.IForumLogic, ForumLogic>();
-            services.AddScoped<Repository.RepoLogic>();
+            services.AddScoped<Repository.IRepoLogic, Repository.RepoLogic>();
             //services.AddScoped<BusinessLogic.ForumLogic>();
 
             services.AddSwaggerGen(c =>

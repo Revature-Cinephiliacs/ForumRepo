@@ -11,7 +11,7 @@ namespace Repository
     /// <summary>
     /// Class Contains all the methods to perfrom CRUD operation for ForumAPL
     /// </summary>
-    public class RepoLogic
+    public class RepoLogic : IRepoLogic
     {
         private readonly Cinephiliacs_ForumContext _dbContext;
 
