@@ -1,0 +1,17 @@
+<p>movie works!</p>
+<div id="discussion">
+    <h4>New Discussion</h4>
+    <form>
+        <label>Topic: </label><br>
+        <select name="rating" id="rating" [(ngModel)]="submitDiscussion.topic" [ngModelOptions]="{standalone: true}">
+            <option selected hidden disabled></option>
+            <option *ngFor="let topic of topics"
+                    [value]="topic">
+                    {{topic}}
+            </option>
+        </select><br>
+        <label>Discussion Subject:</label><br>
+        <input type="text" [(ngModel)]="submitDiscussion.subject" [ngModelOptions]="{standalone: true}"><br>
+        <button type="reset" (click)="postDiscussion()">Submit Discussion</button>
+    </form>
+</div>

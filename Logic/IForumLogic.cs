@@ -70,5 +70,7 @@ namespace BusinessLogic.Interfaces
         /// <param name="comment"></param>
         /// <returns></returns>
         public Task<bool> CreateComment(NewComment comment);
+
+        public Task<bool> CreateTopic(string topic);
     }
 }

@@ -232,5 +232,15 @@ namespace BusinessLogic
             }
             return topics;
         }
+
+        /// <summary>
+        /// save topic in db 
+        /// return ture if success or false if failed to save 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> CreateTopic(string topic){
+           
+            return await _repo.AddTopic(topic);
+        }
     }
 }

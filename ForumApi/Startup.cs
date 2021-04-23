@@ -34,7 +34,7 @@ namespace ForumApi
                 options.AddDefaultPolicy(
                                 builder =>
                                 {
-                                    builder.AllowAnyOrigin()
+                                     builder.WithOrigins("http://localhost:4200", "*")
                                         .AllowAnyHeader()
                                         .AllowAnyMethod();
                                 });

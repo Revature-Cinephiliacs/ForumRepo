@@ -50,6 +50,24 @@ namespace Repository
         }
 
         /// <summary>
+        /// save topic in db
+        /// retuns ture if save is success
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        public async Task<bool> AddTopic(string topic){
+            
+            Topic newTopic = new Topic();
+            newTopic.TopicName = topic;
+
+            await _dbContext.Topics.AddAsync(newTopic);
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+
+        }
+
+        /// <summary>
         /// Saving Discussion into database
         /// Return ture if saved succeffully 
         /// Return false if user or movie doesn't exist  
@@ -300,5 +318,6 @@ namespace Repository
             //return (_dbContext.Movies.Where(m => m.MovieId == movieid).FirstOrDefault<Movie>() != null);
             return true;
         }
+
     }
 }
