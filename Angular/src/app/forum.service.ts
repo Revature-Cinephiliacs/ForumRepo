@@ -4,7 +4,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class ForumService {
   currentUser:string ="";
   askingUser:string = "";
   connection:string ="";

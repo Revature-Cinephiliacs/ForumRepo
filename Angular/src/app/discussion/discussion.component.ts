@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { UserService } from '../user.service';
+import { ForumService } from '../forum.service';
 
 @Component({
   selector: 'app-discussion',
@@ -25,7 +25,7 @@ export class DiscussionComponent implements OnInit {
     isspoiler: false
   };
 
-  constructor(private _forum: UserService, private router:  ActivatedRoute) { }
+  constructor(private _forum: ForumService, private router:  ActivatedRoute) { }
 
   ngOnInit(): void {
 

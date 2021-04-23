@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService} from '../user.service';
+import { ForumService} from '../forum.service';
 
 
 @Component({
@@ -9,7 +9,7 @@ import { UserService} from '../user.service';
 })
 export class MovieComponent implements OnInit {
 
-  constructor( private _user: UserService) { }
+  constructor( private _user: ForumService) { }
 
   topics:any;
   submitDiscussion: any ={
