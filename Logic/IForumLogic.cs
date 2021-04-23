@@ -8,40 +8,44 @@ namespace BusinessLogic.Interfaces
     public interface IForumLogic
     {
         /// <summary>
-        /// Returns a list of every topic's name.
+        /// Method to retrieve all topics from the database
+        /// If there are no topics, return null
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List &lt; Topic ></returns>
         public Task<List<string>> GetTopics();
 
         /// <summary>
-        /// Returns a list of every Discussion object whose Movieid is equal to
-        /// the movieid argument. Returns null if the movieid doesn't exist.
+        /// Method for getting all discussions for a specific movie 
+        /// Takes movieid as a parameter 
+        /// Returns the list of discussions 
         /// </summary>
         /// <param name="movieid"></param>
         /// <returns></returns>
         public Task<List<Discussion>> GetDiscussions(string movieid);
-
+        
         /// <summary>
-        /// Returns the Discussion object whose Discussion ID is equal to the
-        /// discussionid argument.
+        /// Method to get a discussion by id
+        /// It takes discussion id as a parameter
+        /// If discussionid doesn't exist, return null
+        /// If discussionid exists, return the discussion
         /// </summary>
         /// <param name="discussionid"></param>
         /// <returns></returns>
         Task<Discussion> GetDiscussion(Guid discussionid);
 
         /// <summary>
-        /// Returns a list of every Comment object whose Discussionid is equal to
-        /// the discussionid argument. Returns null if the discussionid doesn't
-        /// exist.
+        /// Method to get all comments from a discussion
+        /// Takes discussion id as param
+        /// Returns List of Comments  
         /// </summary>
         /// <param name="discussionid"></param>
         /// <returns></returns>
         public Task<List<Comment>> GetComments(Guid discussionid);
 
         /// <summary>
-        /// Returns Comments objects [n*(page-1), n*(page-1) + n] whose Discussionid
-        /// is equal to the discussionid argument, where n is the current page size
-        /// for comments. Returns null if the discussionid doesn't exist.
+        /// Method to get all comments/page (pagination)
+        /// Takes Duscussion id &amp; page (int) as paremeter
+        /// Returns correct list of comments  
         /// </summary>
         /// <param name="discussionid"></param>
         /// <param name="page"></param>
@@ -49,28 +53,39 @@ namespace BusinessLogic.Interfaces
         public Task<List<Comment>> GetCommentsPage(Guid discussionid, int page);
 
         /// <summary>
-        /// Sets the page size for comments.
+        /// Method to set comments 
+        /// Takes number of pagesize as a parameter 
+        /// Return true if sucessfully saved.
         /// </summary>
         /// <param name="pagesize"></param>
         /// <returns></returns>
         public Task<bool> SetCommentsPageSize(int pagesize);
 
         /// <summary>
-        /// Adds a new Discussion Object to storage.
-        /// Returns true if sucessful; false otherwise.
+        /// Method to post/save a discussion 
+        /// Takes Discussion Object as Pareameter
+        /// Returns true if saved successfully.
         /// </summary>
         /// <param name="discussion"></param>
         /// <returns></returns>
         public Task<bool> CreateDiscussion(NewDiscussion discussion);
 
         /// <summary>
-        /// Adds a new Comment Object to storage.
-        /// Returns true if sucessful; false otherwise.
+        /// Method to post/save a comment
+        /// Takes Comments Objects as param
+        /// Returns true if saved successfully.
         /// </summary>
         /// <param name="comment"></param>
         /// <returns></returns>
         public Task<bool> CreateComment(NewComment comment);
 
+        /// <summary>
+        /// Creates a new topic in the database 
+        /// Returns true if successfully created
+        /// Returns false if failed to create
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
         public Task<bool> CreateTopic(string topic);
     }
 }

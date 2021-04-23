@@ -21,9 +21,9 @@ namespace Repository
         }
 
         /// <summary>
-        /// To save the comment into database
-        /// and Retun True is successfully save the comments 
-        /// Retunrs false if username or discussion ID doesn't exist 
+        /// Save the comment into database
+        /// Returns true is successful
+        /// Returns false if username or discussion ID doesn't exist 
         /// </summary>
         /// <param name="repoComment"></param>
         /// <returns></returns>
@@ -50,8 +50,8 @@ namespace Repository
         }
 
         /// <summary>
-        /// save topic in db
-        /// retuns ture if save is success
+        /// Saves the topic into the database
+        /// Returns true if save is success
         /// </summary>
         /// <param name="topic"></param>
         /// <returns></returns>
@@ -68,9 +68,9 @@ namespace Repository
         }
 
         /// <summary>
-        /// Saving Discussion into database
-        /// Return ture if saved succeffully 
-        /// Return false if user or movie doesn't exist  
+        /// Saves Discussion into database
+        /// Returns true if saved successfully 
+        /// Returns false if user or movie doesn't exist  
         /// </summary>
         /// <param name="repoDiscussion"></param>
         /// <param name="repoTopic"></param>
@@ -116,7 +116,7 @@ namespace Repository
 
         /// <summary>
         /// Returns a list of all Comment objects from the database that match the discussion ID specified
-        /// in the argument. Returns null if the discussion doesn't exist.
+        /// Returns null if the discussion doesn't exist.
         /// </summary>
         /// <param name="discussionid"></param>
         /// <returns></returns>
@@ -279,6 +279,9 @@ namespace Repository
         }
 
         /// Returns true iff the username, specified in the argument, exists in the database's Users table.
+        /// ---------------
+        /// Placeholder until services set up
+        /// ---------------
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
@@ -310,6 +313,9 @@ namespace Repository
 
         /// <summary>
         /// Returns true iff the movie ID, specified in the argument, exists in the database's Movies table.
+        /// ---------------
+        /// Placeholder until services set up
+        /// ---------------
         /// </summary>
         /// <param name="movieid"></param>
         /// <returns></returns>

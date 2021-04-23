@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GlobalModels
 {
+    /// <summary>
+    /// DTO Model for frontend -> backend
+    /// </summary>
     public sealed class NewDiscussion
     {
         [Required]
