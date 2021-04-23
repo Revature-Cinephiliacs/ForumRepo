@@ -1,5 +1,8 @@
 namespace Repository.Models
 {
+    /// <summary>
+    /// Database-first generated backend model
+    /// </summary>
     public partial class Setting
     {
         public string Setting1 { get; set; }

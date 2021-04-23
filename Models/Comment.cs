@@ -2,6 +2,9 @@ using System;
 
 namespace GlobalModels
 {
+    /// <summary>
+    /// DTO Model for frontend -> backend
+    /// </summary>
     public sealed class Comment : IEquatable<Comment>
     {
         public Guid Commentid { get; set; } = Guid.NewGuid();
