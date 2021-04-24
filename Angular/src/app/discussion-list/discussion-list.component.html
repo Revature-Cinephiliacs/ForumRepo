@@ -1,0 +1,44 @@
+<h3>List of Discussions</h3>
+<form action="/action_page.php">
+    <input matInput (keyup)="applyFilter($event.target.value)"name="search">
+   
+  </form>
+  
+<table *ngIf="!DisplayList">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Username</th>
+            <th>Replies</th>
+        </tr>
+    </thead>
+    <tbody>
+         <tr *ngFor = "let discussion of searchDiscussions">
+             
+                <a routerLink="/discussion/{{discussion.discussionid}}"><td>{{discussion.subject}}</td></a>
+                <td>{{discussion.username}}</td>
+                <td>{{discussion.commentCount}}</td>
+            
+        </tr>
+    </tbody>
+</table>
+  
+<table *ngIf="DisplayList">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Username</th>
+            <th>Replies</th>
+        </tr>
+    </thead>
+    <tbody>
+         <tr *ngFor = "let discussion of newDiscussions">
+             
+                <a routerLink="/discussion/{{discussion.discussionid}}"><td>{{discussion.subject}}</td></a>
+                <td>{{discussion.username}}</td>
+                <td>{{discussion.commentCount}}</td>
+            
+        </tr>
+    </tbody>
+</table>
+
