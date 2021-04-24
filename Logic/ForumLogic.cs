@@ -160,7 +160,6 @@ namespace BusinessLogic
             return discussion;
         }
 
-        
         public async Task<List<string>> GetTopics()
         {
             var repoTopics = await _repo.GetTopics();
