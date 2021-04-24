@@ -80,11 +80,13 @@ namespace BusinessLogic.Interfaces
         public Task<bool> CreateComment(NewComment comment);
 
         /// <summary>
-        /// Returns a sorted on basis of higest comment count list of discussion.
+        /// Gets a sorted list of Discussions based off number of comments.
+        /// Parameter type determines is it's an ascending list, or descending
+        /// type = "a" for ascending, type = "d" for descending
         /// </summary>
-        /// 
-        /// <returns>Task<List<Discussion>></returns>
-        public Task<List<DiscussionT>> GetSortedDiscussions();
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionT>> GetSortedDiscussionsByComments(string type);
 
         /// Creates a new topic in the database 
         /// Returns true if successfully created

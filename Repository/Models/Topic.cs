@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Repository.Models
 {
     /// <summary>
-    /// Database-first generated backend model
+    /// Model from database-first (backend model)
     /// </summary>
     public partial class Topic
     {
@@ -15,6 +15,7 @@ namespace Repository.Models
             DiscussionTopics = new HashSet<DiscussionTopic>();
         }
 
+        public string TopicId { get; set; }
         public string TopicName { get; set; }
 
         public virtual ICollection<DiscussionTopic> DiscussionTopics { get; set; }

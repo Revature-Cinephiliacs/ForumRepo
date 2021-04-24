@@ -1,7 +1,12 @@
+﻿using System;
+using System.Collections.Generic;
+
+#nullable disable
+
 namespace Repository.Models
 {
     /// <summary>
-    /// Database-first generated backend model
+    /// Model from database-first (backend model)
     /// </summary>
     public partial class Setting
     {

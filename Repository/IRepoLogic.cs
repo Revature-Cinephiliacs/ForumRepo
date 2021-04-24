@@ -95,7 +95,17 @@ namespace Repository
         /// <returns></returns>
         public Task<bool> AddDiscussionTopic(string discussionId, string topicName);
 
-        public Task<List<Discussion>> GetSortedDiscussions();
+        /// <summary>
+        /// Gets a list of discussions sorted by number of comments (ascending)
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetSortedDiscussionsDescending();
+
+        /// <summary>
+        /// Gets a list of dicussions sorted by number of comments (ascending)
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetSortedDiscussionsAscending();
 
         /// <summary>
         /// Saves the topic into the database

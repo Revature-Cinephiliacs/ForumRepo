@@ -13,8 +13,8 @@ namespace GlobalModels
         public string Movieid { get; set; }
 
         [Required]
-        [StringLength(30)]
-        public string Username { get; set; }
+        [StringLength(50)]
+        public string Userid { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -28,17 +28,17 @@ namespace GlobalModels
             
         }
 
-        public NewDiscussion(string movieid, string username, string subject, string topic)
+        public NewDiscussion(string movieid, string uid, string subject, string topic)
         {
             Movieid = movieid;
-            Username = username;
+            Userid = uid;
             Subject = subject;
             Topic = topic;
         }
         public NewDiscussion(Discussion discussion)
         {
             Movieid = discussion.Movieid;
-            Username = discussion.Username;
+            Userid = discussion.Userid;
             Subject = discussion.Subject;
             Topic = discussion.Topic;
         }
