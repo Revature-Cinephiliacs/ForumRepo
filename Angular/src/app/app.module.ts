@@ -7,12 +7,14 @@ import { DiscussionComponent } from './discussion/discussion.component';
 
 import { AppComponent } from './app.component';
 import { MovieComponent } from './movie/movie.component';
+import { DiscussionListComponent } from './discussion-list/discussion-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DiscussionComponent,
-    MovieComponent
+    MovieComponent,
+    DiscussionListComponent
   ],
   imports: [
     AppRoutingModule,

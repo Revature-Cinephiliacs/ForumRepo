@@ -22,12 +22,12 @@ namespace CineAPI.Controllers
         /// Example of using authentication
         /// </summary>
         /// <returns></returns>
-        [HttpGet("users")]
-        [Authorize]
-        public async Task<ActionResult<List<User>>> GetExample()
-        {
-            return Ok(new { response = "success" });
-        }
+        // [HttpGet("users")]
+        // [Authorize]
+        // public async Task<ActionResult<List<User>>> GetExample()
+        // {
+        //     return Ok(new { response = "success" });
+        // }
 
         /// <summary>
         /// Returns a list of Topic objects that includes every Topic.
