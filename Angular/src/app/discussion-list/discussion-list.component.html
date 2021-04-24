@@ -9,7 +9,7 @@
     </thead>
     <tbody>
         <tr *ngFor = "let discussion of newDiscussions">
-            <td>{{discussion.subject}}</td>
+            <td><a routerLink="/discussion/{{discussion.discussionid}}">{{discussion.subject}}</a></td>
             <td>{{discussion.username}}</td>
             <td>{{discussion.commentCount}}</td>
         </tr>
