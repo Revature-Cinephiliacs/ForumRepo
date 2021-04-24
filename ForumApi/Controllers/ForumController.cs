@@ -193,9 +193,9 @@ namespace CineAPI.Controllers
 
         /// <returns></returns>
         [HttpGet("discussion/sort")]
-        public async Task<ActionResult<List<Discussion>>> GetSortedDiscussions()
+        public async Task<ActionResult<List<DiscussionT>>> GetSortedDiscussions()
         {
-            List<Discussion> discussions = await _forumLogic.GetSortedDiscussions();
+            List<DiscussionT> discussions = await _forumLogic.GetSortedDiscussions();
             if (discussions == null)
             {
                 return StatusCode(404);

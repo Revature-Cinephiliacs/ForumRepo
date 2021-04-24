@@ -76,6 +76,6 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// 
         /// <returns>Task<List<Discussion>></returns>
-        public Task<List<Discussion>> GetSortedDiscussions();
+        public Task<List<DiscussionT>> GetSortedDiscussions();
     }
 }
