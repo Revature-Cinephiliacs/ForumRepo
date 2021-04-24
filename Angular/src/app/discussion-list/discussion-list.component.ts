@@ -32,6 +32,8 @@ export class DiscussionListComponent implements OnInit {
    
   }
 
+  //Function that will get a list of discussions associated with the
+  //snapshot movie id
   async getDiscussions() {
     setTimeout(() => {
       this._forum.getDiscussion(this.movieID).subscribe(data => {
@@ -47,6 +49,10 @@ export class DiscussionListComponent implements OnInit {
     }, 10);
   }
 
+  //Function that will take in a discussion object and will
+  //get the number of comments and add it to a new
+  //discussion object with an added property for comment count, which is then 
+  //added to a discussion list
   async addCommentCount(d: any) {
     setTimeout(() => {
       this._forum.getDiscussionComments(d.discussionid).subscribe(data =>{ 
@@ -72,7 +78,8 @@ export class DiscussionListComponent implements OnInit {
     }, 1000);
   }
 
-
+  //Function that will take in a search string and then filter
+  //the dicussions to show matching results
   applyFilter(filterValue: string){
     console.log(filterValue);
     this.DisplayList = false;

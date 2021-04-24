@@ -41,6 +41,7 @@ export class DiscussionComponent implements OnInit {
     });
   }
 
+  // Function that retrieves comments for a dicussion
   async getComments() {
     setTimeout(() => {
       this._forum.getDiscussionComments(this.disscussionID).subscribe(data =>{ 
@@ -50,6 +51,8 @@ export class DiscussionComponent implements OnInit {
     }, 1000);
   }
 
+  //Function that will check if a user is logged in
+  //if the user is not, elements on the page will be hidden
   displayInput(){
     if(localStorage.getItem("loggedin"))
     {
@@ -61,11 +64,13 @@ export class DiscussionComponent implements OnInit {
     }
   }
 
+  //Function that returns the discussion id
   getDicussionID(){
     console.log("Dicussion ID " +this.disscussionID);
     return this.disscussionID;
   }
 
+  //Function that will add a new post to the discussion
   postComment(){
     if(this.isEmpty(this.newComment.text)){
       console.log("Please enter a comment");

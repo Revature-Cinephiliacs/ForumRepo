@@ -39,6 +39,8 @@ export class MovieComponent implements OnInit {
 
   }
 
+  //Function that will add a new discussion to a movie
+  //will validate input
   postDiscussion(){
     if(this.submitDiscussion.topic == "" || this.submitDiscussion.subject == "")
     {
@@ -53,6 +55,8 @@ export class MovieComponent implements OnInit {
     console.log(this.submitDiscussion);
   }
 
+  //Function that will get a list of discussions for a movie, and 
+  //slice the results to only display the first five
   async getDiscussions() {
     setTimeout(() => {
       this._forum.getDiscussion(this.router.snapshot.params.id).subscribe(data => {
@@ -71,6 +75,10 @@ export class MovieComponent implements OnInit {
     }, 10);
   }
 
+  //Function that will take in a discussion object and will
+  //get the number of comments and add it to a new
+  //discussion object with an added property for comment count, which is then 
+  //added to a discussion list
   async addCommentCount(d: any) {
     setTimeout(() => {
       this._forum.getDiscussionComments(d.discussionid).subscribe(data =>{ 
