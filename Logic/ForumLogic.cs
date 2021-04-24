@@ -7,16 +7,16 @@ using Repository;
 
 namespace BusinessLogic
 {
-     /// <summary>
-     /// Implements the interface IForumLogic.
-     /// Methods are used to read and write objects in the repository.
-     /// Return appropriate response to calling methods
-     /// </summary>
-     public class ForumLogic : Interfaces.IForumLogic
+    /// <summary>
+    /// Implements the interface IForumLogic.
+    /// Methods are used to read and write objects in the repository.
+    /// Return appropriate response to calling methods
+    /// </summary>
+    public class ForumLogic : Interfaces.IForumLogic
     {
-        private readonly RepoLogic _repo;
+        private readonly IRepoLogic _repo;
 
-        public ForumLogic(RepoLogic repo)
+        public ForumLogic(IRepoLogic repo)
         {
             _repo = repo;
         }
@@ -35,7 +35,6 @@ namespace BusinessLogic
             repoTopic.TopicName = discussion.Topic;
             return await _repo.AddDiscussion(repoDiscussion, repoTopic);
         }
-
 
         public async Task<List<Comment>> GetComments(Guid discussionid)
         {
@@ -115,7 +114,6 @@ namespace BusinessLogic
             setting.IntValue = pagesize;
             return await _repo.SetSetting(setting);
         }
-    
 
         public async Task<List<Discussion>> GetDiscussions(string movieid)
         {
@@ -130,7 +128,7 @@ namespace BusinessLogic
             foreach (var repoDiscussion in repoDiscussions)
             {
                 // Get the topic associated with this discussion
-                
+
                 Repository.Models.Topic topic = _repo.GetDiscussionTopic(repoDiscussion.DiscussionId);
                 if (topic == null)
                 {
@@ -141,7 +139,6 @@ namespace BusinessLogic
             }
             return discussions;
         }
-      
 
         public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
@@ -162,8 +159,8 @@ namespace BusinessLogic
             Discussion discussion = Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic);
             return discussion;
         }
-     
 
+        
         public async Task<List<string>> GetTopics()
         {
             var repoTopics = await _repo.GetTopics();
@@ -179,6 +176,11 @@ namespace BusinessLogic
                 topics.Add(repoTopic.TopicName);
             }
             return topics;
+        }
+
+        public async Task<bool> CreateTopic(string topic){
+           
+            return await _repo.AddTopic(topic);
         }
     }
 }

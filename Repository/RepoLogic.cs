@@ -8,7 +8,10 @@ using Repository.Models;
 
 namespace Repository
 {
-    public class RepoLogic
+    /// <summary>
+    /// Class Contains all the methods to perfrom CRUD operation for ForumAPL
+    /// </summary>
+    public class RepoLogic : IRepoLogic
     {
         private readonly Cinephiliacs_ForumContext _dbContext;
 
@@ -18,22 +21,22 @@ namespace Repository
         }
 
         /// <summary>
-        /// To save the comment into database
-        /// and Retun True is successfully save the comments 
-        /// Retunrs false if username or discussion ID doesn't exist 
+        /// Save the comment into database
+        /// Returns true is successful
+        /// Returns false if username or discussion ID doesn't exist 
         /// </summary>
         /// <param name="repoComment"></param>
         /// <returns></returns>
         public async Task<bool> AddComment(Comment repoComment)
         {
             var userExists = UserExists(repoComment.Username);
-            if(!userExists)
+            if (!userExists)
             {
                 Console.WriteLine("RepoLogic.AddComment() was called for a user that doesn't exist.");
                 return false;
             }
             var discussionExists = DiscussionExists(repoComment.DiscussionId);
-            if(!discussionExists)
+            if (!discussionExists)
             {
                 Console.WriteLine("RepoLogic.AddComment() was called for a discussion that doesn't exist.");
                 return false;
@@ -47,9 +50,27 @@ namespace Repository
         }
 
         /// <summary>
-        /// Saving Discussion into database
-        /// Return ture if saved succeffully 
-        /// Return false if user or movie doesn't exist  
+        /// Saves the topic into the database
+        /// Returns true if save is success
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        public async Task<bool> AddTopic(string topic){
+            
+            Topic newTopic = new Topic();
+            newTopic.TopicName = topic;
+
+            await _dbContext.Topics.AddAsync(newTopic);
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+
+        }
+
+        /// <summary>
+        /// Saves Discussion into database
+        /// Returns true if saved successfully 
+        /// Returns false if user or movie doesn't exist  
         /// </summary>
         /// <param name="repoDiscussion"></param>
         /// <param name="repoTopic"></param>
@@ -57,13 +78,14 @@ namespace Repository
         public async Task<bool> AddDiscussion(Discussion repoDiscussion, Topic repoTopic)
         {
             var userExists = UserExists(repoDiscussion.Username);
-            if(!userExists)
+            if (!userExists || repoDiscussion.Username == null)
             {
+
                 Console.WriteLine("RepoLogic.AddDiscussion() was called for a user that doesn't exist.");
                 return false;
             }
             var movieExists = MovieExists(repoDiscussion.MovieId);
-            if(!movieExists)
+            if (!movieExists)
             {
                 Console.WriteLine("RepoLogic.AddDiscussion() was called for a movie that doesn't exist.");
                 return false;
@@ -72,12 +94,12 @@ namespace Repository
             await _dbContext.Discussions.AddAsync(repoDiscussion);
 
             var topicExists = TopicExists(repoTopic.TopicName);
-            if(topicExists)
+            if (topicExists)
             {
                 await _dbContext.SaveChangesAsync();
                 Discussion discussion;
-                if((discussion = _dbContext.Discussions.Where(d => d.MovieId == repoDiscussion.MovieId
-                    && d.Username == repoDiscussion.Username && d.Subject == repoDiscussion.Subject)
+                if ((discussion = _dbContext.Discussions.Where(d => d.MovieId == repoDiscussion.MovieId
+                     && d.Username == repoDiscussion.Username && d.Subject == repoDiscussion.Subject)
                     .FirstOrDefault<Discussion>()) == null)
                 {
                     return true;
@@ -94,14 +116,14 @@ namespace Repository
 
         /// <summary>
         /// Returns a list of all Comment objects from the database that match the discussion ID specified
-        /// in the argument. Returns null if the discussion doesn't exist.
+        /// Returns null if the discussion doesn't exist.
         /// </summary>
         /// <param name="discussionid"></param>
         /// <returns></returns>
         public async Task<List<Comment>> GetMovieComments(string discussionid)
         {
             var discussionExists = DiscussionExists(discussionid);
-            if(!discussionExists)
+            if (!discussionExists)
             {
                 Console.WriteLine("RepoLogic.GetMovieComments() was called for a discussion that doesn't exist.");
                 return null;
@@ -120,7 +142,7 @@ namespace Repository
             return _dbContext.Settings.Where(s => s.Setting1 == key).FirstOrDefault<Setting>();
         }
 
-                /// <summary>
+        /// <summary>
         /// Creates a new setting entry or updates the value(s) of an existing setting
         /// in the database.
         /// </summary>
@@ -128,20 +150,20 @@ namespace Repository
         /// <returns></returns>
         public async Task<bool> SetSetting(Setting setting)
         {
-            if(setting == null || setting.Setting1.Length < 1)
+            if (setting == null || setting.Setting1.Length < 1)
             {
                 Console.WriteLine("RepoLogic.SetSetting() was called with a null or invalid setting.");
                 return false;
             }
-            if(SettingExists(setting.Setting1))
+            if (SettingExists(setting.Setting1))
             {
                 Setting existentSetting = await _dbContext.Settings.Where(
                     s => s.Setting1 == setting.Setting1).FirstOrDefaultAsync<Setting>();
-                if(setting.IntValue != null)
+                if (setting.IntValue != null)
                 {
                     existentSetting.IntValue = setting.IntValue;
                 }
-                if(setting.StringValue != null)
+                if (setting.StringValue != null)
                 {
                     existentSetting.StringValue = setting.StringValue;
                 }
@@ -163,7 +185,7 @@ namespace Repository
         public async Task<List<Discussion>> GetMovieDiscussions(string movieid)
         {
             var movieExists = MovieExists(movieid);
-            if(!movieExists)
+            if (!movieExists)
             {
                 Console.WriteLine("RepoLogic.GetMovieDiscussions() was called for a movie that doesn't exist.");
                 return null;
@@ -181,7 +203,7 @@ namespace Repository
         public Topic GetDiscussionTopic(string discussionId)
         {
             var discussionExists = DiscussionExists(discussionId);
-            if(!discussionExists)
+            if (!discussionExists)
             {
                 Console.WriteLine("RepoLogic.GetDiscussionTopic() was called for a discussion that doesn't exist.");
                 return null;
@@ -225,13 +247,13 @@ namespace Repository
         public async Task<bool> AddDiscussionTopic(string discussionId, string topicName)
         {
             var discussionExists = DiscussionExists(discussionId);
-            if(!discussionExists)
+            if (!discussionExists)
             {
                 Console.WriteLine("RepoLogic.AddDiscussionTopic() was called for a discussion id that doesn't exist.");
                 return false;
             }
             var topicExists = TopicExists(topicName);
-            if(!topicExists)
+            if (!topicExists)
             {
                 Console.WriteLine("RepoLogic.AddDiscussionTopic() was called for a topic that doesn't exist.");
                 return false;
@@ -256,7 +278,10 @@ namespace Repository
             return (_dbContext.Settings.Where(s => s.Setting1 == key).FirstOrDefault<Setting>() != null);
         }
 
-         /// Returns true iff the username, specified in the argument, exists in the database's Users table.
+        /// Returns true iff the username, specified in the argument, exists in the database's Users table.
+        /// ---------------
+        /// Placeholder until services set up
+        /// ---------------
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
@@ -288,6 +313,9 @@ namespace Repository
 
         /// <summary>
         /// Returns true iff the movie ID, specified in the argument, exists in the database's Movies table.
+        /// ---------------
+        /// Placeholder until services set up
+        /// ---------------
         /// </summary>
         /// <param name="movieid"></param>
         /// <returns></returns>
@@ -296,5 +324,6 @@ namespace Repository
             //return (_dbContext.Movies.Where(m => m.MovieId == movieid).FirstOrDefault<Movie>() != null);
             return true;
         }
+
     }
 }

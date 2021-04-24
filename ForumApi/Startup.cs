@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Repository.Models;
 using BusinessLogic;
+using ForumApi.AuthenticationHelper;
+
 
 namespace ForumApi
 {
@@ -34,11 +37,13 @@ namespace ForumApi
                 options.AddDefaultPolicy(
                                 builder =>
                                 {
-                                    builder.AllowAnyOrigin()
+                                     builder.WithOrigins("http://localhost:4200")//, "*")
                                         .AllowAnyHeader()
                                         .AllowAnyMethod();
                                 });
             });
+
+
 
             services.AddControllers();
 
@@ -48,8 +53,29 @@ namespace ForumApi
             );
 
             services.AddScoped<BusinessLogic.Interfaces.IForumLogic, ForumLogic>();
-            services.AddScoped<Repository.RepoLogic>();
+            services.AddScoped<Repository.IRepoLogic, Repository.RepoLogic>();
             //services.AddScoped<BusinessLogic.ForumLogic>();
+
+            // for authentication
+            services.AddAuthentication(o =>
+            {
+                o.DefaultScheme = "scheme";
+            })
+            .AddScheme<AuthenticationSchemeOptions, CustomAuthenticationHandler>(
+                "scheme", o => { });
+
+            var permissions = new[] {
+                // "loggedin", // for signed in
+                "manage:forums", // for moderator (is signed in)
+                "manage:awebsite", // for admin (is moderator and signed in)
+            };
+            services.AddAuthorization(options =>
+            {
+                for (int i = 0; i < permissions.Length; i++)
+                {
+                    options.AddPolicy(permissions[i], policy => policy.RequireClaim(permissions[i], "true"));
+                }
+            });
 
             services.AddSwaggerGen(c =>
             {
@@ -73,6 +99,8 @@ namespace ForumApi
 
             // Enables the CORS policty for all controller endpoints. Must come between UseRouting() and UseEndpoints()
             app.UseCors();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
