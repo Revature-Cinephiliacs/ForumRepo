@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using GlobalModels;
 
 namespace CineAPI.Controllers
@@ -16,6 +17,17 @@ namespace CineAPI.Controllers
         {
             _forumLogic = forumLogic;
         }
+
+        /// <summary>
+        /// Example of using authentication
+        /// </summary>
+        /// <returns></returns>
+        // [HttpGet("users")]
+        // [Authorize]
+        // public async Task<ActionResult<List<User>>> GetExample()
+        // {
+        //     return Ok(new { response = "success" });
+        // }
 
         /// <summary>
         /// Returns a list of Topic objects that includes every Topic.
@@ -43,6 +55,7 @@ namespace CineAPI.Controllers
         [HttpGet("discussions/{movieid}")]
         public async Task<ActionResult<List<Discussion>>> GetDiscussions(string movieid)
         {
+            Console.WriteLine(movieid);
             List<Discussion> discussions = await _forumLogic.GetDiscussions(movieid);
             if (discussions == null)
             {
@@ -185,8 +198,6 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
         }
-
-
         /// <summary>
         /// Returns all discussions sorted by most comments
         /// </summary>
@@ -206,6 +217,32 @@ namespace CineAPI.Controllers
             }
             StatusCode(200);
             return discussions;
+        }
+            
+        /// <summary>
+        /// Adds topic to db
+        /// takes string topic from UI
+        /// retuns success 201 or 400 if failed to save 
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        [HttpPost("topic/{topic}")]
+        public async Task<ActionResult> CreateTopic(string topic)
+        {
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("ForumController.CreateComment() was called with invalid body data.");
+                return StatusCode(400);
+            }
+
+            if (await _forumLogic.CreateTopic(topic))
+            {
+                return StatusCode(201);
+            }
+            else
+            {
+                return StatusCode(400);
+            }
         }
     }
 }
