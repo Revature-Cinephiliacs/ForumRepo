@@ -80,6 +80,12 @@ namespace BusinessLogic.Interfaces
         public Task<bool> CreateComment(NewComment comment);
 
         /// <summary>
+        /// Returns a sorted on basis of higest comment count list of discussion.
+        /// </summary>
+        /// 
+        /// <returns>Task<List<Discussion>></returns>
+        public Task<List<DiscussionT>> GetSortedDiscussions();
+
         /// Creates a new topic in the database 
         /// Returns true if successfully created
         /// Returns false if failed to create

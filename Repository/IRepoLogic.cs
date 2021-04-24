@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Repository
 {
     public interface IRepoLogic
@@ -93,6 +94,8 @@ namespace Repository
         /// <param name="topicName"></param>
         /// <returns></returns>
         public Task<bool> AddDiscussionTopic(string discussionId, string topicName);
+
+        public Task<List<Discussion>> GetSortedDiscussions();
 
         /// <summary>
         /// Saves the topic into the database
