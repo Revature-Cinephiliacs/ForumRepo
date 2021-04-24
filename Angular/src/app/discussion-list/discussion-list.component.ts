@@ -12,16 +12,20 @@ import { Discussion } from '../models';
 export class DiscussionListComponent implements OnInit {
 
   discussions: any;
+  searchDiscussions = [];
   newDiscussion: Discussion & {commentCount: number};
   newDiscussions = [];
   comments: any;
   commentCount: any;
   movieID:string = "";
   discussionID: any;
-
+  DisplayList: boolean = true;
   constructor(private _forum: ForumService, private router:  ActivatedRoute) { }
 
   ngOnInit(): void {
+    // this.DisplayList = true;
+    // this.newDiscussions = [];
+  
     this.movieID =  this.router.snapshot.params.id;
     console.log("Discussion List:" + this.movieID);
     this.getDiscussions();
@@ -32,7 +36,9 @@ export class DiscussionListComponent implements OnInit {
     setTimeout(() => {
       this._forum.getDiscussion(this.movieID).subscribe(data => {
         console.log(data);
+        
         this.discussions = data;
+        
         this.discussions.forEach(d => {
           d.discussionid;
           this.addCommentCount(d);
@@ -65,5 +71,15 @@ export class DiscussionListComponent implements OnInit {
       });
     }, 1000);
   }
+
+
+  applyFilter(filterValue: string){
+    console.log(filterValue);
+    this.DisplayList = false;
+    this.searchDiscussions = this.newDiscussions.filter(obj => {
+      return !!JSON.stringify(Object.values(obj)).match(new RegExp(filterValue));
+    });
+  }
+
 
 }
