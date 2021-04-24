@@ -100,7 +100,7 @@ namespace Testing
             bool result;
 
             NewComment dataSetA = new NewComment();
-            dataSetA.Username = "username1";
+            dataSetA.Userid = "username1";
             dataSetA.Isspoiler = true;
             dataSetA.Text = "this is a text";
             

@@ -38,7 +38,7 @@ namespace Testing
             // Arrange
             NewDiscussion nd = new NewDiscussion();
             nd.Movieid = "any_string";
-            nd.Username = "User Name";
+            nd.Userid = "User Name";
             nd.Subject = "Subject";
             Topic tp = new Topic();
             tp.TopicName = "Any Topic";

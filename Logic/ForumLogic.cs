@@ -177,33 +177,40 @@ namespace BusinessLogic
             return topics;
         }
 
-        public async Task<List<DiscussionT>> GetSortedDiscussions()
+        public async Task<List<DiscussionT>> GetSortedDiscussionsByComments(string type)
         {
-            var repoDiscussions = await _repo.GetSortedDiscussions();
+            List<Repository.Models.Discussion> repoDiscussions = new List<Repository.Models.Discussion>();
+            if(type == "a")
+            {
+                repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsAscending());
+            }
+            else if(type == "d")
+            {
+                repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsDescending());
+            }
+             
             List<DiscussionT> globalDiscussions = new List<DiscussionT>();
 
-            foreach (var dis in repoDiscussions)
+            foreach(Repository.Models.Discussion dis in repoDiscussions)
             {
                 DiscussionT gdis = new DiscussionT();
 
                 gdis.DiscussionId = dis.DiscussionId;
                 gdis.MovieId = dis.MovieId;
-                gdis.Username = dis.Username;
+                gdis.Userid = dis.UserId;
                 gdis.Subject = dis.Subject;
                 foreach (var ct in dis.Comments)
                 {
-                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.Username, ct.CommentText, ct.IsSpoiler);
+                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler);
                     gdis.Comments.Add(nc);
                     
                 }
-                
                 globalDiscussions.Add(gdis);
             }
-
             return globalDiscussions;
         }
-        public async Task<bool> CreateTopic(string topic){
-           
+        public async Task<bool> CreateTopic(string topic)
+        {
             return await _repo.AddTopic(topic);
         }
     }
