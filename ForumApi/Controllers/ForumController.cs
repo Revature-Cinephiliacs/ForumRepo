@@ -185,5 +185,27 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
         }
+
+
+        /// <summary>
+        /// Returns all discussions sorted by most comments
+        /// </summary>
+
+        /// <returns></returns>
+        [HttpGet("discussion/sort")]
+        public async Task<ActionResult<List<Discussion>>> GetSortedDiscussions()
+        {
+            List<Discussion> discussions = await _forumLogic.GetSortedDiscussions();
+            if (discussions == null)
+            {
+                return StatusCode(404);
+            }
+            if (discussions.Count == 0)
+            {
+                return StatusCode(204);
+            }
+            StatusCode(200);
+            return discussions;
+        }
     }
 }

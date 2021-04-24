@@ -232,5 +232,19 @@ namespace BusinessLogic
             }
             return topics;
         }
+
+        public async Task<List<Discussion>> GetSortedDiscussions()
+        {
+            var repoDiscussions = await _repo.GetSortedDiscussions();
+            List<Discussion> globalDiscussions = new List<Discussion>();
+
+            foreach (var dis in repoDiscussions)
+            {
+                Discussion gdis = new Discussion(Guid.Parse(dis.DiscussionId), dis.MovieId, dis.Username, dis.Subject, dis.ToString());
+                globalDiscussions.Add(gdis);
+            }
+
+            return globalDiscussions;
+        }
     }
 }

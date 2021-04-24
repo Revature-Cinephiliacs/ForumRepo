@@ -70,5 +70,12 @@ namespace BusinessLogic.Interfaces
         /// <param name="comment"></param>
         /// <returns></returns>
         public Task<bool> CreateComment(NewComment comment);
+
+        /// <summary>
+        /// Returns a sorted on basis of higest comment count list of discussion.
+        /// </summary>
+        /// 
+        /// <returns>Task<List<Discussion>></returns>
+        public Task<List<Discussion>> GetSortedDiscussions();
     }
 }
