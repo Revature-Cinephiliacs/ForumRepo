@@ -10,8 +10,14 @@ namespace Repository
 {
     public interface IRepoLogic
     {
+        /// <summary>
+        /// Save the comment into database
+        /// Returns true is successful
+        /// Returns false if username or discussion ID doesn't exist 
+        /// </summary>
+        /// <param name="repoComment"></param>
+        /// <returns></returns>
         Task<bool> AddComment(Comment repoComment);
-
 
         /// <summary>
         /// Saving Discussion into database
@@ -21,9 +27,7 @@ namespace Repository
         /// <param name="repoDiscussion"></param>
         /// <param name="repoTopic"></param>
         /// <returns></returns>
-
         Task<bool> AddDiscussion(Discussion repoDiscussion, Topic repoTopic);
-
 
         /// <summary>
         /// Returns a list of all Comment objects from the database that match the discussion ID specified
@@ -31,9 +35,7 @@ namespace Repository
         /// </summary>
         /// <param name="discussionid"></param>
         /// <returns></returns>
-
         Task<List<Comment>> GetMovieComments(string discussionid);
-
 
         /// <summary>
         /// Gets the value(s) of an existing setting in the database with a matching key string.
@@ -48,18 +50,15 @@ namespace Repository
         /// </summary>
         /// <param name="setting"></param>
         /// <returns></returns>
-
         Task<bool> SetSetting(Setting setting);
 
         /// <summary>
-        /// Returns a list of all Discussion objects from the database that match the movie ID specified
-        /// in the argument. Returns null if the movie doesn't exist.
+        /// Returns a list of all Comment objects from the database that match the discussion ID specified
+        /// Returns null if the discussion doesn't exist.
         /// </summary>
-        /// <param name="movieid"></param>
+        /// <param name="discussionid"></param>
         /// <returns></returns>
-
         public Task<List<Discussion>> GetMovieDiscussions(string movieid);
-
 
         /// <summary>
         /// Returns the Topic object from the database that matches the discussionId specified
@@ -68,16 +67,13 @@ namespace Repository
         /// </summary>
         /// <param name="discussionId"></param>
         /// <returns></returns>
-
         public Topic GetDiscussionTopic(string discussionId);
-
 
         /// <summary>
         /// Returns the Discussion object that match the discussionid specified in the argument.
         /// </summary>
         /// <param name="discussionid"></param>
         /// <returns></returns>
-        
         public Task<Discussion> GetDiscussion(string discussionid);
 
         /// <summary>
@@ -85,7 +81,6 @@ namespace Repository
         /// </summary>
         /// <returns></returns>
         public Task<List<Topic>> GetTopics();
-
 
         /// <summary>
         /// Adds the DiscussionTopic defined by the discussion Id and topic name arguments
@@ -100,8 +95,24 @@ namespace Repository
         /// <returns></returns>
         public Task<bool> AddDiscussionTopic(string discussionId, string topicName);
 
+        /// <summary>
+        /// Gets a list of discussions sorted by number of comments (ascending)
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetSortedDiscussionsDescending();
 
-        public Task<List<Discussion>> GetSortedDiscussions();
+        /// <summary>
+        /// Gets a list of dicussions sorted by number of comments (ascending)
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetSortedDiscussionsAscending();
 
+        /// <summary>
+        /// Saves the topic into the database
+        /// Returns true if save is success
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        public Task<bool> AddTopic(string topic);
     }
 }

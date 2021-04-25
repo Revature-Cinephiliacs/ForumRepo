@@ -16,7 +16,7 @@ namespace GlobalModels
 
         public string DiscussionId { get; set; }
         public string MovieId { get; set; }
-        public string Username { get; set; }
+        public string Userid { get; set; }
         public DateTime CreationTime { get; set; }
         public string Subject { get; set; }
 

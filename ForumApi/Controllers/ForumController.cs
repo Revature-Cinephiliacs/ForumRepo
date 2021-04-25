@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using GlobalModels;
 
 namespace CineAPI.Controllers
@@ -43,6 +44,7 @@ namespace CineAPI.Controllers
         [HttpGet("discussions/{movieid}")]
         public async Task<ActionResult<List<Discussion>>> GetDiscussions(string movieid)
         {
+            Console.WriteLine(movieid);
             List<Discussion> discussions = await _forumLogic.GetDiscussions(movieid);
             if (discussions == null)
             {
@@ -185,17 +187,15 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
         }
-
-
+        
         /// <summary>
-        /// Returns all discussions sorted by most comments
+        /// Returns a list of sorted discussions based off number of comments (ascending)
         /// </summary>
-
         /// <returns></returns>
-        [HttpGet("discussion/sort")]
-        public async Task<ActionResult<List<DiscussionT>>> GetSortedDiscussions()
+        [HttpGet("discussion/sort/comment/ascend")]
+        public async Task<ActionResult<List<DiscussionT>>> GetSortedDiscussionsCommentsAscending()
         {
-            List<DiscussionT> discussions = await _forumLogic.GetSortedDiscussions();
+            List<DiscussionT> discussions = await _forumLogic.GetSortedDiscussionsByComments("a");
             if (discussions == null)
             {
                 return StatusCode(404);
@@ -206,6 +206,52 @@ namespace CineAPI.Controllers
             }
             StatusCode(200);
             return discussions;
+        }
+
+        /// <summary>
+        /// Returns a list of sorted discussions based off number of comments (descending)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("discussion/sort/comment/descending")]
+        public async Task<ActionResult<List<DiscussionT>>> GetSortedDiscussionsCommentsDescending()
+        {
+            List<DiscussionT> discussions = await _forumLogic.GetSortedDiscussionsByComments("d");
+            if (discussions == null)
+            {
+                return StatusCode(404);
+            }
+            if (discussions.Count == 0)
+            {
+                return StatusCode(204);
+            }
+            StatusCode(200);
+            return discussions;
+        }
+            
+        /// <summary>
+        /// Adds topic to db
+        /// takes string topic from UI
+        /// retuns success 201 or 400 if failed to save 
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        [HttpPost("topic/{topic}")]
+        public async Task<ActionResult> CreateTopic(string topic)
+        {
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("ForumController.CreateComment() was called with invalid body data.");
+                return StatusCode(400);
+            }
+
+            if (await _forumLogic.CreateTopic(topic))
+            {
+                return StatusCode(201);
+            }
+            else
+            {
+                return StatusCode(400);
+            }
         }
     }
 }

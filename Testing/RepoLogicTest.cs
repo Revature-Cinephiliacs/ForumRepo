@@ -17,12 +17,6 @@ namespace Testing
             new DbContextOptionsBuilder<Repository.Models.Cinephiliacs_ForumContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
 
-        [Fact]
-        public void Test1()
-        {
-
-        }
-
         /// <summary>
         /// Testing SetSetting
         /// SetSetting should retun false if setting.setting1 length is less than 1 
@@ -59,14 +53,6 @@ namespace Testing
 
             Assert.Null(result);
         }
-
-        // [Fact]
-        // public async Task NoIdDiscussionExists(){
-        //     bool result;
-        //     var context = new Repository.Models.Cinephiliacs_ForumContext(dbOptions);
-        //     RepoLogic repoLogic = new RepoLogic(context);       
-        //     result = await repoLogic.DiscussionExists("what's up?");
-        // }
 
         /// <summary>
         /// Testing AddDiscussion function in RepoLogic 
@@ -114,7 +100,7 @@ namespace Testing
             bool result;
 
             NewComment dataSetA = new NewComment();
-            dataSetA.Username = "username1";
+            dataSetA.Userid = "username1";
             dataSetA.Isspoiler = true;
             dataSetA.Text = "this is a text";
             

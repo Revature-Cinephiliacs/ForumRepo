@@ -21,26 +21,12 @@ namespace BusinessLogic
             _repo = repo;
         }
 
-        /// <summary>
-        /// To post/save comment 
-        /// Takes Comments Objects as param
-        /// Returns true if saved successfully.
-        /// </summary>
-        /// <param name="comment"></param>
-        /// <returns></returns>
         public async Task<bool> CreateComment(NewComment comment)
         {
             var repoComment = Mapper.NewCommentToNewRepoComment(comment);
             return await _repo.AddComment(repoComment);
         }
 
-        /// <summary>
-        /// Method to Psot/save Duscussion 
-        /// Takes Discussion Object as Pareameter
-        /// Returns true if saved successfully.
-        /// </summary>
-        /// <param name="discussion"></param>
-        /// <returns></returns>
         public async Task<bool> CreateDiscussion(NewDiscussion discussion)
         {
             var repoDiscussion = Mapper.NewDiscussionToNewRepoDiscussion(discussion);
@@ -50,13 +36,6 @@ namespace BusinessLogic
             return await _repo.AddDiscussion(repoDiscussion, repoTopic);
         }
 
-        /// <summary>
-        /// Method to get all comments
-        /// Takes discussion id as param
-        /// Returns List of Comments  
-        /// </summary>
-        /// <param name="discussionid"></param>
-        /// <returns></returns>
         public async Task<List<Comment>> GetComments(Guid discussionid)
         {
             List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid.ToString());
@@ -74,14 +53,6 @@ namespace BusinessLogic
             return comments;
         }
 
-        /// <summary>
-        /// Method to get all comments/page
-        /// Takes Duscussion id & page (int) as paremeter
-        /// Returns list of comments  
-        /// </summary>
-        /// <param name="discussionid"></param>
-        /// <param name="page"></param>
-        /// <returns></returns>
         public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page)
         {
             if (page < 1)
@@ -130,13 +101,6 @@ namespace BusinessLogic
             return comments;
         }
 
-        /// <summary>
-        /// Method to set comments 
-        /// Takes number of pagesize as a parameter 
-        /// Retun true if succefully saved.
-        /// </summary>
-        /// <param name="pagesize"></param>
-        /// <returns></returns>
         public async Task<bool> SetCommentsPageSize(int pagesize)
         {
             if (pagesize < 1 || pagesize > 100)
@@ -151,13 +115,6 @@ namespace BusinessLogic
             return await _repo.SetSetting(setting);
         }
 
-        /// <summary>
-        /// Method for getting all dissussions for a specific movie 
-        /// Takes movieid as a parameter 
-        /// Returns the list if duscussion 
-        /// </summary>
-        /// <param name="movieid"></param>
-        /// <returns></returns>
         public async Task<List<Discussion>> GetDiscussions(string movieid)
         {
             List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
@@ -183,14 +140,6 @@ namespace BusinessLogic
             return discussions;
         }
 
-        /// <summary>
-        /// Method to get discussion by id
-        /// It takes discussion id as a pareameter send it to RepoLogic 
-        /// If duscussion id is null returns null
-        /// if RepoLogic returns Duscussion than returns that discussion.
-        /// </summary>
-        /// <param name="discussionid"></param>
-        /// <returns></returns>
         public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
             Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());
@@ -211,11 +160,6 @@ namespace BusinessLogic
             return discussion;
         }
 
-        /// <summary>
-        /// Method to retrive all topics from the RepoLoic (DB)
-        /// if topic is null then returns null
-        /// </summary>
-        /// <returns>List<Topic></returns>
         public async Task<List<string>> GetTopics()
         {
             var repoTopics = await _repo.GetTopics();
@@ -233,30 +177,41 @@ namespace BusinessLogic
             return topics;
         }
 
-        public async Task<List<DiscussionT>> GetSortedDiscussions()
+        public async Task<List<DiscussionT>> GetSortedDiscussionsByComments(string type)
         {
-            var repoDiscussions = await _repo.GetSortedDiscussions();
+            List<Repository.Models.Discussion> repoDiscussions = new List<Repository.Models.Discussion>();
+            if(type == "a")
+            {
+                repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsAscending());
+            }
+            else if(type == "d")
+            {
+                repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsDescending());
+            }
+             
             List<DiscussionT> globalDiscussions = new List<DiscussionT>();
 
-            foreach (var dis in repoDiscussions)
+            foreach(Repository.Models.Discussion dis in repoDiscussions)
             {
                 DiscussionT gdis = new DiscussionT();
 
                 gdis.DiscussionId = dis.DiscussionId;
                 gdis.MovieId = dis.MovieId;
-                gdis.Username = dis.Username;
+                gdis.Userid = dis.UserId;
                 gdis.Subject = dis.Subject;
                 foreach (var ct in dis.Comments)
                 {
-                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.Username, ct.CommentText, ct.IsSpoiler);
+                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler);
                     gdis.Comments.Add(nc);
                     
                 }
-                
                 globalDiscussions.Add(gdis);
             }
-
-            return globalDiscussions.OrderBy(x => x.Comments.Count).ToList();
+            return globalDiscussions;
+        }
+        public async Task<bool> CreateTopic(string topic)
+        {
+            return await _repo.AddTopic(topic);
         }
     }
 }

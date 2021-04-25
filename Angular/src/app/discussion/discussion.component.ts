@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { UserService } from '../user.service';
+import { ForumService } from '../forum.service';
 
 @Component({
   selector: 'app-discussion',
@@ -25,30 +25,34 @@ export class DiscussionComponent implements OnInit {
     isspoiler: false
   };
 
-  constructor(private _login:UserService,private router :ActivatedRoute) { }
+  constructor(private _forum: ForumService, private router:  ActivatedRoute) { }
 
   ngOnInit(): void {
 
     this.disscussionID =  this.router.snapshot.params.id;
+    console.log(this.disscussionID);
     this.newComment.discussionid = this.router.snapshot.params.id;
     this.displayInput();
     this.getComments();
-    this._login.getCurrentDiscussion(this.disscussionID).subscribe(data => {
+    this._forum.getCurrentDiscussion(this.disscussionID).subscribe(data => {
       console.log(data);
       this.discussion = data;
       this.subject = this.discussion.subject;
     });
   }
 
+  // Function that retrieves comments for a dicussion
   async getComments() {
     setTimeout(() => {
-      this._login.getDiscussionComments(this.disscussionID).subscribe(data =>{ 
+      this._forum.getDiscussionComments(this.disscussionID).subscribe(data =>{ 
         console.log(data);
         this.comments = data;
       });
     }, 1000);
   }
 
+  //Function that will check if a user is logged in
+  //if the user is not, elements on the page will be hidden
   displayInput(){
     if(localStorage.getItem("loggedin"))
     {
@@ -60,16 +64,19 @@ export class DiscussionComponent implements OnInit {
     }
   }
 
+  //Function that returns the discussion id
   getDicussionID(){
     console.log("Dicussion ID " +this.disscussionID);
     return this.disscussionID;
   }
 
+  //Function that will add a new post to the discussion
   postComment(){
     if(this.isEmpty(this.newComment.text)){
       console.log("Please enter a comment");
     }else{
-      this._login.postComment(this.newComment).subscribe(data => console.log(data));
+      this.newComment.username = "sagar1"; // just for testing pourpose, need to remove it later.
+      this._forum.postComment(this.newComment).subscribe(data => console.log(data));
       this.getComments();
     }
     console.log(this.newComment);

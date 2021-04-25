@@ -6,13 +6,13 @@ using System.Collections.Generic;
 namespace Repository.Models
 {
     /// <summary>
-    /// Repo Model -> Comment for database 
+    /// Model from database-first (backend model)
     /// </summary>
     public partial class Comment
     {
         public string CommentId { get; set; }
         public string DiscussionId { get; set; }
-        public string Username { get; set; }
+        public string UserId { get; set; }
         public DateTime CreationTime { get; set; }
         public string CommentText { get; set; }
         public bool IsSpoiler { get; set; }
