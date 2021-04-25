@@ -113,6 +113,6 @@ namespace Repository
         /// </summary>
         /// <param name="topic"></param>
         /// <returns></returns>
-        public Task<bool> AddTopic(string topic);
+        public Task<bool> AddTopic(Topic topic);
     }
 }

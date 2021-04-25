@@ -72,5 +72,21 @@ namespace BusinessLogic
 
             return repoComment;
         }
+
+        /// <summary>
+        /// Maps an instance of GlobalModels.Topic onto a new intance of Repository.Models.Topic.
+        /// Creates a new Guid and converts it to a string
+        /// Assigns the new topic name
+        /// Returns the new Repository.Models.Topic
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        internal static Repository.Models.Topic NewTopicToRepoTopic(string topic)
+        {
+            Repository.Models.Topic newTopic = new Repository.Models.Topic();
+            newTopic.TopicId = Guid.NewGuid().ToString();
+            newTopic.TopicName = topic;
+            return newTopic;
+        }
     }
 }
