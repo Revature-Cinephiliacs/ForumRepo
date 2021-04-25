@@ -20,7 +20,7 @@ export class DiscussionComponent implements OnInit {
 
   newComment: any = {
     discussionid: 0,
-    username: "",
+    userid: "",
     text: "",
     isspoiler: false
   };
@@ -57,7 +57,7 @@ export class DiscussionComponent implements OnInit {
     if(localStorage.getItem("loggedin"))
     {
       this.user = localStorage.getItem("loggedin");
-      this.newComment.username= JSON.parse(this.user).username;
+      this.newComment.userid= JSON.parse(this.user).userid;
       console.log("User Logged In");
     }else{
       console.log("Hide inputs");
@@ -75,7 +75,7 @@ export class DiscussionComponent implements OnInit {
     if(this.isEmpty(this.newComment.text)){
       console.log("Please enter a comment");
     }else{
-      this.newComment.username = "sagar1"; // just for testing pourpose, need to remove it later.
+      this.newComment.userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3"; // just for testing pourpose, need to remove it later.
       this._forum.postComment(this.newComment).subscribe(data => console.log(data));
       this.getComments();
     }
