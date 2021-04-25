@@ -2,8 +2,11 @@
 <form action="/action_page.php">
     <input matInput (keyup)="applyFilter($event.target.value)"name="search">
    
-  </form>
-  
+</form>
+
+<button (click) = "sortDiscussionsByCommentsAsc()">Sort Ascending</button>
+<button (click) = "sortDiscussionsByCommentsDesc()">Sort Descending</button>
+
 <table *ngIf="!DisplayList">
     <thead>
         <tr>
@@ -16,7 +19,7 @@
          <tr *ngFor = "let discussion of searchDiscussions">
              
                 <a routerLink="/discussion/{{discussion.discussionid}}"><td>{{discussion.subject}}</td></a>
-                <td>{{discussion.username}}</td>
+                <td>{{discussion.userid}}</td>
                 <td>{{discussion.commentCount}}</td>
             
         </tr>
@@ -35,9 +38,14 @@
          <tr *ngFor = "let discussion of newDiscussions">
              
                 <a routerLink="/discussion/{{discussion.discussionid}}"><td>{{discussion.subject}}</td></a>
-                <td>{{discussion.username}}</td>
+                <td>{{discussion.userid}}</td>
                 <td>{{discussion.commentCount}}</td>
             
+        </tr>
+        <tr *ngFor = "let d of sortDiscussions">
+            <a routerLink="/discussion/{{d.discussionId}}"><td>{{d.subject}}</td></a>
+            <td>{{d.userid}}</td>  
+            <td>{{d.comments.length}}</td>      
         </tr>
     </tbody>
 </table>
