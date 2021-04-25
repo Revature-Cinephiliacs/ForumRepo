@@ -4,18 +4,21 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Xunit.Abstractions;
 using Microsoft.EntityFrameworkCore;
-
 using GlobalModels;
 using BusinessLogic;
 using Repository;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Testing
 {
-    public class RepoLocigTesting
+    public class RepoLogicTesting
     {
         readonly DbContextOptions<Repository.Models.Cinephiliacs_ForumContext> dbOptions =
             new DbContextOptionsBuilder<Repository.Models.Cinephiliacs_ForumContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+
+        readonly ILogger<RepoLogic> repoLogger = new ServiceCollection().AddLogging().BuildServiceProvider().GetService<ILoggerFactory>().CreateLogger<RepoLogic>();
 
         /// <summary>
         /// Testing SetSetting
@@ -27,7 +30,7 @@ namespace Testing
         {
             bool result; 
                 var context = new Repository.Models.Cinephiliacs_ForumContext(dbOptions);
-                RepoLogic repoLogic = new RepoLogic(context);
+                RepoLogic repoLogic = new RepoLogic(context, repoLogger);
                 Repository.Models.Setting setting = new Repository.Models.Setting();
                 setting.StringValue = "one";
                 setting.Setting1 = "";
@@ -47,7 +50,7 @@ namespace Testing
         {
             Repository.Models.Setting result; 
                 var context = new Repository.Models.Cinephiliacs_ForumContext(dbOptions);
-                RepoLogic repoLogic = new RepoLogic(context);
+                RepoLogic repoLogic = new RepoLogic(context, repoLogger);
                 
                 result =  repoLogic.GetSetting(" ");
 
@@ -78,7 +81,7 @@ namespace Testing
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                RepoLogic repoLogic = new RepoLogic(context);
+                RepoLogic repoLogic = new RepoLogic(context, repoLogger);
 
                 Repository.Models.Discussion inputGMUser = BusinessLogic.Mapper.NewDiscussionToNewRepoDiscussion(dataSetA);
 
@@ -112,7 +115,7 @@ namespace Testing
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                RepoLogic repoLogic = new RepoLogic(context);
+                RepoLogic repoLogic = new RepoLogic(context, repoLogger);
 
                 Repository.Models.Comment inputGMUser = BusinessLogic.Mapper.NewCommentToNewRepoComment(dataSetA);
 
@@ -138,7 +141,7 @@ namespace Testing
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                RepoLogic repoLogic = new RepoLogic(context);
+                RepoLogic repoLogic = new RepoLogic(context, repoLogger);
 
                 result = await repoLogic.GetDiscussion("what's up?");
             }
@@ -162,7 +165,7 @@ namespace Testing
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                RepoLogic repoLogic = new RepoLogic(context);
+                RepoLogic repoLogic = new RepoLogic(context, repoLogger);
 
                 result = await repoLogic.GetMovieDiscussions("movieIb?");
             }
