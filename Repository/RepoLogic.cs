@@ -197,11 +197,11 @@ namespace Repository
 
         public async Task<List<Discussion>> GetSortedDiscussionsDescending()
         {
-            return await _dbContext.Discussions.OrderByDescending(x => x.Comments.Count).ToListAsync<Discussion>();
+            return await _dbContext.Discussions.Include(d => d.Comments).OrderByDescending(x => x.Comments.Count).ToListAsync<Discussion>();
         }
         public async Task<List<Discussion>> GetSortedDiscussionsAscending()
         {
-            return await _dbContext.Discussions.OrderBy(x => x.Comments.Count).ToListAsync<Discussion>();
+            return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.Comments.Count).ToListAsync<Discussion>();
         }
 
         /// <summary>
