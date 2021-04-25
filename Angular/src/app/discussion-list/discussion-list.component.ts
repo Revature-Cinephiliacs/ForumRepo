@@ -15,6 +15,7 @@ export class DiscussionListComponent implements OnInit {
   searchDiscussions = [];
   newDiscussion: Discussion & {commentCount: number};
   newDiscussions = [];
+  sortDiscussions: any;
   comments: any;
   commentCount: any;
   movieID:string = "";
@@ -42,11 +43,10 @@ export class DiscussionListComponent implements OnInit {
         this.discussions = data;
         
         this.discussions.forEach(d => {
-          d.discussionid;
           this.addCommentCount(d);
         });    
       });
-    }, 10);
+    }, 1000);
   }
 
   //Function that will take in a discussion object and will
@@ -68,7 +68,7 @@ export class DiscussionListComponent implements OnInit {
         this.newDiscussion = {
           discussionid: d.discussionid,
           movieid: d.movieid,
-          username: d.username,
+          userid: d.userid,
           subject: d.subject,
           topic: d.topic,
           commentCount: this.commentCount
@@ -84,9 +84,33 @@ export class DiscussionListComponent implements OnInit {
     console.log(filterValue);
     this.DisplayList = false;
     this.searchDiscussions = this.newDiscussions.filter(obj => {
+      console.log(obj);
       return !!JSON.stringify(Object.values(obj)).match(new RegExp(filterValue));
     });
   }
 
+  //Function that will get a list of discussions for a movie
+  //sorted in ascending order based on number of comments
+  async sortDiscussionsByCommentsAsc() {
+    setTimeout(() => {
+      this._forum.sortDiscussionByCommentsAsc().subscribe(data => {
+        console.log(data);
+        this.sortDiscussions = data;
+        this.newDiscussions = [];   
+      });
+    }, 1000);
+  }
+
+  //Function that will get a list of discussions for a movie
+  //sorted in descending order based on number of comments
+  async sortDiscussionsByCommentsDesc() {
+    setTimeout(() => {
+      this._forum.sortDiscussionByCommentsDesc().subscribe(data => {
+        console.log(data);
+        this.sortDiscussions = data;
+        this.newDiscussions = [];
+      });
+    }, 1000);
+  }
 
 }
