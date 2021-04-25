@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Repository.Models;
 
 namespace Repository
@@ -14,10 +15,17 @@ namespace Repository
     public class RepoLogic : IRepoLogic
     {
         private readonly Cinephiliacs_ForumContext _dbContext;
+        private readonly ILogger<RepoLogic> _logger;
 
         public RepoLogic(Cinephiliacs_ForumContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        public RepoLogic(Cinephiliacs_ForumContext dbContext, ILogger<RepoLogic> logger)
+        {
+            _dbContext = dbContext;
+            _logger = logger;
         }
 
         public async Task<bool> AddComment(Comment repoComment)
@@ -25,13 +33,13 @@ namespace Repository
             var userExists = UserExists(repoComment.UserId);
             if (!userExists)
             {
-                Console.WriteLine("RepoLogic.AddComment() was called for a user that doesn't exist.");
+                _logger.LogWarning($"RepoLogic.AddComment() was called for a user that doesn't exist {repoComment.UserId}.");
                 return false;
             }
             var discussionExists = DiscussionExists(repoComment.DiscussionId);
             if (!discussionExists)
             {
-                Console.WriteLine("RepoLogic.AddComment() was called for a discussion that doesn't exist.");
+                _logger.LogWarning($"RepoLogic.AddComment() was called for a discussion that doesn't exist {repoComment.DiscussionId}.");
                 return false;
             }
 
@@ -41,13 +49,14 @@ namespace Repository
             return true;
         }
 
-        public async Task<bool> AddTopic(string topic){
-            
-            Topic newTopic = new Topic();
-            newTopic.TopicId = Guid.NewGuid().ToString();
-            newTopic.TopicName = topic;
-
-            await _dbContext.Topics.AddAsync(newTopic);
+        public async Task<bool> AddTopic(Topic topic)
+        {
+            Topic getTopic = await _dbContext.Topics.FirstOrDefaultAsync(x => x.TopicName == topic.TopicName);
+            if(getTopic != null)
+            {
+                return false;
+            }
+            await _dbContext.Topics.AddAsync(topic);
 
             await _dbContext.SaveChangesAsync();
             return true;
@@ -59,13 +68,13 @@ namespace Repository
             if (!userExists || repoDiscussion.UserId == null)
             {
 
-                Console.WriteLine("RepoLogic.AddDiscussion() was called for a user that doesn't exist.");
+                _logger.LogWarning($"RepoLogic.AddDiscussion() was called for a user that doesn't exist {repoDiscussion.UserId}.");
                 return false;
             }
             var movieExists = MovieExists(repoDiscussion.MovieId);
             if (!movieExists)
             {
-                Console.WriteLine("RepoLogic.AddDiscussion() was called for a movie that doesn't exist.");
+                _logger.LogWarning($"RepoLogic.AddDiscussion() was called for a movie that doesn't exist {repoDiscussion.MovieId}.");
                 return false;
             }
 
@@ -97,7 +106,7 @@ namespace Repository
             var discussionExists = DiscussionExists(discussionid);
             if (!discussionExists)
             {
-                Console.WriteLine("RepoLogic.GetMovieComments() was called for a discussion that doesn't exist.");
+                _logger.LogWarning($"RepoLogic.GetMovieComments() was called for a discussion that doesn't exist {discussionid}.");
                 return null;
             }
             var commentList = await _dbContext.Comments.Where(c => c.DiscussionId == discussionid).ToListAsync();
@@ -113,7 +122,7 @@ namespace Repository
         {
             if (setting == null || setting.Setting1.Length < 1)
             {
-                Console.WriteLine("RepoLogic.SetSetting() was called with a null or invalid setting.");
+                _logger.LogWarning($"RepoLogic.SetSetting() was called with a null or invalid setting {setting.Setting1}.");
                 return false;
             }
             if (SettingExists(setting.Setting1))
@@ -142,7 +151,7 @@ namespace Repository
             var movieExists = MovieExists(movieid);
             if (!movieExists)
             {
-                Console.WriteLine("RepoLogic.GetMovieDiscussions() was called for a movie that doesn't exist.");
+                _logger.LogWarning($"RepoLogic.GetMovieDiscussions() was called for a movie that doesn't exist {movieid}.");
                 return null;
             }
             return await _dbContext.Discussions.Where(d => d.MovieId == movieid).ToListAsync();
@@ -153,7 +162,7 @@ namespace Repository
             var discussionExists = DiscussionExists(discussionId);
             if (!discussionExists)
             {
-                Console.WriteLine("RepoLogic.GetDiscussionTopic() was called for a discussion that doesn't exist.");
+                _logger.LogWarning($"RepoLogic.GetDiscussionTopic() was called for a discussion that doesn't exist {discussionId}.");
                 return null;
             }
             return _dbContext.Topics.Where(t => t.TopicId == _dbContext.DiscussionTopics
@@ -176,13 +185,13 @@ namespace Repository
             var discussionExists = DiscussionExists(discussionId);
             if (!discussionExists)
             {
-                Console.WriteLine("RepoLogic.AddDiscussionTopic() was called for a discussion id that doesn't exist.");
+                _logger.LogWarning($"RepoLogic.AddDiscussionTopic() was called for a discussion id that doesn't exist {discussionId}.");
                 return false;
             }
             var topicExists = TopicExists(topicid);
             if (!topicExists)
             {
-                Console.WriteLine("RepoLogic.AddDiscussionTopic() was called for a topic that doesn't exist.");
+                _logger.LogWarning($"RepoLogic.AddDiscussionTopic() was called for a topic that doesn't exist {topicid}.");
                 return false;
             }
             var discussionTopic = new DiscussionTopic();
@@ -199,6 +208,7 @@ namespace Repository
         {
             return await _dbContext.Discussions.Include(d => d.Comments).OrderByDescending(x => x.Comments.Count).ToListAsync<Discussion>();
         }
+        
         public async Task<List<Discussion>> GetSortedDiscussionsAscending()
         {
             return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.Comments.Count).ToListAsync<Discussion>();

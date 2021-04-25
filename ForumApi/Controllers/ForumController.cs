@@ -5,6 +5,7 @@ using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GlobalModels;
+using Microsoft.Extensions.Logging;
 
 namespace CineAPI.Controllers
 {
@@ -13,9 +14,11 @@ namespace CineAPI.Controllers
     public class ForumController : ControllerBase
     {
         private readonly IForumLogic _forumLogic;
-        public ForumController(IForumLogic forumLogic)
+        private readonly ILogger<ForumController> _logger;
+        public ForumController(IForumLogic forumLogic, ILogger<ForumController> logger)
         {
             _forumLogic = forumLogic;
+            _logger = logger;
         }
 
         /// <summary>
@@ -149,7 +152,7 @@ namespace CineAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                Console.WriteLine("ForumController.CreateDiscussion() was called with invalid body data.");
+                _logger.LogWarning("ForumController.CreateDiscussion() was called with invalid body data.");
                 return StatusCode(400);
             }
             //Console.WriteLine(discussion.Discussionid);
@@ -174,7 +177,7 @@ namespace CineAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                Console.WriteLine("ForumController.CreateComment() was called with invalid body data.");
+                _logger.LogWarning("ForumController.CreateComment() was called with invalid body data.");
                 return StatusCode(400);
             }
 
@@ -212,7 +215,7 @@ namespace CineAPI.Controllers
         /// Returns a list of sorted discussions based off number of comments (descending)
         /// </summary>
         /// <returns></returns>
-        [HttpGet("discussion/sort/comment/descending")]
+        [HttpGet("discussion/sort/comment/descend")]
         public async Task<ActionResult<List<DiscussionT>>> GetSortedDiscussionsCommentsDescending()
         {
             List<DiscussionT> discussions = await _forumLogic.GetSortedDiscussionsByComments("d");
@@ -229,9 +232,9 @@ namespace CineAPI.Controllers
         }
             
         /// <summary>
-        /// Adds topic to db
-        /// takes string topic from UI
-        /// retuns success 201 or 400 if failed to save 
+        /// Adds a new topic to the database
+        /// Returns 201 if successful
+        /// Returns 400 if failed
         /// </summary>
         /// <param name="topic"></param>
         /// <returns></returns>
@@ -240,10 +243,9 @@ namespace CineAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                Console.WriteLine("ForumController.CreateComment() was called with invalid body data.");
+                _logger.LogWarning("ForumController.CreateComment() was called with invalid body data.");
                 return StatusCode(400);
             }
-
             if (await _forumLogic.CreateTopic(topic))
             {
                 return StatusCode(201);

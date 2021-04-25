@@ -88,6 +88,7 @@ namespace BusinessLogic.Interfaces
         /// <returns></returns>
         public Task<List<DiscussionT>> GetSortedDiscussionsByComments(string type);
 
+        /// <summary>
         /// Creates a new topic in the database 
         /// Returns true if successfully created
         /// Returns false if failed to create
