@@ -256,7 +256,7 @@ namespace BusinessLogic
                 globalDiscussions.Add(gdis);
             }
 
-            return globalDiscussions;
+            return globalDiscussions.OrderBy(x => x.Comments.Count).ToList();
         }
     }
 }
