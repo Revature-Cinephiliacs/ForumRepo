@@ -24,7 +24,7 @@ export class MovieComponent implements OnInit {
   submitDiscussion: any ={
     movieid: this.router.snapshot.params.id,
     topic:"",
-    username:"sagar1",
+    userid:"b23dbdad-3179-4b9a-b514-0164ee9547f3",
     subject:""
   }
 
@@ -94,7 +94,7 @@ export class MovieComponent implements OnInit {
         this.newDiscussion = {
           discussionid: d.discussionid,
           movieid: d.movieid,
-          username: d.username,
+          userid: d.userid,
           subject: d.subject,
           topic: d.topic,
           commentCount: this.commentCount
