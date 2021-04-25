@@ -12,7 +12,7 @@ import { ForumService } from '../forum.service';
 export class DiscussionComponent implements OnInit {
 
   comments: any;
-  disscussionID:string = "";
+  discussionID:string = "";
   discussion: any;
   subject: any;
   displaySpoilers: any = false;
@@ -29,12 +29,12 @@ export class DiscussionComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.disscussionID =  this.router.snapshot.params.id;
-    console.log(this.disscussionID);
+    this.discussionID =  this.router.snapshot.params.id;
+    console.log(this.discussionID);
     this.newComment.discussionid = this.router.snapshot.params.id;
     this.displayInput();
     this.getComments();
-    this._forum.getCurrentDiscussion(this.disscussionID).subscribe(data => {
+    this._forum.getCurrentDiscussion(this.discussionID).subscribe(data => {
       console.log(data);
       this.discussion = data;
       this.subject = this.discussion.subject;
@@ -44,7 +44,7 @@ export class DiscussionComponent implements OnInit {
   // Function that retrieves comments for a dicussion
   async getComments() {
     setTimeout(() => {
-      this._forum.getDiscussionComments(this.disscussionID).subscribe(data =>{ 
+      this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ 
         console.log(data);
         this.comments = data;
       });
@@ -66,8 +66,8 @@ export class DiscussionComponent implements OnInit {
 
   //Function that returns the discussion id
   getDicussionID(){
-    console.log("Dicussion ID " +this.disscussionID);
-    return this.disscussionID;
+    console.log("Dicussion ID " +this.discussionID);
+    return this.discussionID;
   }
 
   //Function that will add a new post to the discussion
@@ -82,11 +82,13 @@ export class DiscussionComponent implements OnInit {
     console.log(this.newComment);
   }
 
+  //Displays a spoiler(unblurs it)
   showSpoilers() {
     this.displaySpoilers = true;
     console.log(this.displaySpoilers);
   }
 
+  //Function returns whether a comment is shown or not(spoiler vs shown/not a spoiler)
   spoilersShown() {
     return this.displaySpoilers;
   }
@@ -94,5 +96,4 @@ export class DiscussionComponent implements OnInit {
   isEmpty(testSTR:string){
     return (testSTR == "");
   }
-
 }

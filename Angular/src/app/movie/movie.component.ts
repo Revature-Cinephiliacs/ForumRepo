@@ -21,7 +21,7 @@ export class MovieComponent implements OnInit {
   newDiscussions = [];
   displayMoreDuscussion: boolean = false;
   newDiscussion: Discussion & {commentCount: number};
-  submitDiscussion: any ={
+  submitDiscussion: any = {
     movieid: this.router.snapshot.params.id,
     topic:"",
     userid:"b23dbdad-3179-4b9a-b514-0164ee9547f3",
@@ -30,17 +30,15 @@ export class MovieComponent implements OnInit {
 
 
   ngOnInit(): void {
-
     this._forum.getTopics().subscribe(data => {
       console.log(data);
       this.topics = data;
     });
     this.getDiscussions();
-
   }
 
   //Function that will add a new discussion to a movie
-  //will validate input
+  //Will validate input
   postDiscussion(){
     if(this.submitDiscussion.topic == "" || this.submitDiscussion.subject == "")
     {
@@ -56,7 +54,11 @@ export class MovieComponent implements OnInit {
   }
 
   //Function that will get a list of discussions for a movie, and 
-  //slice the results to only display the first five
+  //Slice the results to only display the first five
+  //---------------------------------------------
+  //Might make handling top 5 in backend instead of frontend
+  //(Api will return top 5, instead of slicing in frontend)
+  //---------------------------------------------
   async getDiscussions() {
     setTimeout(() => {
       this._forum.getDiscussion(this.router.snapshot.params.id).subscribe(data => {
@@ -103,5 +105,4 @@ export class MovieComponent implements OnInit {
       });
     }, 1000);
   }
-
 }

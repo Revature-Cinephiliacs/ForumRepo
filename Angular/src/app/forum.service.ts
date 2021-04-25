@@ -10,7 +10,7 @@ export class ForumService {
   connection:string ="";
   loggedIn:any;
 
-  //URL to Forum API
+  //URL to Forum API(temporary)
   baseURL:string = "https://localhost:5001/Forum/";
   constructor(private http:HttpClient) { }
 
@@ -42,7 +42,6 @@ export class ForumService {
   //Function that will make a call to the Forum API discussion/discussionid endpoint
   //to retrieve a discussion with the given discussionid
   getCurrentDiscussion(discussionID: string){
-    console.log("here")
     return this.http.get( this.baseURL + "discussion/" + discussionID);
   }
 
@@ -61,6 +60,6 @@ export class ForumService {
   //Function that will make a call to the Forum API discussion/sort/comment/descending
   //endpoint to sort a list of discussions in descending order by the number of comments
   sortDiscussionByCommentsDesc(){
-    return this.http.get( this.baseURL + "discussion/sort/comment/descending");
+    return this.http.get( this.baseURL + "discussion/sort/comment/descend");
   }
 }
