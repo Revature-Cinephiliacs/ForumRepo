@@ -51,4 +51,16 @@ export class ForumService {
   getTopics(){
     return this.http.get( this.baseURL + "topics");
   }
+
+  //Function that will make a call to the Forum API discussion/sort/comment/ascend
+  //endpoint to sort a list of discussions in ascending order by the number of comments
+  sortDiscussionByCommentsAsc(){
+    return this.http.get( this.baseURL + "discussion/sort/comment/ascend");
+  }
+
+  //Function that will make a call to the Forum API discussion/sort/comment/descending
+  //endpoint to sort a list of discussions in descending order by the number of comments
+  sortDiscussionByCommentsDesc(){
+    return this.http.get( this.baseURL + "discussion/sort/comment/descending");
+  }
 }
