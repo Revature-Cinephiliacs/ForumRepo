@@ -8,6 +8,9 @@ namespace GlobalModels
 {
     public class DiscussionT
     {
+        /// <summary>
+        /// DTO Model for discussions backend - > frontend
+        /// </summary>
         public DiscussionT()
         {
             Comments = new List<Comment>();
