@@ -23,6 +23,18 @@ namespace BusinessLogic.Interfaces
         /// <returns></returns>
         public Task<List<Discussion>> GetDiscussions(string movieid);
         
+
+        /// <summary>
+        /// Method for getting all discussions for a specific movie 
+        /// * sort as specified by sortingOrder param.
+        /// * paginate as specified by page (pagenumber).
+        /// Takes movieid, page, and sortingOrder as a parameter 
+        /// Returns the list of discussions 
+        /// </summary>
+        /// <param name="movieid"></param>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetDiscussionsPage(string movieid, int page, string sortingOrder);
+
         /// <summary>
         /// Method to get a discussion by id
         /// It takes discussion id as a parameter
@@ -50,7 +62,7 @@ namespace BusinessLogic.Interfaces
         /// <param name="discussionid"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        public Task<List<Comment>> GetCommentsPage(Guid discussionid, int page);
+        public Task<List<Comment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder);
 
         /// <summary>
         /// Method to set comments 
@@ -78,6 +90,15 @@ namespace BusinessLogic.Interfaces
         /// <param name="comment"></param>
         /// <returns></returns>
         public Task<bool> CreateComment(NewComment comment);
+
+        /// <summary>
+        /// Gets a sorted list of Discussions based off number of comments.
+        /// Parameter type determines is it's an ascending list, or descending
+        /// type = "a" for ascending, type = "d" for descending
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionT>> GetSortedDiscussionsByComments(string type);
 
         /// <summary>
         /// Creates a new topic in the database 

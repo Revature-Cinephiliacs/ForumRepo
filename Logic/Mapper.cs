@@ -16,7 +16,7 @@ namespace BusinessLogic
             repoDiscussion, Repository.Models.Topic topic)
         {
             var discussion = new Discussion(Guid.Parse(repoDiscussion.DiscussionId), repoDiscussion.MovieId,
-                repoDiscussion.Username, repoDiscussion.Subject, topic.TopicName);
+                repoDiscussion.UserId, repoDiscussion.Subject, topic.TopicName);
             return discussion;
         }
 
@@ -29,7 +29,7 @@ namespace BusinessLogic
         public static Comment RepoCommentToComment(Repository.Models.Comment repoComment)
         {
             var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId),
-                repoComment.Username, repoComment.CommentText, repoComment.IsSpoiler);
+                repoComment.UserId, repoComment.CommentText, repoComment.IsSpoiler);
             return comment;
         }
 
@@ -46,7 +46,7 @@ namespace BusinessLogic
             var repoDiscussion = new Repository.Models.Discussion();
             repoDiscussion.DiscussionId = Guid.NewGuid().ToString();
             repoDiscussion.MovieId = discussion.Movieid;
-            repoDiscussion.Username = discussion.Username;
+            repoDiscussion.UserId = discussion.Userid;
             repoDiscussion.Subject = discussion.Subject;
             repoDiscussion.CreationTime = DateTime.Now;
 
@@ -65,12 +65,28 @@ namespace BusinessLogic
             var repoComment = new Repository.Models.Comment();
             repoComment.CommentId = Guid.NewGuid().ToString();
             repoComment.DiscussionId = comment.Discussionid.ToString();
-            repoComment.Username = comment.Username;
+            repoComment.UserId = comment.Userid;
             repoComment.CommentText = comment.Text;
             repoComment.CreationTime = DateTime.Now;
             repoComment.IsSpoiler = comment.Isspoiler;
 
             return repoComment;
+        }
+
+        /// <summary>
+        /// Maps an instance of GlobalModels.Topic onto a new intance of Repository.Models.Topic.
+        /// Creates a new Guid and converts it to a string
+        /// Assigns the new topic name
+        /// Returns the new Repository.Models.Topic
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        internal static Repository.Models.Topic NewTopicToRepoTopic(string topic)
+        {
+            Repository.Models.Topic newTopic = new Repository.Models.Topic();
+            newTopic.TopicId = Guid.NewGuid().ToString();
+            newTopic.TopicName = topic;
+            return newTopic;
         }
     }
 }

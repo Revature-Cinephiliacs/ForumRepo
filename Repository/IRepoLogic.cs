@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Repository
 {
     public interface IRepoLogic
@@ -95,11 +96,23 @@ namespace Repository
         public Task<bool> AddDiscussionTopic(string discussionId, string topicName);
 
         /// <summary>
+        /// Gets a list of discussions sorted by number of comments (ascending)
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetSortedDiscussionsDescending();
+
+        /// <summary>
+        /// Gets a list of dicussions sorted by number of comments (ascending)
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetSortedDiscussionsAscending();
+
+        /// <summary>
         /// Saves the topic into the database
         /// Returns true if save is success
         /// </summary>
         /// <param name="topic"></param>
         /// <returns></returns>
-        public Task<bool> AddTopic(string topic);
+        public Task<bool> AddTopic(Topic topic);
     }
 }

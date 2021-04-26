@@ -6,9 +6,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Repository.Models
 {
-    /// <summary>
-    /// Dbcontext for Forum Api database
-    /// </summary>
     public partial class Cinephiliacs_ForumContext : DbContext
     {
         public Cinephiliacs_ForumContext()
@@ -27,7 +24,9 @@ namespace Repository.Models
         public virtual DbSet<Topic> Topics { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        { }
+        {
+            
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,17 +59,26 @@ namespace Repository.Models
 
                 entity.Property(e => e.IsSpoiler).HasColumnName("is_spoiler");
 
-                entity.Property(e => e.Username)
-                    .IsRequired()
-                    .HasMaxLength(30)
+                entity.Property(e => e.Likes)
+                    .HasColumnName("likes")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.ParentCommentid)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
-                    .HasColumnName("username");
+                    .HasColumnName("parent_commentid");
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("userID");
 
                 entity.HasOne(d => d.Discussion)
                     .WithMany(p => p.Comments)
                     .HasForeignKey(d => d.DiscussionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__comments__discus__6EF57B66");
+                    .HasConstraintName("FK__comments__discus__7B5B524B");
             });
 
             modelBuilder.Entity<Discussion>(entity =>
@@ -98,16 +106,16 @@ namespace Repository.Models
                     .IsUnicode(false)
                     .HasColumnName("subject");
 
-                entity.Property(e => e.Username)
+                entity.Property(e => e.UserId)
                     .IsRequired()
-                    .HasMaxLength(30)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
-                    .HasColumnName("username");
+                    .HasColumnName("userID");
             });
 
             modelBuilder.Entity<DiscussionTopic>(entity =>
             {
-                entity.HasKey(e => new { e.DiscussionId, e.TopicName })
+                entity.HasKey(e => new { e.DiscussionId, e.TopicId })
                     .HasName("discussionID_topic_pk");
 
                 entity.ToTable("discussion_topics");
@@ -117,22 +125,22 @@ namespace Repository.Models
                     .IsUnicode(false)
                     .HasColumnName("discussionID");
 
-                entity.Property(e => e.TopicName)
-                    .HasMaxLength(25)
+                entity.Property(e => e.TopicId)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
-                    .HasColumnName("topic_name");
+                    .HasColumnName("topicID");
 
                 entity.HasOne(d => d.Discussion)
                     .WithMany(p => p.DiscussionTopics)
                     .HasForeignKey(d => d.DiscussionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__discussio__discu__6B24EA82");
+                    .HasConstraintName("FK__discussio__discu__778AC167");
 
-                entity.HasOne(d => d.TopicNameNavigation)
+                entity.HasOne(d => d.Topic)
                     .WithMany(p => p.DiscussionTopics)
-                    .HasForeignKey(d => d.TopicName)
+                    .HasForeignKey(d => d.TopicId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__discussio__topic__6C190EBB");
+                    .HasConstraintName("FK__discussio__topic__787EE5A0");
             });
 
             modelBuilder.Entity<Setting>(entity =>
@@ -157,12 +165,15 @@ namespace Repository.Models
 
             modelBuilder.Entity<Topic>(entity =>
             {
-                entity.HasKey(e => e.TopicName)
-                    .HasName("PK__topics__54BAE5ED445F65A9");
-
                 entity.ToTable("topics");
 
+                entity.Property(e => e.TopicId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("topicID");
+
                 entity.Property(e => e.TopicName)
+                    .IsRequired()
                     .HasMaxLength(25)
                     .IsUnicode(false)
                     .HasColumnName("topic_name");

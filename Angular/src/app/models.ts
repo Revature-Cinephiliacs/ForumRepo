@@ -8,7 +8,7 @@ export interface User {
   
   export interface Review {
     movieid: string,
-    username: string,
+    userid: string,
     rating: string,
     text: string
   }
@@ -16,15 +16,15 @@ export interface User {
   export interface Discussion {
     discussionid: number,
     movieid: string,
-    username: string,
+    userid: string,
     subject: string,
     topic: string
   }
-  
+
   export interface Comment {
     commentid: number,
     discussionid: number,
-    username: string,
+    userid: string,
     text: string,
     isspoiler: boolean
   }

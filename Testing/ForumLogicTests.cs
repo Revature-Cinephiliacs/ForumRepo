@@ -9,12 +9,16 @@ using System.Threading.Tasks;
 using Xunit;
 using GlobalModels;
 using Comment = Repository.Models.Comment;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Testing
 {
     public class ForumLogicTests
     {
         private Mock<IRepoLogic> repoStub = new Mock<IRepoLogic>();
+        
+        readonly ILogger<ForumLogic> logicLogger = new ServiceCollection().AddLogging().BuildServiceProvider().GetService<ILoggerFactory>().CreateLogger<ForumLogic>();
 
         [Fact]
         public void CreateComment_WithCommentObject_ReturnTrue()
@@ -23,7 +27,7 @@ namespace Testing
             NewComment nc = new NewComment(Guid.NewGuid(), "def", "fgh", true);
 
             repoStub.Setup(repo => repo.AddComment(It.IsAny<Repository.Models.Comment>())).ReturnsAsync(true);
-            var logic = new ForumLogic(repoStub.Object);
+            var logic = new ForumLogic(repoStub.Object, logicLogger);
 
             // Act
             var result = logic.CreateComment(nc);
@@ -38,14 +42,14 @@ namespace Testing
             // Arrange
             NewDiscussion nd = new NewDiscussion();
             nd.Movieid = "any_string";
-            nd.Username = "User Name";
+            nd.Userid = "User Name";
             nd.Subject = "Subject";
             Topic tp = new Topic();
             tp.TopicName = "Any Topic";
             
             repoStub.Setup(repo => repo.AddDiscussion(It.IsAny<Repository.Models.Discussion>(), It.IsAny<Topic>())).ReturnsAsync(true);
 
-            var logic = new ForumLogic(repoStub.Object);
+            var logic = new ForumLogic(repoStub.Object, logicLogger);
 
             // Act
             var result = logic.CreateDiscussion(nd);
@@ -61,7 +65,7 @@ namespace Testing
             repoStub.Setup(repo => repo.GetDiscussion(It.IsAny<string>()))
                 .ReturnsAsync((Repository.Models.Discussion) null);
 
-            var logic = new ForumLogic(repoStub.Object);
+            var logic = new ForumLogic(repoStub.Object, logicLogger);
 
             // Act
             var result = logic.GetDiscussion(Guid.NewGuid());

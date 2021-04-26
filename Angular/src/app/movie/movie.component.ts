@@ -21,24 +21,24 @@ export class MovieComponent implements OnInit {
   newDiscussions = [];
   displayMoreDuscussion: boolean = false;
   newDiscussion: Discussion & {commentCount: number};
-  submitDiscussion: any ={
+  submitDiscussion: any = {
     movieid: this.router.snapshot.params.id,
     topic:"",
-    username:"sagar1",
+    userid:"b23dbdad-3179-4b9a-b514-0164ee9547f3",
     subject:""
   }
 
 
   ngOnInit(): void {
-
     this._forum.getTopics().subscribe(data => {
       console.log(data);
       this.topics = data;
     });
     this.getDiscussions();
-
   }
 
+  //Function that will add a new discussion to a movie
+  //Will validate input
   postDiscussion(){
     if(this.submitDiscussion.topic == "" || this.submitDiscussion.subject == "")
     {
@@ -53,6 +53,12 @@ export class MovieComponent implements OnInit {
     console.log(this.submitDiscussion);
   }
 
+  //Function that will get a list of discussions for a movie, and 
+  //Slice the results to only display the first five
+  //---------------------------------------------
+  //Might make handling top 5 in backend instead of frontend
+  //(Api will return top 5, instead of slicing in frontend)
+  //---------------------------------------------
   async getDiscussions() {
     setTimeout(() => {
       this._forum.getDiscussion(this.router.snapshot.params.id).subscribe(data => {
@@ -71,6 +77,10 @@ export class MovieComponent implements OnInit {
     }, 10);
   }
 
+  //Function that will take in a discussion object and will
+  //get the number of comments and add it to a new
+  //discussion object with an added property for comment count, which is then 
+  //added to a discussion list
   async addCommentCount(d: any) {
     setTimeout(() => {
       this._forum.getDiscussionComments(d.discussionid).subscribe(data =>{ 
@@ -86,7 +96,7 @@ export class MovieComponent implements OnInit {
         this.newDiscussion = {
           discussionid: d.discussionid,
           movieid: d.movieid,
-          username: d.username,
+          userid: d.userid,
           subject: d.subject,
           topic: d.topic,
           commentCount: this.commentCount
@@ -95,5 +105,4 @@ export class MovieComponent implements OnInit {
       });
     }, 1000);
   }
-
 }

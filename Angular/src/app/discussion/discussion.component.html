@@ -7,12 +7,14 @@
                 <button (click)="showSpoilers()">Show Spoilers</button>
             </div>
             <div class="commentContent" *ngIf="!comment.isspoiler || spoilersShown()">
-                <a routerLink="/user/{{comment.username}}" class="username">{{ comment.username }}</a>
+                <a routerLink="/user/{{comment.userid}}" class="userid">{{ comment.userid }}</a>
                 <div class="commenttext">{{comment.text}}</div>
             </div>
         </li>
     </ul>
 </div>
+<button *ngIf="1<pageNum" (click)="onPrev()">Previous</button>
+<button *ngIf="numOfComments>(pageNum*10)" (click)="onNext()">Next</button>
 
 <div id="input">
     <h3>New Comment</h3>

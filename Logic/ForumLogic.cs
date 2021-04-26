@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GlobalModels;
+using Microsoft.Extensions.Logging;
 using Repository;
 
 namespace BusinessLogic
@@ -11,14 +12,22 @@ namespace BusinessLogic
     /// Implements the interface IForumLogic.
     /// Methods are used to read and write objects in the repository.
     /// Return appropriate response to calling methods
+    /// Comments found in IForumLogic
     /// </summary>
     public class ForumLogic : Interfaces.IForumLogic
     {
         private readonly IRepoLogic _repo;
+        private readonly ILogger<ForumLogic> _logger;
 
         public ForumLogic(IRepoLogic repo)
         {
             _repo = repo;
+        }
+
+        public ForumLogic(IRepoLogic repo, ILogger<ForumLogic> logger)
+        {
+            _repo = repo;
+            _logger = logger;
         }
 
         public async Task<bool> CreateComment(NewComment comment)
@@ -41,7 +50,7 @@ namespace BusinessLogic
             List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid.ToString());
             if (repoComments == null)
             {
-                Console.WriteLine("ForumLogic.GetComments() was called with a discussionid that doesn't exist.");
+                _logger.LogWarning($"ForumLogic.GetComments() was called with a discussionid that doesn't exist {discussionid}.");
                 return null;
             }
 
@@ -53,36 +62,53 @@ namespace BusinessLogic
             return comments;
         }
 
-        public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page)
+        public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
         {
             if (page < 1)
             {
-                Console.WriteLine("ForumLogic.GetCommentsPage() was called with a negative or zero page number.");
+                _logger.LogWarning($"ForumLogic.GetCommentsPage() was called with a negative or zero page number {page}.");
                 return null;
             }
 
             Repository.Models.Setting pageSizeSetting = _repo.GetSetting("commentspagesize");
-            int pageSize = 1;//pageSizeSetting.IntValue ?? default(int);
+            int pageSize = pageSizeSetting.IntValue ?? default(int);
             if (pageSize < 1)
             {
-                Console.WriteLine("ForumLogic.GetCommentsPage() was called but the commentspagesize is invalid");
+                _logger.LogWarning($"ForumLogic.GetCommentsPage() was called but the commentspagesize is invalid {pageSize}");
                 return null;
             }
 
             List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid.ToString());
             if (repoComments == null)
             {
-                Console.WriteLine("ForumLogic.GetCommentsPage() was called with a discussionid that doesn't exist.");
+                _logger.LogWarning($"ForumLogic.GetCommentsPage() was called with a discussionid that doesn't exist {discussionid}.");
                 return null;
             }
-            repoComments = repoComments.OrderByDescending(c => c.CreationTime).ToList<Repository.Models.Comment>();
+
+            // Sort the list of comments
+            switch (sortingOrder)
+            {
+                // case "likes":
+                //     repoComments = repoComments.OrderBy(r => r.like).ToList<Repository.Models.Comment>();
+                // break;
+                // case "comments":
+                //     repoComments = repoComments.OrderByDescending(r => r.comments).ToList<Repository.Models.Comment>();
+                // break;
+                case "timeA":
+                    repoComments = repoComments.OrderBy(r => r.CreationTime).ToList<Repository.Models.Comment>();
+                break;
+                case "timeD":
+                    repoComments = repoComments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Comment>();
+                break;
+                
+            }
 
             int numberOfComments = repoComments.Count;
             int startIndex = pageSize * (page - 1);
 
             if (startIndex > numberOfComments - 1)
             {
-                Console.WriteLine("ForumLogic.GetCommentsPage() was called for a page number without comments.");
+                _logger.LogWarning($"ForumLogic.GetCommentsPage() was called for a page number without comments {numberOfComments}.");
                 return null;
             }
 
@@ -98,6 +124,7 @@ namespace BusinessLogic
             {
                 comments.Add(Mapper.RepoCommentToComment(repoComments[i]));
             }
+
             return comments;
         }
 
@@ -105,7 +132,7 @@ namespace BusinessLogic
         {
             if (pagesize < 1 || pagesize > 100)
             {
-                Console.WriteLine("ForumLogic.SetCommentsPageSize() was called with an invalid pagesize.");
+                _logger.LogWarning($"ForumLogic.SetCommentsPageSize() was called with an invalid pagesize {pagesize}.");
                 return false;
             }
 
@@ -120,7 +147,7 @@ namespace BusinessLogic
             List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
             if (repoDiscussions == null)
             {
-                Console.WriteLine("ForumLogic.GetDiscussions() was called with a movieid that doesn't exist.");
+                _logger.LogWarning($"ForumLogic.GetDiscussions() was called with a movieid that doesn't exist {movieid}.");
                 return null;
             }
 
@@ -140,12 +167,100 @@ namespace BusinessLogic
             return discussions;
         }
 
+        public async Task<List<Discussion>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
+        {
+            if(page < 1)
+            {
+                Console.WriteLine("ForumLogic.GetDiscussionsPage() was called with a negative or zero page number.");
+                return null;
+            }
+
+            Repository.Models.Setting pageSizeSetting = _repo.GetSetting("Discussionpagesize");
+            
+            int pageSize = pageSizeSetting.IntValue ?? default(int);
+            if(pageSize < 1)
+            {
+                Console.WriteLine("ForumLogic.GetDiscussionsPage() was called but the Duscussionspagesize is invalid");
+                return null;
+            }
+
+            List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
+            if (repoDiscussions == null)
+            {
+                _logger.LogWarning($"ForumLogic.GetDiscussions() was called with a movieid that doesn't exist {movieid}.");
+                return null;
+            }
+
+            foreach (var item in repoDiscussions)
+            {
+                item.Comments = await _repo.GetMovieComments(item.DiscussionId);
+            }
+
+            // Sort the list of Discussion according to sorting string
+            switch (sortingOrder)
+            {
+                // case "like":
+                //     repoDiscussions = repoDiscussions.OrderBy(r => r.like).ToList<Repository.Models.Discussion>();
+                // break;
+                case "commentsA":
+                    repoDiscussions = repoDiscussions.OrderBy(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+                break;
+                case "commentsD":
+                    repoDiscussions = repoDiscussions.OrderByDescending(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+                break;
+                case "timeA":
+                    repoDiscussions = repoDiscussions.OrderBy(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+                break;
+                case "timeD":
+                    repoDiscussions = repoDiscussions.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+                break;
+            }
+
+
+            int numOfDiscussion = repoDiscussions.Count;
+            int start = pageSize * (page -1);
+            if(start > numOfDiscussion - 1)
+            {
+                Console.WriteLine("ForumLogic.GetDiscussionsPage() was called for a page number without reviews.");
+                return null;
+            }
+
+            int end = start + pageSize-1;
+            if(end > numOfDiscussion - 1)
+            {
+                end = numOfDiscussion - 1;
+            }
+
+            List<Repository.Models.Discussion> pageDiscussions = new List<Repository.Models.Discussion>();
+            for(int i = start; i <= end; i++){
+
+                pageDiscussions.Add(repoDiscussions[i]);
+            }
+
+            List<Discussion> discussions = new List<Discussion>();
+            foreach (var repoDiscussion in pageDiscussions)
+            {
+                
+                // Get the topic associated with this discussion
+                Repository.Models.Topic topic = _repo.GetDiscussionTopic(repoDiscussion.DiscussionId);
+                if (topic == null)
+                {
+                    topic = new Repository.Models.Topic();
+                    topic.TopicName = "None";
+                }
+                discussions.Add(Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic));
+                
+            }
+            return discussions;
+        }
+
+
         public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
             Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());
             if (repoDiscussion == null)
             {
-                Console.WriteLine("ForumLogic.GetDiscussion() was called for an invalid discussionid.");
+                _logger.LogWarning($"ForumLogic.GetDiscussion() was called for an invalid discussionid {discussionid}.");
                 return null;
             }
 
@@ -160,12 +275,13 @@ namespace BusinessLogic
             return discussion;
         }
 
+
         public async Task<List<string>> GetTopics()
         {
             var repoTopics = await _repo.GetTopics();
             if (repoTopics == null)
             {
-                Console.WriteLine("ForumLogic.GetTopics() was called but there are no topics.");
+                _logger.LogWarning($"ForumLogic.GetTopics() was called but there are no topics.");
                 return null;
             }
 
@@ -177,9 +293,42 @@ namespace BusinessLogic
             return topics;
         }
 
-        public async Task<bool> CreateTopic(string topic){
-           
-            return await _repo.AddTopic(topic);
+        public async Task<List<DiscussionT>> GetSortedDiscussionsByComments(string type)
+        {
+            List<Repository.Models.Discussion> repoDiscussions = new List<Repository.Models.Discussion>();
+            if(type == "a")
+            {
+                repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsAscending());
+            }
+            else if(type == "d")
+            {
+                repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsDescending());
+            }
+             
+            List<DiscussionT> globalDiscussions = new List<DiscussionT>();
+
+            foreach(Repository.Models.Discussion dis in repoDiscussions)
+            {
+                DiscussionT gdis = new DiscussionT();
+
+                gdis.DiscussionId = dis.DiscussionId;
+                gdis.MovieId = dis.MovieId;
+                gdis.Userid = dis.UserId;
+                gdis.Subject = dis.Subject;
+                foreach (var ct in dis.Comments)
+                {
+                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler);
+                    gdis.Comments.Add(nc);
+                    
+                }
+                globalDiscussions.Add(gdis);
+            }
+            return globalDiscussions;
+        }
+        public async Task<bool> CreateTopic(string topic)
+        {
+            Repository.Models.Topic newTopic = Mapper.NewTopicToRepoTopic(topic);
+            return await _repo.AddTopic(newTopic);
         }
     }
 }

@@ -9,15 +9,15 @@ namespace GlobalModels
     {
         public Guid Commentid { get; set; } = Guid.NewGuid();
         public Guid Discussionid { get; set; }
-        public string Username { get; set; }
+        public string Userid { get; set; }
         public string Text { get; set; }
         public bool Isspoiler { get; set; }
 
-        public Comment(Guid commentid, Guid discussionid, string username, string text, bool isspoiler)
+        public Comment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler)
         {
             Commentid = commentid;
             Discussionid = discussionid;
-            Username = username;
+            Userid = uid;
             Text = text;
             Isspoiler = isspoiler;
         }

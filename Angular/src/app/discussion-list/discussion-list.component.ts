@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ForumService } from '../forum.service';
 import { ActivatedRoute } from '@angular/router';
 import { Discussion } from '../models';
+import { ThisReceiver } from '@angular/compiler';
 
 @Component({
   selector: 'app-discussion-list',
@@ -15,11 +16,17 @@ export class DiscussionListComponent implements OnInit {
   searchDiscussions = [];
   newDiscussion: Discussion & {commentCount: number};
   newDiscussions = [];
+  sortDiscussions: any;
   comments: any;
   commentCount: any;
   movieID:string = "";
   discussionID: any;
   DisplayList: boolean = true;
+
+  pageNum: number = 1;
+  sortingOrder: string = "commentsD"   //Default sorting order will be based on total num of comments 
+  numOfDiscussion: number;
+
   constructor(private _forum: ForumService, private router:  ActivatedRoute) { }
 
   ngOnInit(): void {
@@ -29,24 +36,45 @@ export class DiscussionListComponent implements OnInit {
     this.movieID =  this.router.snapshot.params.id;
     console.log("Discussion List:" + this.movieID);
     this.getDiscussions();
-   
+    this._forum.getDiscussion(this.movieID).subscribe(data =>{ 
+      this.discussions = data;
+      this.numOfDiscussion = this.discussions.length
+      this.discussions = []})
   }
 
+  //Function that will get a list of discussions associated with the
+  //snapshot movie id
   async getDiscussions() {
     setTimeout(() => {
-      this._forum.getDiscussion(this.movieID).subscribe(data => {
+      this._forum.getDiscussionPage(this.movieID, this.pageNum, this.sortingOrder).subscribe(data => {
         console.log(data);
         
         this.discussions = data;
         
         this.discussions.forEach(d => {
-          d.discussionid;
           this.addCommentCount(d);
         });    
       });
-    }, 10);
+    }, 1000);
   }
 
+  //get next discussion page
+  onNext(){
+    this.newDiscussions = [];
+    this.pageNum++;
+    this.getDiscussions();
+  }
+  //get previous duscussuin page
+  onPrev(){
+    this.newDiscussions = [];
+    this.pageNum--;
+    this.getDiscussions();
+  }
+
+  //Function that will take in a discussion object and will
+  //get the number of comments and add it to a new
+  //discussion object with an added property for comment count, which is then 
+  //added to a discussion list
   async addCommentCount(d: any) {
     setTimeout(() => {
       this._forum.getDiscussionComments(d.discussionid).subscribe(data =>{ 
@@ -62,7 +90,7 @@ export class DiscussionListComponent implements OnInit {
         this.newDiscussion = {
           discussionid: d.discussionid,
           movieid: d.movieid,
-          username: d.username,
+          userid: d.userid,
           subject: d.subject,
           topic: d.topic,
           commentCount: this.commentCount
@@ -72,14 +100,39 @@ export class DiscussionListComponent implements OnInit {
     }, 1000);
   }
 
-
+  //Function that will take in a search string and then filter
+  //the dicussions to show matching results
   applyFilter(filterValue: string){
     console.log(filterValue);
     this.DisplayList = false;
     this.searchDiscussions = this.newDiscussions.filter(obj => {
+      console.log(obj);
       return !!JSON.stringify(Object.values(obj)).match(new RegExp(filterValue));
     });
   }
 
+  //Function that will get a list of discussions for a movie
+  //sorted in ascending order based on number of comments
+  async sortDiscussionsByCommentsAsc() {
+    setTimeout(() => {
+      this._forum.sortDiscussionByCommentsAsc().subscribe(data => {
+        console.log(data);
+        this.sortDiscussions = data;
+        this.newDiscussions = [];   
+      });
+    }, 1000);
+  }
+
+  //Function that will get a list of discussions for a movie
+  //sorted in descending order based on number of comments
+  async sortDiscussionsByCommentsDesc() {
+    setTimeout(() => {
+      this._forum.sortDiscussionByCommentsDesc().subscribe(data => {
+        console.log(data);
+        this.sortDiscussions = data;
+        this.newDiscussions = [];
+      });
+    }, 1000);
+  }
 
 }
