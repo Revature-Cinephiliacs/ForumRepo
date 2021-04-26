@@ -6,9 +6,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Repository.Models
 {
-    /// <summary>
-    /// Dbcontext for Forum Api database
-    /// </summary>
     public partial class Cinephiliacs_ForumContext : DbContext
     {
         public Cinephiliacs_ForumContext()
@@ -27,7 +24,9 @@ namespace Repository.Models
         public virtual DbSet<Topic> Topics { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        { }
+        {
+            
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,6 +59,15 @@ namespace Repository.Models
 
                 entity.Property(e => e.IsSpoiler).HasColumnName("is_spoiler");
 
+                entity.Property(e => e.Likes)
+                    .HasColumnName("likes")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.ParentCommentid)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("parent_commentid");
+
                 entity.Property(e => e.UserId)
                     .IsRequired()
                     .HasMaxLength(50)
@@ -70,7 +78,7 @@ namespace Repository.Models
                     .WithMany(p => p.Comments)
                     .HasForeignKey(d => d.DiscussionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__comments__discus__2C3393D0");
+                    .HasConstraintName("FK__comments__discus__7B5B524B");
             });
 
             modelBuilder.Entity<Discussion>(entity =>
@@ -126,19 +134,19 @@ namespace Repository.Models
                     .WithMany(p => p.DiscussionTopics)
                     .HasForeignKey(d => d.DiscussionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__discussio__discu__286302EC");
+                    .HasConstraintName("FK__discussio__discu__778AC167");
 
                 entity.HasOne(d => d.Topic)
                     .WithMany(p => p.DiscussionTopics)
                     .HasForeignKey(d => d.TopicId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__discussio__topic__29572725");
+                    .HasConstraintName("FK__discussio__topic__787EE5A0");
             });
 
             modelBuilder.Entity<Setting>(entity =>
             {
                 entity.HasKey(e => e.Setting1)
-                    .HasName("PK__settings__25A3BB9AD5080CBA");
+                    .HasName("PK__settings__25A3BB9AE55A1B57");
 
                 entity.ToTable("settings");
 
