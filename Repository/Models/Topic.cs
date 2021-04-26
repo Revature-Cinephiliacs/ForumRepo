@@ -5,9 +5,6 @@ using System.Collections.Generic;
 
 namespace Repository.Models
 {
-    /// <summary>
-    /// Model from database-first (backend model)
-    /// </summary>
     public partial class Topic
     {
         public Topic()
