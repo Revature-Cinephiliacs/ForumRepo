@@ -18,6 +18,9 @@ export class DiscussionComponent implements OnInit {
   displaySpoilers: any = false;
   user: any;
 
+  pageNum: number = 1;
+  sortingOrder:string = "timeD";
+  numOfComments: number;
   newComment: any = {
     discussionid: 0,
     userid: "",
@@ -39,18 +42,32 @@ export class DiscussionComponent implements OnInit {
       this.discussion = data;
       this.subject = this.discussion.subject;
     });
+    this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ this.numOfComments = data.length})
   }
 
   // Function that retrieves comments for a dicussion
   async getComments() {
     setTimeout(() => {
-      this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ 
+      this._forum.getDiscussionCommentsPage(this.discussionID, this.pageNum, this.sortingOrder).subscribe(data =>{ 
         console.log(data);
         this.comments = data;
       });
     }, 1000);
   }
 
+    //get next comments page
+    onNext(){
+      this.comments = [];
+      this.pageNum++;
+      this.getComments();
+    }
+    //get previous comments page
+    onPrev(){
+      this.comments = [];
+      this.pageNum--;
+      this.getComments();
+    }
+  
   //Function that will check if a user is logged in
   //if the user is not, elements on the page will be hidden
   displayInput(){

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Discussion } from './models';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +18,14 @@ export class ForumService {
 
   //Function that will make a call to the Forum API discussions/movieid endpoint
   //to retrieve a list of discussions associated with given movie id
-  getDiscussion(movieId: String){
-    return this.http.get( this.baseURL + "discussions/"+movieId);
+  getDiscussion(movieId: String): Observable<Discussion> {
+    return this.http.get<Discussion>( this.baseURL + "discussions/"+movieId);
+  }
+
+  //Function that will make a call to the Forum API discussions/movieid endpoint
+  //to retrieve a list of discussions associated with given movie id
+  getDiscussionPage(movieId: String, page: number, sortingOrder: string){
+    return this.http.get( this.baseURL + "discussions/"+movieId+"/"+page+"/"+sortingOrder);
   }
 
   //Function that will make a call to the Forum API discussion endpoint
@@ -28,8 +36,14 @@ export class ForumService {
 
   //Function that will make a call to the Forum API comments/discussionid endpoint
   //to retrieve a list of comments associated with given discussionid
-  getDiscussionComments(discussionID:string){
-    return this.http.get( this.baseURL + "comments/" + discussionID);
+  getDiscussionComments(discussionID:string): Observable<Comment> {
+    return this.http.get<Comment>( this.baseURL + "comments/" + discussionID);
+  }
+  
+  //Function that will make a call to the Forum API comments/discussionid endpoint
+  //to retrieve a list of comments associated with given discussionid
+  getDiscussionCommentsPage(discussionID:string, page: number, sortingOrder: string){
+    return this.http.get( this.baseURL + "comments/" + discussionID+ "/" + page + "/" + sortingOrder);
   }
 
   //Function that will make a call to the Forum API comment endpoint
