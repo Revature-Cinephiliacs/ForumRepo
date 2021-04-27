@@ -270,5 +270,10 @@ namespace Repository
             //return (_dbContext.Movies.Where(m => m.MovieId == movieid).FirstOrDefault<Movie>() != null);
             return true;
         }
+
+        public async Task<List<Discussion>> GetSortedDiscussionsRecent()
+        {
+            return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.CreationTime).ToListAsync<Discussion>();
+        }
     }
 }

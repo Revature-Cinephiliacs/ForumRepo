@@ -304,7 +304,12 @@ namespace BusinessLogic
             {
                 repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsDescending());
             }
-             
+
+            else if (type == "r")
+            {
+                repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsRecent());
+            }
+
             List<DiscussionT> globalDiscussions = new List<DiscussionT>();
 
             foreach(Repository.Models.Discussion dis in repoDiscussions)
