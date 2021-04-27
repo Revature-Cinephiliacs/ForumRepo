@@ -275,5 +275,12 @@ namespace Repository
         {
             return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.CreationTime).ToListAsync<Discussion>();
         }
+
+        public async Task<List<Discussion>> GetDiscussionsByTopicId(string topicid)
+        {
+           
+
+            return await _dbContext.Discussions.Include(dis => dis.DiscussionTopics).ToListAsync<Discussion>();
+        }
     }
 }

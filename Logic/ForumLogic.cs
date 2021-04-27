@@ -189,11 +189,11 @@ namespace BusinessLogic
         public async Task<List<DiscussionT>> GetSortedDiscussionsByComments(string type)
         {
             List<Repository.Models.Discussion> repoDiscussions = new List<Repository.Models.Discussion>();
-            if(type == "a")
+            if (type == "a")
             {
                 repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsAscending());
             }
-            else if(type == "d")
+            else if (type == "d")
             {
                 repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsDescending());
             }
@@ -205,7 +205,7 @@ namespace BusinessLogic
 
             List<DiscussionT> globalDiscussions = new List<DiscussionT>();
 
-            foreach(Repository.Models.Discussion dis in repoDiscussions)
+            foreach (Repository.Models.Discussion dis in repoDiscussions)
             {
                 DiscussionT gdis = new DiscussionT();
 
@@ -217,7 +217,11 @@ namespace BusinessLogic
                 {
                     Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler);
                     gdis.Comments.Add(nc);
-                    
+
+                }
+                foreach (var top in dis.DiscussionTopics)
+                {
+                    gdis.DiscussionTopics.Add(top.TopicId);
                 }
                 globalDiscussions.Add(gdis);
             }
@@ -227,6 +231,42 @@ namespace BusinessLogic
         {
             Repository.Models.Topic newTopic = Mapper.NewTopicToRepoTopic(topic);
             return await _repo.AddTopic(newTopic);
+        }
+
+        public async Task<List<DiscussionT>> GetDiscussionsByTopicId(string topicid)
+        {
+            List<Repository.Models.Discussion> repoDiscussions = new List<Repository.Models.Discussion>();
+
+            repoDiscussions = await Task.Run(() => _repo.GetDiscussionsByTopicId(topicid));
+
+
+
+            List<DiscussionT> globalDiscussions = new List<DiscussionT>();
+            DiscussionT gdis;
+            foreach (Repository.Models.Discussion dis in repoDiscussions)
+            {
+                gdis = new();
+                gdis.DiscussionId = dis.DiscussionId;
+                gdis.MovieId = dis.MovieId;
+                gdis.Userid = dis.UserId;
+                gdis.Subject = dis.Subject;
+                foreach (var ct in dis.Comments)
+                {
+                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler);
+                    gdis.Comments.Add(nc);
+
+                }
+
+                foreach (var top in dis.DiscussionTopics)
+                {
+                    gdis.DiscussionTopics.Add(top.TopicId);
+                    if (top.TopicId.Equals(topicid))
+                        globalDiscussions.Add(gdis);
+                }
+            }
+
+            return globalDiscussions;
+
         }
     }
 }

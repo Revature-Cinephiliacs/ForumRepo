@@ -275,7 +275,29 @@ namespace CineAPI.Controllers
             StatusCode(200);
             return discussions;
         }
+        /// <summary>
+        /// Returns a list of all Discussion objects that are associated with
+        /// the provided movie ID.
+        /// </summary>
+       
+        /// <returns></returns>
+        [HttpGet("discussions/topic/{topicid}")]
+        public async Task<ActionResult<List<DiscussionT>>> GetDiscussionsByTopicId(string topicid)
+        {
+          
+            List<DiscussionT> discussions = await _forumLogic.GetDiscussionsByTopicId(topicid);
+            if (discussions == null)
+            {
+                return StatusCode(404);
+            }
+            if (discussions.Count == 0)
+            {
+                return StatusCode(204);
+            }
+            StatusCode(200);
+            return discussions;
+        }
 
-        
+
     }
 }
