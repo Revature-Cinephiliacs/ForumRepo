@@ -99,14 +99,25 @@ export class DiscussionListComponent implements OnInit {
 
   //Function that will take in a search string and then filter
   //the dicussions to show matching results
-  applyFilter(filterValue: string){
-    console.log(filterValue);
-    this.DisplayList = false;
-    this.searchDiscussions = this.newDiscussions.filter(obj => {
-      console.log(obj);
-      return !!JSON.stringify(Object.values(obj)).match(new RegExp(filterValue));
-    });
-  }
+  setTable(){
+    
+    let input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("myTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }       
+    }
+    }
 
   //Function that will get a list of discussions for a movie
   //sorted in ascending order based on number of comments

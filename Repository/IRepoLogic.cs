@@ -108,6 +108,12 @@ namespace Repository
         public Task<List<Discussion>> GetSortedDiscussionsAscending();
 
         /// <summary>
+        /// Get a list of dicussions sorted by most recent discussions
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetSortedDiscussionsRecent();
+
+        /// <summary>
         /// Saves the topic into the database
         /// Returns true if save is success
         /// </summary>

@@ -279,5 +279,27 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
         }
+
+        /// <summary>
+        /// Returns a list of sorted discussions based on recent comments (ascending)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("discussion/sort/comment/recent")]
+        public async Task<ActionResult<List<DiscussionT>>> GetDiscussionsCommentsRecent()
+        {
+            List<DiscussionT> discussions = await _forumLogic.GetSortedDiscussionsByComments("r");
+            if (discussions == null)
+            {
+                return StatusCode(404);
+            }
+            if (discussions.Count == 0)
+            {
+                return StatusCode(204);
+            }
+            StatusCode(200);
+            return discussions;
+        }
+
+        
     }
 }

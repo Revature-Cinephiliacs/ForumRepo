@@ -5,9 +5,6 @@ using System.Collections.Generic;
 
 namespace Repository.Models
 {
-    /// <summary>
-    /// Model from database-first (backend model)
-    /// </summary>
     public partial class Comment
     {
         public string CommentId { get; set; }
@@ -16,6 +13,8 @@ namespace Repository.Models
         public DateTime CreationTime { get; set; }
         public string CommentText { get; set; }
         public bool IsSpoiler { get; set; }
+        public string ParentCommentid { get; set; }
+        public int? Likes { get; set; }
 
         public virtual Discussion Discussion { get; set; }
     }
