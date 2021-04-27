@@ -19,6 +19,7 @@ namespace Repository.Models
 
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Discussion> Discussions { get; set; }
+        public virtual DbSet<DiscussionFollow> DiscussionFollows { get; set; }
         public virtual DbSet<DiscussionTopic> DiscussionTopics { get; set; }
         public virtual DbSet<Setting> Settings { get; set; }
         public virtual DbSet<Topic> Topics { get; set; }
@@ -111,6 +112,31 @@ namespace Repository.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("userID");
+            });
+
+            modelBuilder.Entity<DiscussionFollow>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("discussion_follows");
+
+                entity.Property(e => e.DiscussionId)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("discussionID");
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("userID");
+
+                entity.HasOne(d => d.Discussion)
+                    .WithMany()
+                    .HasForeignKey(d => d.DiscussionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__discussio__discu__08B54D69");
             });
 
             modelBuilder.Entity<DiscussionTopic>(entity =>
