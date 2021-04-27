@@ -81,6 +81,7 @@ namespace CineAPI.Controllers
                 return StatusCode(204);
             }
             StatusCode(200);
+            Console.WriteLine(discussions[0].Comments.Count);
             return discussions;
         }
 

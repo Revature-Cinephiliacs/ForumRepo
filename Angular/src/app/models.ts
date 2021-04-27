@@ -18,7 +18,8 @@ export interface User {
     movieid: string,
     userid: string,
     subject: string,
-    topic: string
+    topic: string,
+    comments: [Comment]
   }
 
   export interface Comment {

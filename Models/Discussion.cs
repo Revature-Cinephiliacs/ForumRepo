@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace GlobalModels
 {
@@ -12,14 +13,17 @@ namespace GlobalModels
         public string Userid { get; set; }
         public string Subject { get; set; }
         public string Topic { get; set; }
+        public ICollection<Comment> Comments { get; set; }
 
-        public Discussion(Guid discussionid, string movieid, string uid, string subject, string topic)
+        public Discussion(Guid discussionid, string movieid, string uid, string subject, string topic, ICollection<Comment> comments)
         {
             Discussionid = discussionid;
             Movieid = movieid;
             Userid = uid;
             Subject = subject;
             Topic = topic;
+            Comments = comments;
+
         }
 
         public bool Equals(Discussion other)
