@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { ForumService } from '../forum.service';
-
+import { NestedComment } from '../models'
 @Component({
   selector: 'app-discussion',
   templateUrl: './discussion.component.html',
@@ -12,17 +12,23 @@ import { ForumService } from '../forum.service';
 export class DiscussionComponent implements OnInit {
 
   comments: any;
+  nestedComments = [];
+  parentComments = [];
   discussionID:string = "";
   discussion: any;
   subject: any;
   displaySpoilers: any = false;
   user: any;
+  displayReplyForm = false;
+  displayMessageForm = true;
+  parentid: string;
 
   newComment: any = {
     discussionid: 0,
     userid: "",
     text: "",
-    isspoiler: false
+    isspoiler: false,
+    parentcommentid: null
   };
 
   constructor(private _forum: ForumService, private router:  ActivatedRoute) { }
@@ -70,12 +76,42 @@ export class DiscussionComponent implements OnInit {
     return this.discussionID;
   }
 
-  //Function that will add a new post to the discussion
+  //Function that will add a new parent comment to the discussion
   postComment(){
     if(this.isEmpty(this.newComment.text)){
       console.log("Please enter a comment");
     }else{
-      this.newComment.userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3"; // just for testing pourpose, need to remove it later.
+      this.newComment.userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3"; // just for testing purpose, need to remove it later.
+      this._forum.postComment(this.newComment).subscribe(data => console.log(data));
+      this.getComments();
+    }
+    console.log(this.newComment);
+  }
+
+  //Function that will show the reply form and hide the new comment form
+  showReplyForm(commentparentid:string){
+    this.displayReplyForm = true;
+    this.displayMessageForm = false;
+    this.parentid = commentparentid;
+    console.log("Reply to: " + commentparentid);
+    console.log("This parent id" + this.parentid);
+  }
+
+  cancelReply()
+  {
+    this.displayReplyForm = false;
+    this.displayMessageForm = true;
+    console.log("cancel")
+  }
+
+  postReply()
+  {
+    console.log("Post reply" + this.parentid);
+    if(this.isEmpty(this.newComment.text)){
+      console.log("Please enter a comment");
+    }else{
+      this.newComment.userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3"; // just for testing purpose, need to remove it later.
+      this.newComment.parentcommentid = this.parentid;
       this._forum.postComment(this.newComment).subscribe(data => console.log(data));
       this.getComments();
     }
@@ -96,4 +132,81 @@ export class DiscussionComponent implements OnInit {
   isEmpty(testSTR:string){
     return (testSTR == "");
   }
+
+  showReplies(commentid:string)
+  {
+    let replyComments = [];
+    console.log(commentid)
+    this.comments.forEach(comment => {
+      if(comment.parentCommentid == commentid)
+      {
+        let newNestedComment = this.createNewNestedComment(comment);
+        replyComments.push(newNestedComment);
+      }
+    });
+
+    console.log("Show replies array: ");
+    console.log(replyComments);
+
+    return replyComments;
+  }
+
+  testingStuff(){
+    console.log("test");
+    //var parentComments = [];
+    this.comments.forEach(ct => {
+      let newNestedComment = this.createNewNestedComment(ct);
+      this.nestedComments.push(newNestedComment);
+    });
+
+    console.log("New nested Comment list: ");
+    console.log(this.nestedComments);
+    this.nestedComments.forEach(nc => {
+      if(nc.parentcommentid == null)
+      {
+        this.parentComments.push(nc);
+      }
+    });
+
+    this.parentComments.forEach(pc => {
+      this.addReplies(pc);
+    });
+    
+    console.log("Added Replies");
+    console.log(this.nestedComments);
+
+  }
+
+  createNewNestedComment(comment:any)
+  {
+    let newNestedComment = new NestedComment(
+      comment.commentid,
+      comment.discussionid,
+      comment.userid,
+      comment.text,
+      comment.isspoiler,
+      comment.parentCommentid,
+      []
+    );
+
+    return newNestedComment;
+  }
+
+  addReplies(parent: any)
+  {
+    console.log(parent);
+    for(let i = 0; i < this.nestedComments.length; i++)
+    {
+      if(this.nestedComments[i].parentcommentid == parent.commentid)
+      {
+        console.log(parent)
+        //child is found so add to its replies
+        parent.replies.push(this.nestedComments[i]);
+
+        //check if the child has replies
+        this.addReplies(this.nestedComments[i]);
+      }
+    }
+  }
+
 }
