@@ -13,7 +13,7 @@ export class ForumService {
   loggedIn:any;
 
   //URL to Forum API(temporary)
-  baseURL:string = "https://localhost:44335/Forum/";
+  baseURL:string = "https://localhost:5001/Forum/";
   constructor(private http:HttpClient) { }
 
   //Function that will make a call to the Forum API discussions/movieid endpoint

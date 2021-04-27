@@ -14,6 +14,15 @@ export class DiscussionComponent implements OnInit {
   comments: any;
   nestedComments = [];
   parentComments = [];
+
+  commentHolder = [];
+  currentPage = 1;
+  lowerCommentNum = 0;
+  higherCommentNum = 0;
+  numPerPage = 5;
+  pageNum: number = 1;
+  numOfComments: number;
+
   discussionID:string = "";
   discussion: any;
   subject: any;
@@ -22,10 +31,8 @@ export class DiscussionComponent implements OnInit {
   displayReplyForm = false;
   displayMessageForm = true;
   parentid: string;
-
-  pageNum: number = 1;
   sortingOrder:string = "timeD";
-  numOfComments: number;
+  
   newComment: any = {
     discussionid: 0,
     userid: "",
@@ -37,7 +44,6 @@ export class DiscussionComponent implements OnInit {
   constructor(private _forum: ForumService, private router:  ActivatedRoute) { }
 
   ngOnInit(): void {
-
     this.discussionID =  this.router.snapshot.params.id;
     console.log(this.discussionID);
     this.newComment.discussionid = this.router.snapshot.params.id;
@@ -48,31 +54,51 @@ export class DiscussionComponent implements OnInit {
       this.discussion = data;
       this.subject = this.discussion.subject;
     });
-    this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ this.numOfComments = data.length})
   }
 
   // Function that retrieves comments for a dicussion
   async getComments() {
     setTimeout(() => {
-      this._forum.getDiscussionCommentsPage(this.discussionID, this.pageNum, this.sortingOrder).subscribe(data =>{ 
+      this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ 
         console.log(data);
         this.comments = data;
         this.createNestedForm();
+        this.getFive();
       });
     }, 1000);
   }
 
+    //get first five
+    getFive(){
+      this.lowerCommentNum = (this.pageNum - 1) * this.numPerPage;
+      this.higherCommentNum = (this.pageNum * this.numPerPage);
+      console.log(this.lowerCommentNum);
+      console.log(this.higherCommentNum);
+      console.log("Number of parents");
+      console.log(this.numOfComments);
+      if(this.higherCommentNum > this.numOfComments)
+      {
+        this.higherCommentNum = this.numOfComments;
+      }
+
+      for(let i = this.lowerCommentNum; i<this.higherCommentNum; i++)
+      {
+        this.commentHolder.push(this.parentComments[i]);
+      }
+      console.log(this.commentHolder);
+    }
+
     //get next comments page
     onNext(){
-      this.comments = [];
+      this.commentHolder = [];
       this.pageNum++;
-      this.getComments();
+      this.getFive();
     }
     //get previous comments page
     onPrev(){
-      this.comments = [];
+      this.commentHolder = [];
       this.pageNum--;
-      this.getComments();
+      this.getFive();
     }
   
   //Function that will check if a user is logged in
@@ -172,7 +198,7 @@ export class DiscussionComponent implements OnInit {
         this.parentComments.push(nc);
       }
     });
-
+    this.numOfComments = this.parentComments.length;
     this.parentComments.forEach(pc => {
       this.addReplies(pc);
     });

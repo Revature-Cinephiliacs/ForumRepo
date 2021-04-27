@@ -1,47 +1,8 @@
 <h1>{{subject}}</h1>
-<!-- <div *ngIf="comments">
-    <ul>
-        <li *ngFor="let comment of parentComments">
-            <div  class="spoilerCover" *ngIf="comment.isspoiler && !spoilersShown()">
-                <button (click)="showSpoilers()">Show Spoilers</button>
-            </div>
-            <div class="commentContent" *ngIf="!comment.isspoiler || spoilersShown()">
-                <a routerLink="/user/{{comment.userid}}" class="userid">{{ comment.userid }}</a>
-                <div class="commenttext">{{comment.text}}</div>
-            </div>
-            <ul>
-                <li *ngFor="let reply of comment.replies">
-                    <div  class="spoilerCover" *ngIf="reply.isspoiler && !spoilersShown()">
-                        <button (click)="showSpoilers()">Show Spoilers</button>
-                    </div>
-                    <div class="commentContent" *ngIf="!reply.isspoiler || spoilersShown()">
-                        <a routerLink="/user/{{reply.userid}}" class="userid">{{ reply.userid }}</a>
-                        <div class="commenttext">{{reply.text}}</div>
-                    </div>
-                    <button (click) = "showReplyForm(reply.commentid)">Reply {{reply.commentid}}</button>
-                    <ul>
-                        <li *ngFor="let r of reply.replies">
-                            <div  class="spoilerCover" *ngIf="r.isspoiler && !spoilersShown()">
-                                <button (click)="showSpoilers()">Show Spoilers</button>
-                            </div>
-                            <div class="commentContent" *ngIf="!reply.isspoiler || spoilersShown()">
-                                <a routerLink="/user/{{r.userid}}" class="userid">{{ r.userid }}</a>
-                                <div class="commenttext">{{r.text}}</div>
-                            </div>
-                            <button (click) = "showReplyForm(r.commentid)">Reply {{r.commentid}}</button>
-                        </li>
-                    </ul>
-                    <button (click) = "showReplyForm(reply.commentid)">Reply</button>
-                </li>
-            </ul>
-            <button (click) = "showReplyForm(comment.commentid)">Reply</button>
-        </li>
-    </ul>
-</div> -->
 
 <ul>
     <ng-container
-      *ngTemplateOutlet="recursiveListTmpl; context:{ list: parentComments }"
+      *ngTemplateOutlet="recursiveListTmpl; context:{ list: commentHolder }"
     ></ng-container>
 </ul>
   
@@ -75,8 +36,9 @@
     </form>
     <button (click) = "cancelReply()">Cancel Reply</button>
 </div>
+
 <button *ngIf="1<pageNum" (click)="onPrev()">Previous</button>
-<button *ngIf="numOfComments>(pageNum*10)" (click)="onNext()">Next</button>
+<button *ngIf="numOfComments>(pageNum*5)" (click)="onNext()">Next</button>
 
 <div id="input" *ngIf = "displayMessageForm">
     <h3>New Comment</h3>
