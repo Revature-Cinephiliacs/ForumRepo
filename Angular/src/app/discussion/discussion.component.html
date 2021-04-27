@@ -1,22 +1,46 @@
 <h1>{{subject}}</h1>
 
-<div *ngIf="comments">
-    <ul>
-        <li *ngFor="let comment of comments">
-            <div  class="spoilerCover" *ngIf="comment.isspoiler && !spoilersShown()">
-                <button (click)="showSpoilers()">Show Spoilers</button>
-            </div>
-            <div class="commentContent" *ngIf="!comment.isspoiler || spoilersShown()">
-                <a routerLink="/user/{{comment.userid}}" class="userid">{{ comment.userid }}</a>
-                <div class="commenttext">{{comment.text}}</div>
-            </div>
-        </li>
+<ul>
+    <ng-container
+      *ngTemplateOutlet="recursiveListTmpl; context:{ list: commentHolder }"
+    ></ng-container>
+</ul>
+  
+<ng-template #recursiveListTmpl let-list="list">
+<li *ngFor="let item of list">
+    <div  class="spoilerCover" *ngIf="item.isspoiler && !spoilersShown()">
+        <button (click)="showSpoilers()">Show Spoilers</button>
+    </div>
+    <div class="commentContent" *ngIf="!item.isspoiler || spoilersShown()">
+        <a routerLink="/user/{{item.userid}}" class="userid">{{ item.userid }}</a>
+        {{item.commentid}}
+        <div class="commenttext">{{item.text}}</div>
+        <button (click) = "showReplyForm(item.commentid)">reply</button>
+    </div>    
+    <ul *ngIf="item.replies.length > 0">
+    <ng-container
+        *ngTemplateOutlet="recursiveListTmpl; context:{ list: item.replies }"
+    ></ng-container>
     </ul>
-</div>
-<button *ngIf="1<pageNum" (click)="onPrev()">Previous</button>
-<button *ngIf="numOfComments>(pageNum*10)" (click)="onNext()">Next</button>
+</li>
+</ng-template>
 
-<div id="input">
+<div id = "reply" *ngIf = "displayReplyForm">
+    <h3>Reply</h3>
+    <form class = "replyForm">
+        <label>Message</label>
+        <input type="text" placeholder="Comment" [(ngModel)]="newComment.text" [ngModelOptions]="{standalone: true}" required><br>
+        <button (click)="postReply()">Post Reply</button>
+        <input type="checkbox" [(ngModel)]="newComment.isspoiler" [ngModelOptions]="{standalone: true}">
+        <label>Spoiler</label>
+    </form>
+    <button (click) = "cancelReply()">Cancel Reply</button>
+</div>
+
+<button *ngIf="1<pageNum" (click)="onPrev()">Previous</button>
+<button *ngIf="numOfComments>(pageNum*5)" (click)="onNext()">Next</button>
+
+<div id="input" *ngIf = "displayMessageForm">
     <h3>New Comment</h3>
     <form>
         <input type="text" placeholder="Comment" id="comment" [(ngModel)]="newComment.text" [ngModelOptions]="{standalone: true}" required><br>
