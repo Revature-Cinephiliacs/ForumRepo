@@ -62,7 +62,7 @@ namespace BusinessLogic
             return comments;
         }
 
-        public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page)
+        public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
         {
             if (page < 1)
             {
@@ -71,7 +71,7 @@ namespace BusinessLogic
             }
 
             Repository.Models.Setting pageSizeSetting = _repo.GetSetting("commentspagesize");
-            int pageSize = 1;//pageSizeSetting.IntValue ?? default(int);
+            int pageSize = pageSizeSetting.IntValue ?? default(int);
             if (pageSize < 1)
             {
                 _logger.LogWarning($"ForumLogic.GetCommentsPage() was called but the commentspagesize is invalid {pageSize}");
@@ -84,7 +84,24 @@ namespace BusinessLogic
                 _logger.LogWarning($"ForumLogic.GetCommentsPage() was called with a discussionid that doesn't exist {discussionid}.");
                 return null;
             }
-            repoComments = repoComments.OrderByDescending(c => c.CreationTime).ToList<Repository.Models.Comment>();
+
+            // Sort the list of comments
+            switch (sortingOrder)
+            {
+                // case "likes":
+                //     repoComments = repoComments.OrderBy(r => r.like).ToList<Repository.Models.Comment>();
+                // break;
+                // case "comments":
+                //     repoComments = repoComments.OrderByDescending(r => r.comments).ToList<Repository.Models.Comment>();
+                // break;
+                case "timeA":
+                    repoComments = repoComments.OrderBy(r => r.CreationTime).ToList<Repository.Models.Comment>();
+                break;
+                case "timeD":
+                    repoComments = repoComments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Comment>();
+                break;
+                
+            }
 
             int numberOfComments = repoComments.Count;
             int startIndex = pageSize * (page - 1);
@@ -107,6 +124,7 @@ namespace BusinessLogic
             {
                 comments.Add(Mapper.RepoCommentToComment(repoComments[i]));
             }
+
             return comments;
         }
 
@@ -149,6 +167,94 @@ namespace BusinessLogic
             return discussions;
         }
 
+        public async Task<List<Discussion>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
+        {
+            if(page < 1)
+            {
+                Console.WriteLine("ForumLogic.GetDiscussionsPage() was called with a negative or zero page number.");
+                return null;
+            }
+
+            Repository.Models.Setting pageSizeSetting = _repo.GetSetting("Discussionpagesize");
+            
+            int pageSize = pageSizeSetting.IntValue ?? default(int);
+            if(pageSize < 1)
+            {
+                Console.WriteLine("ForumLogic.GetDiscussionsPage() was called but the Duscussionspagesize is invalid");
+                return null;
+            }
+
+            List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
+            if (repoDiscussions == null)
+            {
+                _logger.LogWarning($"ForumLogic.GetDiscussions() was called with a movieid that doesn't exist {movieid}.");
+                return null;
+            }
+
+            foreach (var item in repoDiscussions)
+            {
+                item.Comments = await _repo.GetMovieComments(item.DiscussionId);
+            }
+
+            // Sort the list of Discussion according to sorting string
+            switch (sortingOrder)
+            {
+                // case "like":
+                //     repoDiscussions = repoDiscussions.OrderBy(r => r.like).ToList<Repository.Models.Discussion>();
+                // break;
+                case "commentsA":
+                    repoDiscussions = repoDiscussions.OrderBy(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+                break;
+                case "commentsD":
+                    repoDiscussions = repoDiscussions.OrderByDescending(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+                break;
+                case "timeA":
+                    repoDiscussions = repoDiscussions.OrderBy(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+                break;
+                case "timeD":
+                    repoDiscussions = repoDiscussions.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+                break;
+            }
+
+
+            int numOfDiscussion = repoDiscussions.Count;
+            int start = pageSize * (page -1);
+            if(start > numOfDiscussion - 1)
+            {
+                Console.WriteLine("ForumLogic.GetDiscussionsPage() was called for a page number without reviews.");
+                return null;
+            }
+
+            int end = start + pageSize-1;
+            if(end > numOfDiscussion - 1)
+            {
+                end = numOfDiscussion - 1;
+            }
+
+            List<Repository.Models.Discussion> pageDiscussions = new List<Repository.Models.Discussion>();
+            for(int i = start; i <= end; i++){
+
+                pageDiscussions.Add(repoDiscussions[i]);
+            }
+
+            List<Discussion> discussions = new List<Discussion>();
+            foreach (var repoDiscussion in pageDiscussions)
+            {
+                
+                // Get the topic associated with this discussion
+                Repository.Models.Topic topic = _repo.GetDiscussionTopic(repoDiscussion.DiscussionId);
+                if (topic == null)
+                {
+                    topic = new Repository.Models.Topic();
+                    topic.TopicName = "None";
+                }
+                discussions.Add(Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic));
+                
+            }
+            return discussions;
+        }
+
+
         public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
             Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());
@@ -168,6 +274,7 @@ namespace BusinessLogic
             Discussion discussion = Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic);
             return discussion;
         }
+
 
         public async Task<List<string>> GetTopics()
         {
@@ -197,7 +304,12 @@ namespace BusinessLogic
             {
                 repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsDescending());
             }
-             
+
+            else if (type == "r")
+            {
+                repoDiscussions = await Task.Run(() => _repo.GetSortedDiscussionsRecent());
+            }
+
             List<DiscussionT> globalDiscussions = new List<DiscussionT>();
 
             foreach(Repository.Models.Discussion dis in repoDiscussions)

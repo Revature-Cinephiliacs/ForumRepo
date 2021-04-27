@@ -1,13 +1,14 @@
 <h3>List of Discussions</h3>
-<form action="/action_page.php">
-    <input matInput (keyup)="applyFilter($event.target.value)"name="search">
-   
-</form>
+<div class="input-group">
+    <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
+    aria-describedby="search-addon" id="myInput" (keyup)="setTable()" placeholder="Search for names.." title="Type in a name">
+    <button type="button" class="btn btn-outline-primary">search</button>
+  </div>
 
 <button (click) = "sortDiscussionsByCommentsAsc()">Sort Ascending</button>
 <button (click) = "sortDiscussionsByCommentsDesc()">Sort Descending</button>
 
-<table *ngIf="!DisplayList">
+<table id="myTable" *ngIf="DisplayList">
     <thead>
         <tr>
             <th>Title</th>
@@ -33,7 +34,7 @@
             <th>Username</th>
             <th>Replies</th>
         </tr>
-    </thead>
+</thead>
     <tbody>
          <tr *ngFor = "let discussion of newDiscussions">
              
@@ -49,4 +50,9 @@
         </tr>
     </tbody>
 </table>
+
+<button *ngIf="1<pageNum" (click)="onPrev()">Previous</button>
+<button *ngIf="numOfDiscussion > (pageNum*10)" (click)="onNext()">Next</button>
+
+
 

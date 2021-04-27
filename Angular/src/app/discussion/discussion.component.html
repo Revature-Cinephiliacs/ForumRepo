@@ -75,6 +75,8 @@
     </form>
     <button (click) = "cancelReply()">Cancel Reply</button>
 </div>
+<button *ngIf="1<pageNum" (click)="onPrev()">Previous</button>
+<button *ngIf="numOfComments>(pageNum*10)" (click)="onNext()">Next</button>
 
 <div id="input" *ngIf = "displayMessageForm">
     <h3>New Comment</h3>

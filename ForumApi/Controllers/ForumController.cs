@@ -61,6 +61,29 @@ namespace CineAPI.Controllers
             return discussions;
         }
 
+                /// <summary>
+        /// Returns a list of all Discussion objects that are associated with
+        /// the provided movie ID.
+        /// </summary>
+        /// <param name="movieid"></param>
+        /// <returns></returns>
+        [HttpGet("discussions/{movieid}/{page}/{sortingOrder}")]
+        public async Task<ActionResult<List<Discussion>>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
+        {
+            Console.WriteLine(movieid);
+            List<Discussion> discussions = await _forumLogic.GetDiscussionsPage(movieid, page, sortingOrder);
+            if (discussions == null)
+            {
+                return StatusCode(404);
+            }
+            if (discussions.Count == 0)
+            {
+                return StatusCode(204);
+            }
+            StatusCode(200);
+            return discussions;
+        }
+
         /// <summary>
         /// Returns the Discussion object with the provided discussion ID.
         /// </summary>
@@ -107,10 +130,10 @@ namespace CineAPI.Controllers
         /// <param name="discussionid"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        [HttpGet("comments/{discussionid}/{page}")]
-        public async Task<ActionResult<List<Comment>>> GetCommentsPage(Guid discussionid, int page)
+        [HttpGet("comments/{discussionid}/{page}/{sortingOrder}")]
+        public async Task<ActionResult<List<Comment>>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
         {
-            List<Comment> comments = await _forumLogic.GetCommentsPage(discussionid, page);
+            List<Comment> comments = await _forumLogic.GetCommentsPage(discussionid, page, sortingOrder);
             if (comments == null)
             {
                 return StatusCode(404);
@@ -257,5 +280,27 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
         }
+
+        /// <summary>
+        /// Returns a list of sorted discussions based on recent comments (ascending)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("discussion/sort/comment/recent")]
+        public async Task<ActionResult<List<DiscussionT>>> GetDiscussionsCommentsRecent()
+        {
+            List<DiscussionT> discussions = await _forumLogic.GetSortedDiscussionsByComments("r");
+            if (discussions == null)
+            {
+                return StatusCode(404);
+            }
+            if (discussions.Count == 0)
+            {
+                return StatusCode(204);
+            }
+            StatusCode(200);
+            return discussions;
+        }
+
+        
     }
 }
