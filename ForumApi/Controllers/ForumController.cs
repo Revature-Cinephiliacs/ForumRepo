@@ -61,7 +61,7 @@ namespace CineAPI.Controllers
             return discussions;
         }
 
-                /// <summary>
+        /// <summary>
         /// Returns a list of all Discussion objects that are associated with
         /// the provided movie ID.
         /// </summary>
@@ -305,7 +305,6 @@ namespace CineAPI.Controllers
         /// Returns a list of all Discussion objects that are associated with
         /// the provided movie ID.
         /// </summary>
-       
         /// <returns></returns>
         [HttpGet("discussions/topic/{topicid}")]
         public async Task<ActionResult<List<DiscussionT>>> GetDiscussionsByTopicId(string topicid)
