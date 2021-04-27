@@ -24,11 +24,11 @@
             </tr>
         </thead>
         <tbody>
-             <tr *ngFor = "let discussion of newDiscussions">
+             <tr *ngFor = "let discussion of discussions">
                  
                     <a routerLink="/discussion/{{discussion.discussionid}}"><td>{{discussion.subject}}</td></a>
                     <td>{{discussion.userid}}</td>
-                    <td>{{discussion.commentCount}}</td>
+                    <td>{{discussion.comments.length}}</td>
                 
             </tr>
         </tbody>

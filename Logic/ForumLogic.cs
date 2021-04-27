@@ -150,6 +150,11 @@ namespace BusinessLogic
                 _logger.LogWarning($"ForumLogic.GetDiscussions() was called with a movieid that doesn't exist {movieid}.");
                 return null;
             }
+            
+            foreach (var item in repoDiscussions)
+            {
+                item.Comments = await _repo.GetMovieComments(item.DiscussionId);
+            }
 
             List<Discussion> discussions = new List<Discussion>();
             foreach (var repoDiscussion in repoDiscussions)

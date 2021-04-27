@@ -14,7 +14,7 @@ export class DiscussionListComponent implements OnInit {
 
   discussions: any;
   searchDiscussions = [];
-  newDiscussion: Discussion & {commentCount: number};
+  
   newDiscussions = [];
   sortDiscussions: any;
   comments: any;
@@ -30,8 +30,7 @@ export class DiscussionListComponent implements OnInit {
   constructor(private _forum: ForumService, private router:  ActivatedRoute) { }
 
   ngOnInit(): void {
-    // this.DisplayList = true;
-    // this.newDiscussions = [];
+    
   
     this.movieID =  this.router.snapshot.params.id;
     console.log("Discussion List:" + this.movieID);
@@ -50,23 +49,20 @@ export class DiscussionListComponent implements OnInit {
         console.log(data);
         
         this.discussions = data;
-        
-        this.discussions.forEach(d => {
-          this.addCommentCount(d);
-        });    
+        console.log(this.discussions);   
       });
     }, 1000);
   }
 
   //get next discussion page
   onNext(){
-    this.newDiscussions = [];
+    this.discussions = [];
     this.pageNum++;
     this.getDiscussions();
   }
   //get previous duscussuin page
   onPrev(){
-    this.newDiscussions = [];
+    this.discussions = [];
     this.pageNum--;
     this.getDiscussions();
   }
@@ -75,30 +71,31 @@ export class DiscussionListComponent implements OnInit {
   //get the number of comments and add it to a new
   //discussion object with an added property for comment count, which is then 
   //added to a discussion list
-  async addCommentCount(d: any) {
-    setTimeout(() => {
-      this._forum.getDiscussionComments(d.discussionid).subscribe(data =>{ 
-        this.comments = data;
-        if(this.comments == null)
-        {
-          this.commentCount = 0;
-        }
-        else
-        {
-          this.commentCount = this.comments.length;
-        }
-        this.newDiscussion = {
-          discussionid: d.discussionid,
-          movieid: d.movieid,
-          userid: d.userid,
-          subject: d.subject,
-          topic: d.topic,
-          commentCount: this.commentCount
-        }
-        this.newDiscussions.push(this.newDiscussion);
-      });
-    }, 1000);
-  }
+  // async addCommentCount(d: any) {
+  //   setTimeout(() => {
+  //     this._forum.getDiscussionComments(d.discussionid).subscribe(data =>{ 
+  //       this.comments = data;
+  //       if(this.comments == null)
+  //       {
+  //         this.commentCount = 0;
+  //       }
+  //       else
+  //       {
+  //         this.commentCount = this.comments.length;
+  //       }
+  //       this.newDiscussion = {
+  //         discussionid: d.discussionid,
+  //         movieid: d.movieid,
+  //         userid: d.userid,
+  //         subject: d.subject,
+  //         topic: d.topic,
+  //         comments: d.
+  //         commentCount: this.commentCount
+  //       }
+  //       this.newDiscussions.push(this.newDiscussion);
+  //     });
+  //   }, 1000);
+  // }
 
   //Function that will take in a search string and then filter
   //the dicussions to show matching results

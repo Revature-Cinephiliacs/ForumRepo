@@ -1,5 +1,6 @@
 using System;
 using GlobalModels;
+using System.Collections.Generic;
 
 namespace BusinessLogic
 {
@@ -15,8 +16,15 @@ namespace BusinessLogic
         public static Discussion RepoDiscussionToDiscussion(Repository.Models.Discussion
             repoDiscussion, Repository.Models.Topic topic)
         {
+            List<Comment> newComment = new List<Comment>();
+            foreach (var item in repoDiscussion.Comments)
+            {   
+                if(item != null){
+                    newComment.Add(RepoCommentToComment(item));
+                }
+            }
             var discussion = new Discussion(Guid.Parse(repoDiscussion.DiscussionId), repoDiscussion.MovieId,
-                repoDiscussion.UserId, repoDiscussion.Subject, topic.TopicName);
+                repoDiscussion.UserId, repoDiscussion.Subject, topic.TopicName, newComment);
             return discussion;
         }
 

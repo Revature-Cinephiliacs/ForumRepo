@@ -17,10 +17,9 @@ export class MovieComponent implements OnInit {
   topics:any;
   discussions: any;
   comments: any;
-  commentCount: any;
-  newDiscussions = [];
+  
   displayMoreDuscussion: boolean = false;
-  newDiscussion: Discussion & {commentCount: number};
+  
   submitDiscussion: any = {
     movieid: this.router.snapshot.params.id,
     topic:"",
@@ -62,47 +61,16 @@ export class MovieComponent implements OnInit {
   async getDiscussions() {
     setTimeout(() => {
       this._forum.getDiscussion(this.router.snapshot.params.id).subscribe(data => {
-        console.log(data);
-        
         this.discussions = data;
+        console.log(data);
+        console.log(this.discussions[1].comments.length);
         if(this.discussions.length > 5){
           this.discussions =  this.discussions.slice(0, 5)
           this.displayMoreDuscussion = true;
         }
-        this.discussions.forEach(d => {
-          d.discussionid;
-          this.addCommentCount(d);
-        });    
+          
       });
     }, 10);
   }
 
-  //Function that will take in a discussion object and will
-  //get the number of comments and add it to a new
-  //discussion object with an added property for comment count, which is then 
-  //added to a discussion list
-  async addCommentCount(d: any) {
-    setTimeout(() => {
-      this._forum.getDiscussionComments(d.discussionid).subscribe(data =>{ 
-        this.comments = data;
-        if(this.comments == null)
-        {
-          this.commentCount = 0;
-        }
-        else
-        {
-          this.commentCount = this.comments.length;
-        }
-        this.newDiscussion = {
-          discussionid: d.discussionid,
-          movieid: d.movieid,
-          userid: d.userid,
-          subject: d.subject,
-          topic: d.topic,
-          commentCount: this.commentCount
-        }
-        this.newDiscussions.push(this.newDiscussion);
-      });
-    }, 1000);
-  }
 }
