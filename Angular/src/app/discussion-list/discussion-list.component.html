@@ -17,7 +17,32 @@
         </tr>
     </thead>
     <tbody>
-     
+         <tr *ngFor = "let discussion of searchDiscussions">
+             
+                <a routerLink="/discussion/{{discussion.discussionid}}"><td>{{discussion.subject}}</td></a>
+                <td>{{discussion.userid}}</td>
+                <td>{{discussion.commentCount}}</td>
+            
+        </tr>
+    </tbody>
+</table>
+  
+<table *ngIf="DisplayList">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Username</th>
+            <th>Replies</th>
+        </tr>
+</thead>
+    <tbody>
+         <tr *ngFor = "let discussion of newDiscussions">
+             
+                <a routerLink="/discussion/{{discussion.discussionid}}"><td>{{discussion.subject}}</td></a>
+                <td>{{discussion.userid}}</td>
+                <td>{{discussion.commentCount}}</td>
+            
+        </tr>
         <tr *ngFor = "let d of sortDiscussions">
             <a routerLink="/discussion/{{d.discussionId}}"><td>{{d.subject}}</td></a>
             <td>{{d.userid}}</td>  
@@ -25,4 +50,9 @@
         </tr>
     </tbody>
 </table>
+
+<button *ngIf="1<pageNum" (click)="onPrev()">Previous</button>
+<button *ngIf="numOfDiscussion > (pageNum*10)" (click)="onNext()">Next</button>
+
+
 
