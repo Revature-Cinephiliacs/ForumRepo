@@ -8,9 +8,10 @@ This microservice is part of the Cinephiliacs application. It manages all forum 
 * ASP.NET Core
 * EntityFramework Core
 
-## API Address
+## Usage
+#### API Address
 http://20.45.6.142/
-## Endpoint Objects
+#### Endpoint Objects
 * Discussion
   * discussionid: string,
   * movieid: string,
@@ -37,8 +38,8 @@ http://20.45.6.142/
   * text: string,
   * isspoiler: boolean
 
-### Object usage within an endpoint is denoted by placing the object name with parenthesis: (Object)
-## Endpoints
+##### Object usage within an endpoint is denoted by placing the object name with parenthesis: (Object)
+#### Endpoints
 | Description                       | Type | Path                                                | Request Body    | Returned       | Comments                               |
 |-----------------------------------|------|-----------------------------------------------------|-----------------|----------------|----------------------------------------|
 | Get all topics                    | Get  | forum/topics                                        |                 | string[]       |                                        |
