@@ -21,16 +21,19 @@ namespace GlobalModels
 
         [Required]
         public bool Isspoiler { get; set; }
+
+        public string ParentCommentid {get; set;}
         public NewComment()
         {
             
         }
-        public NewComment(Guid discussionid, string uid, string text, bool isspoiler)
+        public NewComment(Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid)
         {
             Discussionid = discussionid;
             Userid = uid;
             Text = text;
             Isspoiler = isspoiler;
+            ParentCommentid = parentcommentid;
         }
         public NewComment(Comment comment)
         {

@@ -210,7 +210,7 @@ namespace BusinessLogic
                 gdis.Subject = dis.Subject;
                 foreach (var ct in dis.Comments)
                 {
-                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler);
+                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid);
                     gdis.Comments.Add(nc);
                     
                 }

@@ -12,14 +12,16 @@ namespace GlobalModels
         public string Userid { get; set; }
         public string Text { get; set; }
         public bool Isspoiler { get; set; }
+        public string ParentCommentid { get; set; }
 
-        public Comment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler)
+        public Comment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid)
         {
             Commentid = commentid;
             Discussionid = discussionid;
             Userid = uid;
             Text = text;
             Isspoiler = isspoiler;
+            ParentCommentid = parentcommentid;
         }
 
         public bool Equals(Comment other)

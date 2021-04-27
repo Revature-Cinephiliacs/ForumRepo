@@ -175,6 +175,8 @@ namespace CineAPI.Controllers
         [HttpPost("comment")]
         public async Task<ActionResult> CreateComment([FromBody] NewComment comment)
         {
+            System.Console.WriteLine("Form Controller: " + comment);
+            
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("ForumController.CreateComment() was called with invalid body data.");

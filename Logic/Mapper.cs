@@ -28,8 +28,11 @@ namespace BusinessLogic
         /// <returns></returns>
         public static Comment RepoCommentToComment(Repository.Models.Comment repoComment)
         {
-            var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId),
-                repoComment.UserId, repoComment.CommentText, repoComment.IsSpoiler);
+            // var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId),
+            //     repoComment.UserId, repoComment.CommentText, repoComment.IsSpoiler);
+            
+            var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), repoComment.UserId,
+                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid);
             return comment;
         }
 
@@ -69,7 +72,7 @@ namespace BusinessLogic
             repoComment.CommentText = comment.Text;
             repoComment.CreationTime = DateTime.Now;
             repoComment.IsSpoiler = comment.Isspoiler;
-
+            repoComment.ParentCommentid = comment.ParentCommentid;
             return repoComment;
         }
 
