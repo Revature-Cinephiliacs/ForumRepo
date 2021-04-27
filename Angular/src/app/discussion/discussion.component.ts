@@ -53,6 +53,7 @@ export class DiscussionComponent implements OnInit {
       this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ 
         console.log(data);
         this.comments = data;
+        this.createNestedForm();
       });
     }, 1000);
   }
@@ -88,22 +89,8 @@ export class DiscussionComponent implements OnInit {
     console.log(this.newComment);
   }
 
-  //Function that will show the reply form and hide the new comment form
-  showReplyForm(commentparentid:string){
-    this.displayReplyForm = true;
-    this.displayMessageForm = false;
-    this.parentid = commentparentid;
-    console.log("Reply to: " + commentparentid);
-    console.log("This parent id" + this.parentid);
-  }
-
-  cancelReply()
-  {
-    this.displayReplyForm = false;
-    this.displayMessageForm = true;
-    console.log("cancel")
-  }
-
+  //This function will add a reply to a comment and then
+  //Redisplay the nested comments
   postReply()
   {
     console.log("Post reply" + this.parentid);
@@ -116,6 +103,23 @@ export class DiscussionComponent implements OnInit {
       this.getComments();
     }
     console.log(this.newComment);
+  }
+
+  //Function that will show the reply form and hide the new comment form
+  showReplyForm(commentparentid:string){
+    this.displayReplyForm = true;
+    this.displayMessageForm = false;
+    this.parentid = commentparentid;
+    console.log("Reply to: " + commentparentid);
+    console.log("This parent id" + this.parentid);
+  }
+
+  //Will hide the reply form and display the new comment form
+  cancelReply()
+  {
+    this.displayReplyForm = false;
+    this.displayMessageForm = true;
+    console.log("cancel")
   }
 
   //Displays a spoiler(unblurs it)
@@ -133,27 +137,11 @@ export class DiscussionComponent implements OnInit {
     return (testSTR == "");
   }
 
-  showReplies(commentid:string)
-  {
-    let replyComments = [];
-    console.log(commentid)
-    this.comments.forEach(comment => {
-      if(comment.parentCommentid == commentid)
-      {
-        let newNestedComment = this.createNewNestedComment(comment);
-        replyComments.push(newNestedComment);
-      }
-    });
-
-    console.log("Show replies array: ");
-    console.log(replyComments);
-
-    return replyComments;
-  }
-
-  testingStuff(){
-    console.log("test");
-    //var parentComments = [];
+  //This method will take the list of comments from the database
+  //and rearrange them into a nested comment form
+  createNestedForm(){
+    this.nestedComments = [];
+    this.parentComments = [];
     this.comments.forEach(ct => {
       let newNestedComment = this.createNewNestedComment(ct);
       this.nestedComments.push(newNestedComment);
@@ -177,6 +165,8 @@ export class DiscussionComponent implements OnInit {
 
   }
 
+  //Function will convert a comment from the backend
+  //to a new form of nest comment object
   createNewNestedComment(comment:any)
   {
     let newNestedComment = new NestedComment(
@@ -188,10 +178,11 @@ export class DiscussionComponent implements OnInit {
       comment.parentCommentid,
       []
     );
-
     return newNestedComment;
   }
 
+  //Recursive function that will take in a parent comment
+  //and add its children comments to its replies array
   addReplies(parent: any)
   {
     console.log(parent);

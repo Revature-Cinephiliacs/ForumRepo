@@ -1,6 +1,5 @@
 <h1>{{subject}}</h1>
-<button (click) = "testingStuff()">Test</button>
-<div *ngIf="comments">
+<!-- <div *ngIf="comments">
     <ul>
         <li *ngFor="let comment of parentComments">
             <div  class="spoilerCover" *ngIf="comment.isspoiler && !spoilersShown()">
@@ -38,7 +37,32 @@
             <button (click) = "showReplyForm(comment.commentid)">Reply</button>
         </li>
     </ul>
-</div>
+</div> -->
+
+<ul>
+    <ng-container
+      *ngTemplateOutlet="recursiveListTmpl; context:{ list: parentComments }"
+    ></ng-container>
+</ul>
+  
+<ng-template #recursiveListTmpl let-list="list">
+<li *ngFor="let item of list">
+    <div  class="spoilerCover" *ngIf="item.isspoiler && !spoilersShown()">
+        <button (click)="showSpoilers()">Show Spoilers</button>
+    </div>
+    <div class="commentContent" *ngIf="!item.isspoiler || spoilersShown()">
+        <a routerLink="/user/{{item.userid}}" class="userid">{{ item.userid }}</a>
+        {{item.commentid}}
+        <div class="commenttext">{{item.text}}</div>
+        <button (click) = "showReplyForm(item.commentid)">reply</button>
+    </div>    
+    <ul *ngIf="item.replies.length > 0">
+    <ng-container
+        *ngTemplateOutlet="recursiveListTmpl; context:{ list: item.replies }"
+    ></ng-container>
+    </ul>
+</li>
+</ng-template>
 
 <div id = "reply" *ngIf = "displayReplyForm">
     <h3>Reply</h3>
