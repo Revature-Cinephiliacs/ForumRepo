@@ -123,6 +123,26 @@ namespace BusinessLogic
             return repoComment;
         }
 
+        public static DiscussionT RepoDiscussionToDiscussionT(Repository.Models.Discussion dis)
+        {
+            DiscussionT gdis = new();
+            gdis.DiscussionId = dis.DiscussionId;
+            gdis.MovieId = dis.MovieId;
+            gdis.Userid = dis.UserId;
+            gdis.Subject = dis.Subject;
+            foreach (var ct in dis.Comments)
+            {
+                Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid);
+                gdis.Comments.Add(nc);
+            }
+            foreach (var top in dis.DiscussionTopics)
+            {
+                gdis.DiscussionTopics.Add(top.TopicId);
+            }
+
+            return gdis;
+        }
+
         /// <summary>
         /// Maps an instance of GlobalModels.Topic onto a new intance of Repository.Models.Topic.
         /// Creates a new Guid and converts it to a string

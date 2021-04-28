@@ -153,5 +153,22 @@ namespace BusinessLogic.Interfaces
         /// <param name="topicid"></param>
         /// <returns></returns>
         public Task<bool> DeleteTopic(Guid topicid);
+
+        /// <summary>
+        /// Adds a new user-discussion follow relationship
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        public Task<bool> FollowDiscussion(Guid discussionid, string userid);
+
+        /// <summary>
+        /// Returns the list of discussions that a user is following
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionT>> GetFollowDiscList(string userid);
     }
 }

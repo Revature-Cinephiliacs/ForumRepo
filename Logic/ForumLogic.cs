@@ -349,23 +349,7 @@ namespace BusinessLogic
 
             foreach (Repository.Models.Discussion dis in repoDiscussions)
             {
-                DiscussionT gdis = new DiscussionT();
-
-                gdis.DiscussionId = dis.DiscussionId;
-                gdis.MovieId = dis.MovieId;
-                gdis.Userid = dis.UserId;
-                gdis.Subject = dis.Subject;
-                foreach (var ct in dis.Comments)
-                {
-                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid);
-                    gdis.Comments.Add(nc);
-
-                }
-                foreach (var top in dis.DiscussionTopics)
-                {
-                    gdis.DiscussionTopics.Add(top.TopicId);
-                }
-                globalDiscussions.Add(gdis);
+                globalDiscussions.Add(Mapper.RepoDiscussionToDiscussionT(dis));
             }
             return globalDiscussions;
         }
@@ -395,7 +379,6 @@ namespace BusinessLogic
                 {
                     Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid);
                     gdis.Comments.Add(nc);
-
                 }
 
                 foreach (var top in dis.DiscussionTopics)
@@ -426,6 +409,35 @@ namespace BusinessLogic
         public async Task<bool> DeleteTopic(Guid topicid)
         {
             return await _repo.DeleteTopic(topicid.ToString());
+        }
+
+        public async Task<bool> FollowDiscussion(Guid discussionid, string userid)
+        {
+            Repository.Models.DiscussionFollow newFollow = new Repository.Models.DiscussionFollow();
+            newFollow.DiscussionId = discussionid.ToString();
+            newFollow.UserId = userid;
+            return await _repo.FollowDiscussion(newFollow);
+        }
+
+        public async Task<List<DiscussionT>> GetFollowDiscList(string userid)
+        {
+            List<Repository.Models.DiscussionFollow> repoFollow = await _repo.GetFollowDiscussionList(userid);
+            if(repoFollow == null)
+            {
+                return null;
+            }
+            List<DiscussionT> allDisc = new List<DiscussionT>();
+            List<Task<DiscussionT>> tasks = new List<Task<DiscussionT>>();
+            foreach(Repository.Models.DiscussionFollow disc in repoFollow)
+            {
+                tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(disc.Discussion)));
+            }
+            var results = await Task.WhenAll(tasks);
+            foreach(var item in results)
+            {
+                allDisc.Add(item);
+            }
+            return allDisc;
         }
     }
 }

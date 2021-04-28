@@ -132,6 +132,10 @@ namespace Repository
             _dbContext.Comments.RemoveRange(discComments);
             await _dbContext.SaveChangesAsync();
 
+            List<DiscussionFollow> discFollows = await _dbContext.DiscussionFollows.Where(x => x.DiscussionId == discussionid).ToListAsync();
+            _dbContext.DiscussionFollows.RemoveRange(discFollows);
+            await _dbContext.SaveChangesAsync();
+
             _dbContext.Discussions.Remove(delDisc);
             await _dbContext.SaveChangesAsync();
 
@@ -154,6 +158,23 @@ namespace Repository
             await _dbContext.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<bool> FollowDiscussion(DiscussionFollow newFollow)
+        {
+            if(!DiscussionExists(newFollow.DiscussionId))
+            {
+                _logger.LogWarning($"RepoLogic.FollowDiscussion() was called for a comment that doesn't exist {newFollow.DiscussionId}.");
+                return false;
+            }
+
+            await _dbContext.AddAsync<DiscussionFollow>(newFollow);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+        public async Task<List<DiscussionFollow>> GetFollowDiscussionList(string userid)
+        {
+            return await _dbContext.DiscussionFollows.Include(x => x.Discussion).Where(x => x.UserId == userid).ToListAsync();
         }
 
         public async Task<List<Comment>> GetMovieComments(string discussionid)
