@@ -91,9 +91,9 @@ namespace CineAPI.Controllers
         /// <param name="discussion"></param>
         /// <returns></returns>
         [HttpGet("discussion/{discussionid}")]
-        public async Task<ActionResult<Discussion>> GetDiscussion(Guid discussionid)
+        public async Task<ActionResult<DiscussionT>> GetDiscussion(Guid discussionid)
         {
-            Discussion discussion = await _forumLogic.GetDiscussion(discussionid);
+            DiscussionT discussion = await _forumLogic.GetDiscussion(discussionid);
             if (discussion == null)
             {
                 return StatusCode(404);
@@ -492,6 +492,24 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             bool success = await _forumLogic.LikeComment(commentid, userid);
+            if(!success)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return success;
+        }
+
+        [HttpPost("discussion/topic/{discussionid}/{topicid}")]
+        public async Task<ActionResult<bool>> AddTopicToDiscussion(string discussionid, string topicid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.AddTopicToDiscussion() was called with invalid body data.");
+                return StatusCode(400);
+            }
+
+            bool success = await _forumLogic.AddDiscussionTopic(discussionid, topicid);
             if(!success)
             {
                 return StatusCode(404);

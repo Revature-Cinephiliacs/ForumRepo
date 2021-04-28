@@ -1,5 +1,10 @@
 <h1>{{subject}}</h1>
-
+<h5>Current Topics</h5>
+<ul>
+    <li *ngFor = "let ct of currentTopics">{{ct}}</li>
+</ul>
+<button>Sort by Time</button>
+<button (click) = "sortByLikes('likes')">Sort by likes</button>
 <ul>
     <ng-container
       *ngTemplateOutlet="recursiveListTmpl; context:{ list: pageComments }"
@@ -50,3 +55,13 @@
         <label>Spoiler</label>
     </form>
 </div>
+<br>
+<h3>Add a Discussion Topic</h3>
+<select [(ngModel)] = "selectedDiscussionOption">
+    <option *ngFor = "let t of topics">{{t.topicName}}</option>
+</select>
+<button (click) = "addNewTopic()">Add</button>
+<div *ngIf = "displayWarning">
+    <p>This topic is already added!</p>
+</div>
+

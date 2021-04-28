@@ -82,8 +82,14 @@ export class ForumService {
     return this.http.get( this.baseURL + "discussions/topic/" + topicid);
   }
 
-  //Function that will modify comment like
+  //Function that will make a call to the Forum API endpoint to modify comment like
   addLike(commentid: string){
     return this.http.post( this.baseURL + "comment/like/" + commentid, null);
+  }
+  
+  //Function that will make a call to the Forum API endpoint to add a given topic to a given discussion
+  addTopicToDiscussion(discussionid: string, topicid: string)
+  {
+    return this.http.post( this.baseURL + "discussion/topic/" + discussionid + "/" + topicid, null);
   }
 }

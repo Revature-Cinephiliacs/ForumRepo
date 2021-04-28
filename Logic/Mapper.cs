@@ -140,9 +140,11 @@ namespace BusinessLogic
             }
             gdis.Likes = totalLikes;
             
+            System.Console.WriteLine("Topics");
             foreach (var top in dis.DiscussionTopics)
             {
                 gdis.DiscussionTopics.Add(top.TopicId);
+                System.Console.WriteLine(top.Topic);
             }
 
             return gdis;
@@ -163,5 +165,6 @@ namespace BusinessLogic
             newTopic.TopicName = topic;
             return newTopic;
         }
+        
     }
 }

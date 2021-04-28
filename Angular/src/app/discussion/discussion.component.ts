@@ -19,12 +19,17 @@ export class DiscussionComponent implements OnInit {
   discussionID:string = "";
   discussion: any;
   subject: any;
+  discussionTopics: any;
+  topics: any;
+  currentTopics = [];
+  selectedDiscussionOption = "Plot";
   displaySpoilers: any = false;
   user: any;
   displayReplyForm = false;
   displayMessageForm = true;
   parentid: string;
   sortingOrder:string = "timeD";
+  displayWarning = false;
   
   newComment: any = {
     discussionid: 0,
@@ -46,7 +51,12 @@ export class DiscussionComponent implements OnInit {
       console.log(data);
       this.discussion = data;
       this.subject = this.discussion.subject;
+      this.discussionTopics = this.discussion.discussionTopics;
     });
+    this._forum.getTopics().subscribe(data => {
+      console.log(data);
+      this.topics = data;
+    })
     this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ 
       // this.numOfComments = data.length;
       this.comments = data;
@@ -63,6 +73,7 @@ export class DiscussionComponent implements OnInit {
       this._forum.getDiscussionCommentsPage(this.discussionID, this.pageNum, this.sortingOrder).subscribe(data =>{ 
         console.log(data);
         this.pageComments = data;
+        this.getCurrentTopicNames();
       });
     }, 1000);
   }
@@ -180,5 +191,63 @@ export class DiscussionComponent implements OnInit {
       console.log(data);
       this.getComments();
     });
+  }
+
+  sortByLikes(sortingorder: string)
+  {
+    console.log(sortingorder);
+    this.sortingOrder = sortingorder;
+    this.getComments();
+  }
+
+  addNewTopic()
+  {
+    var newTopic = this.selectedDiscussionOption;
+    console.log(this.currentTopics.includes(newTopic));
+    if(this.currentTopics.includes(newTopic))
+    {
+      this.displayWarning = true;
+    }
+    else{
+      this.displayWarning = false;
+      let id = "";
+      this.topics.forEach(t => {
+        if(newTopic == t.topicName)
+        {
+          id = t.topicId; 
+        }
+      });
+
+      console.log("Add topic to dis");
+      console.log("new topic id: " + id);
+      console.log(this.discussionID);
+      this._forum.addTopicToDiscussion(this.discussionID, id).subscribe(data => 
+        {
+          console.log(data);
+          if(data == true){
+            this.currentTopics.push(newTopic);
+          }
+      })
+    }
+    
+  }
+
+  getCurrentTopicNames()
+  {
+    console.log("Get Current Topic Name");
+    console.log(this.discussionTopics);
+    console.log(this.topics);
+    this.discussionTopics.forEach(dt => {
+      this.topics.forEach(t => {
+        if(dt == t.topicId)
+        {
+          console.log(dt);
+          console.log(t.topicName);
+          this.currentTopics.push(t.topicName);
+        }
+      });
+    });
+
+    console.log(this.currentTopics);
   }
 }

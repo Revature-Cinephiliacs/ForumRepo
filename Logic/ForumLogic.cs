@@ -89,7 +89,7 @@ namespace BusinessLogic
             switch (sortingOrder)
             {
                 // case "likes":
-                //     repoComments = repoComments.OrderBy(r => r.like).ToList<Repository.Models.Comment>();
+                //     repoComments = SortByLikes(repoComments);
                 // break;
                 // case "comments":
                 //     repoComments = repoComments.OrderByDescending(r => r.comments).ToList<Repository.Models.Comment>();
@@ -156,6 +156,11 @@ namespace BusinessLogic
                 System.Console.WriteLine("for each: -------------------");
                 Mapper.AddReplies(repoComments, nc);
                 System.Console.WriteLine(nc.Text);
+            }
+
+            if(sortingOrder == "likes"){
+                System.Console.WriteLine("Sorting by likes");
+                comments = SortByLikes(comments);
             }
 
             return comments;
@@ -291,7 +296,7 @@ namespace BusinessLogic
             return discussions;
         }
 
-        public async Task<Discussion> GetDiscussion(Guid discussionid)
+        public async Task<DiscussionT> GetDiscussion(Guid discussionid)
         {
             Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());
             if (repoDiscussion == null)
@@ -300,14 +305,15 @@ namespace BusinessLogic
                 return null;
             }
 
-            // Get the topic associated with this discussion
-            Repository.Models.Topic topic = _repo.GetDiscussionTopic(repoDiscussion.DiscussionId);
-            if (topic == null)
-            {
-                topic = new Repository.Models.Topic();
-                topic.TopicName = "None";
-            }
-            Discussion discussion = Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic);
+            // // Get the topic associated with this discussion
+            // Repository.Models.Topic topic = _repo.GetDiscussionTopic(repoDiscussion.DiscussionId);
+            // if (topic == null)
+            // {
+            //     topic = new Repository.Models.Topic();
+            //     topic.TopicName = "None";
+            // }
+
+            DiscussionT discussion = Mapper.RepoDiscussionToDiscussionT(repoDiscussion);
             return discussion;
         }
 
@@ -444,6 +450,25 @@ namespace BusinessLogic
         public async Task<bool> LikeComment(Guid commentid, string userid)
         {
             return await _repo.LikeComment(commentid.ToString(), userid);
+        }
+
+        private List<Comment> SortByLikes(List<Comment> li)
+        {
+            Comparison<Comment> likes = new Comparison<Comment>(Comment.CompareLikes);
+            li.Sort(likes);
+            return li;
+        }
+
+        private List<NestedComment> SortByLikes(List<NestedComment> li)
+        {
+            Comparison<NestedComment> likes = new Comparison<NestedComment>(NestedComment.CompareLikes);
+            li.Sort(likes);
+            return li;
+        }
+
+        public async Task<bool> AddDiscussionTopic(string discussionid, string topicid)
+        {
+            return await _repo.AddDiscussionTopic(discussionid, topicid);
         }
     }
 }
