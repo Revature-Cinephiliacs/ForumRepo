@@ -173,4 +173,12 @@ export class DiscussionComponent implements OnInit {
   isEmpty(testSTR:string){
     return (testSTR == "");
   }
+
+  //Function that will add a like to a comment
+  addLike(commentid: string){
+    this._forum.addLike(commentid).subscribe(data => {
+      console.log(data);
+      this.getComments();
+    });
+  }
 }

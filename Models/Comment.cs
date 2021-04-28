@@ -13,8 +13,9 @@ namespace GlobalModels
         public string Text { get; set; }
         public bool Isspoiler { get; set; }
         public string ParentCommentid { get; set; }
+        public int Likes { get; set; }
 
-        public Comment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid)
+        public Comment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid, int likes)
         {
             Commentid = commentid;
             Discussionid = discussionid;
@@ -22,6 +23,7 @@ namespace GlobalModels
             Text = text;
             Isspoiler = isspoiler;
             ParentCommentid = parentcommentid;
+            Likes = likes;
         }
 
         public bool Equals(Comment other)

@@ -14,9 +14,10 @@ namespace GlobalModels
         public string Text { get; set; }
         public bool Isspoiler { get; set; }
         public string ParentCommentid { get; set; }
+        public int Likes { get; set; }
         public List<NestedComment> Replies { get; set; }
 
-        public NestedComment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid)
+        public NestedComment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid, int likes)
         {
             Commentid = commentid;
             Discussionid = discussionid;
@@ -25,6 +26,7 @@ namespace GlobalModels
             Isspoiler = isspoiler;
             ParentCommentid = parentcommentid;
             Replies = new List<NestedComment>();
+            Likes = likes;
         }
 
         public bool Equals(NestedComment other)

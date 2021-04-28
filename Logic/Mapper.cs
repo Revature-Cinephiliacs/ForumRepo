@@ -40,7 +40,7 @@ namespace BusinessLogic
             //     repoComment.UserId, repoComment.CommentText, repoComment.IsSpoiler);
             
             var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), repoComment.UserId,
-                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid);
+                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid, (int)repoComment.Likes);
             return comment;
         }
 
@@ -53,7 +53,7 @@ namespace BusinessLogic
         public static NestedComment RepoCommentToNestedComment(Repository.Models.Comment repoComment)
         {
             var nestedComment = new NestedComment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), repoComment.UserId,
-                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid);
+                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid, (int)repoComment.Likes);
 
             return nestedComment;
         }
@@ -125,16 +125,21 @@ namespace BusinessLogic
 
         public static DiscussionT RepoDiscussionToDiscussionT(Repository.Models.Discussion dis)
         {
+            int totalLikes = 0;
             DiscussionT gdis = new();
             gdis.DiscussionId = dis.DiscussionId;
             gdis.MovieId = dis.MovieId;
             gdis.Userid = dis.UserId;
             gdis.Subject = dis.Subject;
+            
             foreach (var ct in dis.Comments)
             {
-                Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid);
+                Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid, (int)ct.Likes);
                 gdis.Comments.Add(nc);
+                totalLikes += nc.Likes;
             }
+            gdis.Likes = totalLikes;
+            
             foreach (var top in dis.DiscussionTopics)
             {
                 gdis.DiscussionTopics.Add(top.TopicId);

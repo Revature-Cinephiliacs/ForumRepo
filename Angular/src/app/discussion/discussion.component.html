@@ -16,6 +16,7 @@
         {{item.commentid}}
         <div class="commenttext">{{item.text}}</div>
         <button (click) = "showReplyForm(item.commentid)">reply</button>
+        <button (click) = "addLike(item.commentid)">Like {{item.likes}}</button>
     </div>    
     <ul *ngIf="item.replies.length > 0">
     <ng-container
