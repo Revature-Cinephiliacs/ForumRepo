@@ -375,5 +375,10 @@ namespace BusinessLogic
             return globalDiscussions;
 
         }
+
+        private List<T> SortByLikes(List<T> li)
+        {
+            return null;
+        }
     }
 }
