@@ -216,6 +216,7 @@ namespace BusinessLogic
             Repository.Models.Setting pageSizeSetting = _repo.GetSetting("Discussionpagesize");
             
             int pageSize = pageSizeSetting.IntValue ?? default(int);
+            
             if(pageSize < 1)
             {
                 Console.WriteLine("ForumLogic.GetDiscussionsPage() was called but the Duscussionspagesize is invalid");
@@ -233,7 +234,7 @@ namespace BusinessLogic
             {
                 item.Comments = await _repo.GetMovieComments(item.DiscussionId);
             }
-
+            Console.WriteLine(sortingOrder);
             // Sort the list of Discussion according to sorting string
             switch (sortingOrder)
             {
@@ -241,16 +242,19 @@ namespace BusinessLogic
                 //     repoDiscussions = repoDiscussions.OrderBy(r => r.like).ToList<Repository.Models.Discussion>();
                 // break;
                 case "commentsA":
-                    repoDiscussions = repoDiscussions.OrderBy(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+                    repoDiscussions = sortByNumOfCommentsAsce(repoDiscussions);
                 break;
                 case "commentsD":
-                    repoDiscussions = repoDiscussions.OrderByDescending(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+                    repoDiscussions = sortByNumOfCommentsDesc(repoDiscussions);
                 break;
                 case "timeA":
-                    repoDiscussions = repoDiscussions.OrderBy(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+                    repoDiscussions = sortByCreationTimeAsce(repoDiscussions);
                 break;
                 case "timeD":
-                    repoDiscussions = repoDiscussions.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+                    repoDiscussions = sortByCreationTimeDesc(repoDiscussions);
+                break;
+                case "recent":
+                    repoDiscussions = sortByRecent(repoDiscussions);
                 break;
             }
 
@@ -291,6 +295,90 @@ namespace BusinessLogic
             return discussions;
         }
 
+        /// <summary>
+        /// sorting the Discussion list by number of likes
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        // private List<Repository.Models.Discussion> sortByNumOfLikes( List<Repository.Models.Discussion> discussions){
+
+        //  }
+
+        /// <summary>
+        /// sorting the Discussion list by number of comments in Ascending order
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByNumOfCommentsAsce( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderBy(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+         }
+
+        /// <summary>
+        /// sorting the Discussion list by number of comments in Descending order
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByNumOfCommentsDesc( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderByDescending(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+        }
+
+        /// <summary>
+        /// sorting the Discussion lsit by time created in ascending order  
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByCreationTimeAsce( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderBy(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+        }
+
+        /// <summary>
+        /// sorting the Discussion list by time it was created in Descending order
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByCreationTimeDesc( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+        }
+
+        /// <summary>
+        /// sorting the Discussion lsit by recent activity
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByRecent( List<Repository.Models.Discussion> discussions){
+            List<Repository.Models.Discussion> DiscussionwithComments = new List<Repository.Models.Discussion>();
+            List<Repository.Models.Discussion> DiscussionWithNoComments = new List<Repository.Models.Discussion>();
+            HashSet<Repository.Models.Discussion> tempDiscussions = new HashSet<Repository.Models.Discussion>();
+            foreach (var item in discussions)
+            {
+                if(item.Comments.Count != 0){
+                    DiscussionwithComments.Add(item);
+                    
+                }else{
+                    DiscussionWithNoComments.Add(item);
+                }
+            }
+            DiscussionwithComments = DiscussionwithComments.OrderByDescending(r => r.Comments.First().CreationTime).ToList<Repository.Models.Discussion>();
+            DiscussionWithNoComments = DiscussionWithNoComments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+
+            foreach(var item in DiscussionWithNoComments)
+            {
+               foreach (var d in DiscussionwithComments)
+               { 
+                       if(DateTime.Compare(item.CreationTime, d.Comments.First().CreationTime) < 0){
+                           tempDiscussions.Add(d);
+                       } 
+                }
+                tempDiscussions.Add(item);
+            }  
+
+            discussions.Clear();
+            foreach (var item in tempDiscussions)
+            {   
+                discussions = tempDiscussions.ToList();
+            }
+            return discussions;
+        }
         public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
             Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());

@@ -25,7 +25,7 @@ export class DiscussionListComponent implements OnInit {
   DisplayList: boolean = true;
 
   pageNum: number = 1;
-  sortingOrder: string = "commentsD"   //Default sorting order will be based on total num of comments 
+  sortingOrder: string = "recent"   //Default sorting order will be based on total num of comments 
   numOfDiscussion: number;
 
   constructor(private _forum: ForumService, private router:  ActivatedRoute) { }
@@ -49,6 +49,7 @@ export class DiscussionListComponent implements OnInit {
   //Function that will get a list of discussions associated with the
   //snapshot movie id
   async getDiscussions() {
+    this.discussions = [];
     setTimeout(() => {
       this._forum.getDiscussionPage(this.movieID, this.pageNum, this.sortingOrder).subscribe(data => {
         console.log(data);
@@ -61,13 +62,13 @@ export class DiscussionListComponent implements OnInit {
 
   //get next discussion page
   onNext(){
-    this.discussions = [];
+    //this.discussions = [];
     this.pageNum++;
     this.getDiscussions();
   }
   //get previous duscussuin page
   onPrev(){
-    this.discussions = [];
+    //this.discussions = [];
     this.pageNum--;
     this.getDiscussions();
   }
@@ -97,25 +98,42 @@ export class DiscussionListComponent implements OnInit {
   //Function that will get a list of discussions for a movie
   //sorted in ascending order based on number of comments
   async sortDiscussionsByCommentsAsc() {
-    setTimeout(() => {
-      this._forum.sortDiscussionByCommentsAsc().subscribe(data => {
-        console.log(data);
-        this.sortDiscussions = data;
-        this.discussions = [];   
-      });
-    }, 1000);
+    this.sortingOrder = "commentsA";
+    this.getDiscussions()
+    // setTimeout(() => {
+    //   this._forum.sortDiscussionByCommentsAsc().subscribe(data => {
+    //     console.log(data);
+    //     this.sortDiscussions = data;
+    //     this.discussions = [];   
+    //   });
+    // }, 1000);
   }
 
   //Function that will get a list of discussions for a movie
   //sorted in descending order based on number of comments
   async sortDiscussionsByCommentsDesc() {
-    setTimeout(() => {
-      this._forum.sortDiscussionByCommentsDesc().subscribe(data => {
-        console.log(data);
-        this.sortDiscussions = data;
-        this.discussions = [];
-      });
-    }, 1000);
+    this.sortingOrder = "commentsD";
+    this.getDiscussions();
+    // setTimeout(() => {
+    //   this._forum.sortDiscussionByCommentsDesc().subscribe(data => {
+    //     console.log(data);
+    //     this.sortDiscussions = data;
+    //     this.discussions = [];
+    //   });
+    // }, 1000);
+  }
+
+  sortByCreationA(){
+    this.sortingOrder = "timeA";
+    this.getDiscussions();
+  }
+  sortByCreationB(){
+    this.sortingOrder = "timeD";
+    this.getDiscussions();
+  }
+  sortByRecent(){
+    this.sortingOrder = "recent";
+    this.getDiscussions();
   }
 
   async filterByTopic(topicid: string)

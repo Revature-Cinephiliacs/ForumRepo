@@ -5,8 +5,11 @@
     <button type="button" class="btn btn-outline-primary">search</button>
   </div>
 
-<button (click) = "sortDiscussionsByCommentsAsc()">Sort Ascending</button>
-<button (click) = "sortDiscussionsByCommentsDesc()">Sort Descending</button>
+<button (click) = "sortByCreationA()">Sort By Creation Time Ascending</button>
+<button (click) = "sortByCreationB()">Sort BY Creation Time Descending</button>
+<button (click) = "sortDiscussionsByCommentsDesc()">Sort By Number of Comments Descending</button>
+<button (click) = "sortDiscussionsByCommentsAsc()">Sort By Number of Comments Ascending</button>
+<button (click) = "sortByRecent()">Sort By Recent Activity </button>
 <p>Filter by Topic</p>
 <div>
     <ul *ngFor = "let t of topics">
