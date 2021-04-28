@@ -10,6 +10,7 @@ namespace Repository.Models
         public Discussion()
         {
             Comments = new HashSet<Comment>();
+            DiscussionFollows = new HashSet<DiscussionFollow>();
             DiscussionTopics = new HashSet<DiscussionTopic>();
         }
 
@@ -20,6 +21,7 @@ namespace Repository.Models
         public string Subject { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<DiscussionFollow> DiscussionFollows { get; set; }
         public virtual ICollection<DiscussionTopic> DiscussionTopics { get; set; }
     }
 }

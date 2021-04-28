@@ -166,5 +166,22 @@ namespace Repository
         /// <param name="v"></param>
         /// <returns></returns>
         public Task<bool> DeleteTopic(string topicid);
+
+        /// <summary>
+        /// Adds a new DiscussionFollow object into database
+        /// Creates a user-discussion follow relationship
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="newFollow"></param>
+        /// <returns></returns>
+        public Task<bool> FollowDiscussion(DiscussionFollow newFollow);
+
+        /// <summary>
+        /// Returns a list of followed discussions based on userid
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionFollow>> GetFollowDiscussionList(string userid);
     }
 }

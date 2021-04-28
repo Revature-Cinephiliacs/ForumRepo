@@ -301,6 +301,7 @@ namespace CineAPI.Controllers
             StatusCode(200);
             return discussions;
         }
+
         /// <summary>
         /// Returns a list of all Discussion objects that are associated with
         /// the provided movie ID.
@@ -320,6 +321,58 @@ namespace CineAPI.Controllers
             }
             StatusCode(200);
             return discussions;
+        }
+
+        /// <summary>
+        /// Adds a user as a new follower to a discussion
+        /// Returns 400 if couldn't model bind the id guid.
+        /// Returns 404 if unable to find commentid.
+        /// Returns 200 if successful.
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        [HttpPost("discussions/follow/{discussionid}/{userid}")]
+        public async Task<ActionResult<bool>> FollowDiscussion(Guid discussionid, string userid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.FollowDiscussion() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            bool addSuccess = await _forumLogic.FollowDiscussion(discussionid, userid);
+            if(!addSuccess)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return addSuccess;
+        }
+
+        /// <summary>
+        /// Gets a list of dicussions followed by a user
+        /// Returns 400 if invalid modelbinding
+        /// Returns 204 if list is empty
+        /// Returns 200 with complete list if user is following something
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        [HttpGet("discussions/follow/{userid}")]
+        public async Task<ActionResult<List<DiscussionT>>> FollowDiscussionList(string userid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.FollowDiscussionList() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            List<DiscussionT> followList = await _forumLogic.GetFollowDiscList(userid);
+            if(followList == null)
+            {
+                return StatusCode(204);
+            }
+            StatusCode(200);
+            return followList;
         }
 
         /// <summary>
