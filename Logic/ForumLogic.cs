@@ -439,5 +439,10 @@ namespace BusinessLogic
             }
             return allDisc;
         }
+
+        public async Task<bool> LikeComment(Guid commentid)
+        {
+            return await _repo.LikeComment(commentid.ToString());
+        }
     }
 }

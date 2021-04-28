@@ -474,5 +474,30 @@ namespace CineAPI.Controllers
             StatusCode(200);
             return delSuccess;
         }
+
+        /// <summary>
+        /// Likes a comment. Increments comment likes by one
+        /// Returns 400 if couldn't model bind the id guid.
+        /// Returns 404 if unable to find topicid.
+        /// Returns 200 if successful.
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        [HttpPost("comment/like/{commentid}")]
+        public async Task<ActionResult<bool>> LikeComment(Guid commentid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.LikeComment() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            bool success = await _forumLogic.LikeComment(commentid);
+            if(!success)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return success;
+        }
     }
 }

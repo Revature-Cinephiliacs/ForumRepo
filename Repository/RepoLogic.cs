@@ -300,6 +300,18 @@ namespace Repository
             return true;
         }
 
+        public async Task<bool> LikeComment(string commentid)
+        {
+            Comment getComment = await _dbContext.Comments.FirstOrDefaultAsync(x => x.CommentId == commentid);
+            if(getComment == null)
+            {
+                return false;
+            }
+            getComment.Likes++;
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<List<Discussion>> GetSortedDiscussionsDescending()
         {
             return await _dbContext.Discussions.Include(d => d.Comments).OrderByDescending(x => x.Comments.Count).ToListAsync<Discussion>();
