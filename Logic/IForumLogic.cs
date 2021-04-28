@@ -117,5 +117,41 @@ namespace BusinessLogic.Interfaces
         /// <param name="topic"></param>
         /// <returns></returns>
         public Task<bool> CreateTopic(string topic);
+
+        /// <summary>
+        /// Changes a spoiler tag from true &lt; - > false
+        /// Returns true if successful in switching spoilertag bool
+        /// Returns false is failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> ChangeSpoiler(Guid commentid);
+
+        /// <summary>
+        /// Deletes a comment from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteComment(Guid commentid);
+
+        /// <summary>
+        /// Deletes a discussion from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteDiscussion(Guid discussionid);
+
+        /// <summary>
+        /// Deletes a topic from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteTopic(Guid topicid);
     }
 }

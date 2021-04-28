@@ -125,5 +125,46 @@ namespace Repository
         /// <param name="topic"></param>
         /// <returns></returns>
         public Task<bool> AddTopic(Topic topic);
+
+        /// <summary>
+        /// Changes a comment spoiler tag from true &lt; - > false
+        /// Returns true is successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> ChangeCommentSpoiler(string commentid);
+
+        /// <summary>
+        /// Deletes a comment from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="toString"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteComment(string commentid);
+
+        /// <summary>
+        /// Deletes a discussion from the database
+        /// First deletes all references in discussiontopics table
+        /// Second deletes all references in comments table
+        /// Lastly deletes the discussion itself
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteDiscussion(string discussionid);
+
+        /// <summary>
+        /// Deletes a topic from the database
+        /// First deletes all references of the topic
+        /// Then deletes the topic itself
+        /// Returns true if successful
+        /// Return false if failed
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteTopic(string topicid);
     }
 }

@@ -221,7 +221,6 @@ namespace BusinessLogic
                 break;
             }
 
-
             int numOfDiscussion = repoDiscussions.Count;
             int start = pageSize * (page -1);
             if(start > numOfDiscussion - 1)
@@ -259,7 +258,6 @@ namespace BusinessLogic
             return discussions;
         }
 
-
         public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
             Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());
@@ -279,7 +277,6 @@ namespace BusinessLogic
             Discussion discussion = Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic);
             return discussion;
         }
-
 
         public async Task<List<string>> GetTopics()
         {
@@ -339,6 +336,7 @@ namespace BusinessLogic
             }
             return globalDiscussions;
         }
+
         public async Task<bool> CreateTopic(string topic)
         {
             Repository.Models.Topic newTopic = Mapper.NewTopicToRepoTopic(topic);
@@ -350,8 +348,6 @@ namespace BusinessLogic
             List<Repository.Models.Discussion> repoDiscussions = new List<Repository.Models.Discussion>();
 
             repoDiscussions = await Task.Run(() => _repo.GetDiscussionsByTopicId(topicid));
-
-
 
             List<DiscussionT> globalDiscussions = new List<DiscussionT>();
             DiscussionT gdis;
@@ -376,9 +372,27 @@ namespace BusinessLogic
                         globalDiscussions.Add(gdis);
                 }
             }
-
             return globalDiscussions;
+        }
 
+        public async Task<bool> ChangeSpoiler(Guid commentid)
+        {
+            return await _repo.ChangeCommentSpoiler(commentid.ToString());
+        }
+
+        public async Task<bool> DeleteComment(Guid commentid)
+        {
+            return await _repo.DeleteComment(commentid.ToString());
+        }
+
+        public async Task<bool> DeleteDiscussion(Guid discussionid)
+        {
+            return await _repo.DeleteDiscussion(discussionid.ToString());
+        }
+
+        public async Task<bool> DeleteTopic(Guid topicid)
+        {
+            return await _repo.DeleteTopic(topicid.ToString());
         }
     }
 }
