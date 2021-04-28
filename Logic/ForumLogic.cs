@@ -62,9 +62,9 @@ namespace BusinessLogic
             return comments;
         }
 
-        public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
+        public async Task<List<NestedComment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
         {
-            if (page < 1)
+           if (page < 1)
             {
                 _logger.LogWarning($"ForumLogic.GetCommentsPage() was called with a negative or zero page number {page}.");
                 return null;
@@ -96,14 +96,36 @@ namespace BusinessLogic
                 // break;
                 case "timeA":
                     repoComments = repoComments.OrderBy(r => r.CreationTime).ToList<Repository.Models.Comment>();
-                break;
+                    break;
                 case "timeD":
                     repoComments = repoComments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Comment>();
-                break;
-                
+                    break;
+
             }
 
-            int numberOfComments = repoComments.Count;
+            //Create array of comments to store parent comments
+            List<Repository.Models.Comment> parentComments = new List<Repository.Models.Comment>();
+
+            foreach (Repository.Models.Comment rc in repoComments)
+            {
+                System.Console.WriteLine(rc.CommentText);
+                System.Console.WriteLine(rc.ParentCommentid);
+                if (rc.ParentCommentid == null)
+                {
+                    parentComments.Add(rc);
+                }
+            }
+
+            System.Console.WriteLine("Parent Comment Check");
+            foreach (Repository.Models.Comment pc in parentComments)
+            {
+                System.Console.WriteLine(pc.CommentText);
+                System.Console.WriteLine(pc.ParentCommentid);
+            }
+
+            //Change to number of parent comments
+            int numberOfComments = parentComments.Count;
+
             int startIndex = pageSize * (page - 1);
 
             if (startIndex > numberOfComments - 1)
@@ -118,11 +140,22 @@ namespace BusinessLogic
                 endIndex = numberOfComments - 1;
             }
 
-            List<Comment> comments = new List<Comment>();
-
+            List<NestedComment> comments = new List<NestedComment>();
+            System.Console.WriteLine("Start Index: " + startIndex);
+            System.Console.WriteLine("Emd Index: " + endIndex);
             for (int i = startIndex; i <= endIndex; i++)
             {
-                comments.Add(Mapper.RepoCommentToComment(repoComments[i]));
+                //change to mapper to a different DTO that has replies[]
+                comments.Add(Mapper.RepoCommentToNestedComment(parentComments[i]));
+                //System.Console.WriteLine(comments[i].Text);
+            }
+
+            //call a recursive function to send repoComments and add the children to the comments in page comments
+            foreach (NestedComment nc in comments)
+            {
+                System.Console.WriteLine("for each: -------------------");
+                Mapper.AddReplies(repoComments, nc);
+                System.Console.WriteLine(nc.Text);
             }
 
             return comments;
@@ -142,7 +175,7 @@ namespace BusinessLogic
             return await _repo.SetSetting(setting);
         }
 
-        public async Task<List<Discussion>> GetDiscussions(string movieid)
+        public async Task<List<DiscussionT>> GetDiscussions(string movieid)
         {
             List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
             if (repoDiscussions == null)
@@ -150,8 +183,13 @@ namespace BusinessLogic
                 _logger.LogWarning($"ForumLogic.GetDiscussions() was called with a movieid that doesn't exist {movieid}.");
                 return null;
             }
+            
+            foreach (var item in repoDiscussions)
+            {
+                item.Comments = await _repo.GetMovieComments(item.DiscussionId);
+            }
 
-            List<Discussion> discussions = new List<Discussion>();
+            List<DiscussionT> discussions = new List<DiscussionT>();
             foreach (var repoDiscussion in repoDiscussions)
             {
                 // Get the topic associated with this discussion
@@ -162,12 +200,12 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic));
+                discussions.Add(Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
             }
             return discussions;
         }
 
-        public async Task<List<Discussion>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
+        public async Task<List<DiscussionT>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
         {
             if(page < 1)
             {
@@ -216,7 +254,6 @@ namespace BusinessLogic
                 break;
             }
 
-
             int numOfDiscussion = repoDiscussions.Count;
             int start = pageSize * (page -1);
             if(start > numOfDiscussion - 1)
@@ -237,7 +274,7 @@ namespace BusinessLogic
                 pageDiscussions.Add(repoDiscussions[i]);
             }
 
-            List<Discussion> discussions = new List<Discussion>();
+            List<DiscussionT> discussions = new List<DiscussionT>();
             foreach (var repoDiscussion in pageDiscussions)
             {
                 
@@ -248,12 +285,11 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic));
+                discussions.Add(Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
                 
             }
             return discussions;
         }
-
 
         public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
@@ -275,8 +311,7 @@ namespace BusinessLogic
             return discussion;
         }
 
-
-        public async Task<List<string>> GetTopics()
+        public async Task<List<Topic>> GetTopics()
         {
             var repoTopics = await _repo.GetTopics();
             if (repoTopics == null)
@@ -285,10 +320,11 @@ namespace BusinessLogic
                 return null;
             }
 
-            var topics = new List<string>();
+            var topics = new List<Topic>();
             foreach (var repoTopic in repoTopics)
             {
-                topics.Add(repoTopic.TopicName);
+                var newTopic = new Topic(repoTopic.TopicId, repoTopic.TopicName);
+                topics.Add(newTopic);
             }
             return topics;
         }
@@ -314,26 +350,11 @@ namespace BusinessLogic
 
             foreach (Repository.Models.Discussion dis in repoDiscussions)
             {
-                DiscussionT gdis = new DiscussionT();
-
-                gdis.DiscussionId = dis.DiscussionId;
-                gdis.MovieId = dis.MovieId;
-                gdis.Userid = dis.UserId;
-                gdis.Subject = dis.Subject;
-                foreach (var ct in dis.Comments)
-                {
-                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler);
-                    gdis.Comments.Add(nc);
-
-                }
-                foreach (var top in dis.DiscussionTopics)
-                {
-                    gdis.DiscussionTopics.Add(top.TopicId);
-                }
-                globalDiscussions.Add(gdis);
+                globalDiscussions.Add(Mapper.RepoDiscussionToDiscussionT(dis));
             }
             return globalDiscussions;
         }
+
         public async Task<bool> CreateTopic(string topic)
         {
             Repository.Models.Topic newTopic = Mapper.NewTopicToRepoTopic(topic);
@@ -346,8 +367,6 @@ namespace BusinessLogic
 
             repoDiscussions = await Task.Run(() => _repo.GetDiscussionsByTopicId(topicid));
 
-
-
             List<DiscussionT> globalDiscussions = new List<DiscussionT>();
             DiscussionT gdis;
             foreach (Repository.Models.Discussion dis in repoDiscussions)
@@ -359,9 +378,8 @@ namespace BusinessLogic
                 gdis.Subject = dis.Subject;
                 foreach (var ct in dis.Comments)
                 {
-                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler);
+                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid, (int)ct.Likes);
                     gdis.Comments.Add(nc);
-
                 }
 
                 foreach (var top in dis.DiscussionTopics)
@@ -371,9 +389,61 @@ namespace BusinessLogic
                         globalDiscussions.Add(gdis);
                 }
             }
-
             return globalDiscussions;
+        }
 
+        public async Task<bool> ChangeSpoiler(Guid commentid)
+        {
+            return await _repo.ChangeCommentSpoiler(commentid.ToString());
+        }
+
+        public async Task<bool> DeleteComment(Guid commentid)
+        {
+            return await _repo.DeleteComment(commentid.ToString());
+        }
+
+        public async Task<bool> DeleteDiscussion(Guid discussionid)
+        {
+            return await _repo.DeleteDiscussion(discussionid.ToString());
+        }
+
+        public async Task<bool> DeleteTopic(Guid topicid)
+        {
+            return await _repo.DeleteTopic(topicid.ToString());
+        }
+
+        public async Task<bool> FollowDiscussion(Guid discussionid, string userid)
+        {
+            Repository.Models.DiscussionFollow newFollow = new Repository.Models.DiscussionFollow();
+            newFollow.DiscussionId = discussionid.ToString();
+            newFollow.UserId = userid;
+            return await _repo.FollowDiscussion(newFollow);
+        }
+
+        public async Task<List<DiscussionT>> GetFollowDiscList(string userid)
+        {
+            List<Repository.Models.DiscussionFollow> repoFollow = await _repo.GetFollowDiscussionList(userid);
+            if(repoFollow == null)
+            {
+                return null;
+            }
+            List<DiscussionT> allDisc = new List<DiscussionT>();
+            List<Task<DiscussionT>> tasks = new List<Task<DiscussionT>>();
+            foreach(Repository.Models.DiscussionFollow disc in repoFollow)
+            {
+                tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(disc.Discussion)));
+            }
+            var results = await Task.WhenAll(tasks);
+            foreach(var item in results)
+            {
+                allDisc.Add(item);
+            }
+            return allDisc;
+        }
+
+        public async Task<bool> LikeComment(Guid commentid, string userid)
+        {
+            return await _repo.LikeComment(commentid.ToString(), userid);
         }
 
         private List<T> SortByLikes(List<T> li)

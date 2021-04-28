@@ -12,26 +12,31 @@ import { ForumService } from '../forum.service';
 export class DiscussionComponent implements OnInit {
 
   comments: any;
+  pageComments: any;
+  pageNum: number = 1;
+  numOfComments = 0;
+
   discussionID:string = "";
   discussion: any;
   subject: any;
   displaySpoilers: any = false;
   user: any;
-
-  pageNum: number = 1;
+  displayReplyForm = false;
+  displayMessageForm = true;
+  parentid: string;
   sortingOrder:string = "timeD";
-  numOfComments: number;
+  
   newComment: any = {
     discussionid: 0,
     userid: "",
     text: "",
-    isspoiler: false
+    isspoiler: false,
+    parentcommentid: null
   };
 
   constructor(private _forum: ForumService, private router:  ActivatedRoute) { }
 
   ngOnInit(): void {
-
     this.discussionID =  this.router.snapshot.params.id;
     console.log(this.discussionID);
     this.newComment.discussionid = this.router.snapshot.params.id;
@@ -42,7 +47,14 @@ export class DiscussionComponent implements OnInit {
       this.discussion = data;
       this.subject = this.discussion.subject;
     });
-    this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ this.numOfComments = data.length})
+    this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ 
+      // this.numOfComments = data.length;
+      this.comments = data;
+      this.getParentSize();
+      console.log("Setting number of comments");
+      console.log(this.numOfComments);
+      console.log(this.comments);
+    });
   }
 
   // Function that retrieves comments for a dicussion
@@ -50,23 +62,37 @@ export class DiscussionComponent implements OnInit {
     setTimeout(() => {
       this._forum.getDiscussionCommentsPage(this.discussionID, this.pageNum, this.sortingOrder).subscribe(data =>{ 
         console.log(data);
-        this.comments = data;
+        this.pageComments = data;
       });
     }, 1000);
   }
 
-    //get next comments page
-    onNext(){
-      this.comments = [];
-      this.pageNum++;
-      this.getComments();
-    }
-    //get previous comments page
-    onPrev(){
-      this.comments = [];
-      this.pageNum--;
-      this.getComments();
-    }
+  //Function that will calculate the number of comments
+  //based on the number of parent comments
+  getParentSize()
+  {
+    this.comments.forEach(pc => {
+      if(pc.parentCommentid == null )
+      {
+        this.numOfComments++;
+      }
+    });
+
+    console.log(this.numOfComments);
+  }
+
+  //get next comments page
+  onNext(){
+    this.pageComments = [];
+    this.pageNum++;
+    this.getComments();
+  }
+  //get previous comments page
+  onPrev(){
+    this.pageComments = [];
+    this.pageNum--;
+    this.getComments();
+  }
   
   //Function that will check if a user is logged in
   //if the user is not, elements on the page will be hidden
@@ -87,16 +113,50 @@ export class DiscussionComponent implements OnInit {
     return this.discussionID;
   }
 
-  //Function that will add a new post to the discussion
+  //Function that will add a new parent comment to the discussion
   postComment(){
     if(this.isEmpty(this.newComment.text)){
       console.log("Please enter a comment");
     }else{
-      this.newComment.userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3"; // just for testing pourpose, need to remove it later.
+      this.newComment.userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3"; // just for testing purpose, need to remove it later.
+      this._forum.postComment(this.newComment).subscribe(data => console.log(data));
+      this.pageNum = 1;
+      this.getComments();
+    }
+    console.log(this.newComment);
+  }
+
+  //This function will add a reply to a comment and then
+  //Redisplay the nested comments
+  postReply()
+  {
+    console.log("Post reply" + this.parentid);
+    if(this.isEmpty(this.newComment.text)){
+      console.log("Please enter a comment");
+    }else{
+      this.newComment.userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3"; // just for testing purpose, need to remove it later.
+      this.newComment.parentcommentid = this.parentid;
       this._forum.postComment(this.newComment).subscribe(data => console.log(data));
       this.getComments();
     }
     console.log(this.newComment);
+  }
+
+  //Function that will show the reply form and hide the new comment form
+  showReplyForm(commentparentid:string){
+    this.displayReplyForm = true;
+    this.displayMessageForm = false;
+    this.parentid = commentparentid;
+    console.log("Reply to: " + commentparentid);
+    console.log("This parent id" + this.parentid);
+  }
+
+  //Will hide the reply form and display the new comment form
+  cancelReply()
+  {
+    this.displayReplyForm = false;
+    this.displayMessageForm = true;
+    console.log("cancel")
   }
 
   //Displays a spoiler(unblurs it)
@@ -112,5 +172,13 @@ export class DiscussionComponent implements OnInit {
 
   isEmpty(testSTR:string){
     return (testSTR == "");
+  }
+
+  //Function that will add a like to a comment
+  addLike(commentid: string){
+    this._forum.addLike(commentid).subscribe(data => {
+      console.log(data);
+      this.getComments();
+    });
   }
 }

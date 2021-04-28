@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 
 namespace GlobalModels
 {
     /// <summary>
-    /// DTO Model for frontend -> backend
+    /// DTO Model for comments backend -> nested comment frontend
     /// </summary>
-    public sealed class Comment : IEquatable<Comment>
+    public class NestedComment : IEquatable<NestedComment>
     {
         public Guid Commentid { get; set; } = Guid.NewGuid();
         public Guid Discussionid { get; set; }
@@ -14,8 +15,9 @@ namespace GlobalModels
         public bool Isspoiler { get; set; }
         public string ParentCommentid { get; set; }
         public int Likes { get; set; }
+        public List<NestedComment> Replies { get; set; }
 
-        public Comment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid, int likes)
+        public NestedComment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid, int likes)
         {
             Commentid = commentid;
             Discussionid = discussionid;
@@ -23,10 +25,11 @@ namespace GlobalModels
             Text = text;
             Isspoiler = isspoiler;
             ParentCommentid = parentcommentid;
+            Replies = new List<NestedComment>();
             Likes = likes;
         }
 
-        public bool Equals(Comment other)
+        public bool Equals(NestedComment other)
         {
             if (Object.ReferenceEquals(other, null))
             {
@@ -48,10 +51,10 @@ namespace GlobalModels
 
         public override bool Equals(object obj)
         {
-            return this.Equals(obj as Comment);
+            return this.Equals(obj as NestedComment);
         }
 
-        public static bool operator ==(Comment lhs, Comment rhs)
+        public static bool operator ==(NestedComment lhs, NestedComment rhs)
         {
             if (Object.ReferenceEquals(lhs, null))
             {
@@ -65,7 +68,7 @@ namespace GlobalModels
             return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(Comment lhs, Comment rhs)
+        public static bool operator !=(NestedComment lhs, NestedComment rhs)
         {
             return !(lhs == rhs);
         }

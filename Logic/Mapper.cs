@@ -1,5 +1,6 @@
 using System;
 using GlobalModels;
+using System.Collections.Generic;
 
 namespace BusinessLogic
 {
@@ -15,8 +16,15 @@ namespace BusinessLogic
         public static Discussion RepoDiscussionToDiscussion(Repository.Models.Discussion
             repoDiscussion, Repository.Models.Topic topic)
         {
+            List<Comment> newComment = new List<Comment>();
+            foreach (var item in repoDiscussion.Comments)
+            {   
+                if(item != null){
+                    newComment.Add(RepoCommentToComment(item));
+                }
+            }
             var discussion = new Discussion(Guid.Parse(repoDiscussion.DiscussionId), repoDiscussion.MovieId,
-                repoDiscussion.UserId, repoDiscussion.Subject, topic.TopicName);
+                repoDiscussion.UserId, repoDiscussion.Subject, topic.TopicName, newComment);
             return discussion;
         }
 
@@ -28,9 +36,51 @@ namespace BusinessLogic
         /// <returns></returns>
         public static Comment RepoCommentToComment(Repository.Models.Comment repoComment)
         {
-            var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId),
-                repoComment.UserId, repoComment.CommentText, repoComment.IsSpoiler);
+            // var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId),
+            //     repoComment.UserId, repoComment.CommentText, repoComment.IsSpoiler);
+            
+            var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), repoComment.UserId,
+                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid, (int)repoComment.Likes);
             return comment;
+        }
+
+        /// <summary>
+        /// Maps an instance of Repository.Model.Comment onto a new instance of
+        /// GlobalModels.NestedComment
+        /// </summary>
+        /// <param name="repoComment"></param>
+        /// <returns></returns>
+        public static NestedComment RepoCommentToNestedComment(Repository.Models.Comment repoComment)
+        {
+            var nestedComment = new NestedComment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), repoComment.UserId,
+                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid, (int)repoComment.Likes);
+
+            return nestedComment;
+        }
+
+        /// <summary>
+        /// A helper recursive function that will take a list of discussion comments and a parent comment
+        /// and the child replies to the parent commment
+        /// </summary>
+        /// <param name="repoComments"></param>
+        /// <param name="parent"></param>
+        public static void AddReplies(List<Repository.Models.Comment> repoComments, NestedComment parent)
+        {
+            for (int i = 0; i < repoComments.Count; i++)
+            {
+                System.Console.WriteLine("Add Replies");
+                System.Console.WriteLine("Repo parent: " + repoComments[i].ParentCommentid);
+                System.Console.WriteLine("Parent parent: " + parent.ParentCommentid);
+                string parentId = parent.Commentid.ToString();
+                if (repoComments[i].ParentCommentid == parentId)
+                {
+                    var nestedComment = RepoCommentToNestedComment(repoComments[i]);
+                    parent.Replies.Add(nestedComment);
+                    System.Console.WriteLine("added");
+
+                    AddReplies(repoComments, nestedComment);
+                }
+            }
         }
 
         /// <summary>
@@ -69,8 +119,33 @@ namespace BusinessLogic
             repoComment.CommentText = comment.Text;
             repoComment.CreationTime = DateTime.Now;
             repoComment.IsSpoiler = comment.Isspoiler;
-
+            repoComment.ParentCommentid = comment.ParentCommentid;
             return repoComment;
+        }
+
+        public static DiscussionT RepoDiscussionToDiscussionT(Repository.Models.Discussion dis)
+        {
+            int totalLikes = 0;
+            DiscussionT gdis = new();
+            gdis.DiscussionId = dis.DiscussionId;
+            gdis.MovieId = dis.MovieId;
+            gdis.Userid = dis.UserId;
+            gdis.Subject = dis.Subject;
+            
+            foreach (var ct in dis.Comments)
+            {
+                Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid, (int)ct.Likes);
+                gdis.Comments.Add(nc);
+                totalLikes += nc.Likes;
+            }
+            gdis.Likes = totalLikes;
+            
+            foreach (var top in dis.DiscussionTopics)
+            {
+                gdis.DiscussionTopics.Add(top.TopicId);
+            }
+
+            return gdis;
         }
 
         /// <summary>

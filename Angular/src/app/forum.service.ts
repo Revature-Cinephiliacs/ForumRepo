@@ -13,7 +13,7 @@ export class ForumService {
   loggedIn:any;
 
   //URL to Forum API(temporary)
-  baseURL:string = "https://localhost:44335/Forum/";
+  baseURL:string = "https://localhost:5001/Forum/";
   constructor(private http:HttpClient) { }
 
   //Function that will make a call to the Forum API discussions/movieid endpoint
@@ -75,5 +75,15 @@ export class ForumService {
   //endpoint to sort a list of discussions in descending order by the number of comments
   sortDiscussionByCommentsDesc(){
     return this.http.get( this.baseURL + "discussion/sort/comment/descend");
+  }
+
+  //Function that will make a call to the Forum API endpoint to filter discussion by topic
+  filterDiscussionByTopic(topicid: string){
+    return this.http.get( this.baseURL + "discussions/topic/" + topicid);
+  }
+
+  //Function that will modify comment like
+  addLike(commentid: string){
+    return this.http.post( this.baseURL + "comment/like/" + commentid, null);
   }
 }

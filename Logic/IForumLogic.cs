@@ -12,7 +12,7 @@ namespace BusinessLogic.Interfaces
         /// If there are no topics, return null
         /// </summary>
         /// <returns>List &lt; Topic ></returns>
-        public Task<List<string>> GetTopics();
+        public Task<List<Topic>> GetTopics();
 
         /// <summary>
         /// Method for getting all discussions for a specific movie 
@@ -21,7 +21,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="movieid"></param>
         /// <returns></returns>
-        public Task<List<Discussion>> GetDiscussions(string movieid);
+        public Task<List<DiscussionT>> GetDiscussions(string movieid);
         
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="movieid"></param>
         /// <returns></returns>
-        public Task<List<Discussion>> GetDiscussionsPage(string movieid, int page, string sortingOrder);
+        public Task<List<DiscussionT>> GetDiscussionsPage(string movieid, int page, string sortingOrder);
 
         /// <summary>
         /// Method to get a discussion by id
@@ -62,7 +62,7 @@ namespace BusinessLogic.Interfaces
         /// <param name="discussionid"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        public Task<List<Comment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder);
+        public Task<List<NestedComment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder);
 
         /// <summary>
         /// Method to set comments 
@@ -117,5 +117,67 @@ namespace BusinessLogic.Interfaces
         /// <param name="topic"></param>
         /// <returns></returns>
         public Task<bool> CreateTopic(string topic);
+
+        /// <summary>
+        /// Changes a spoiler tag from true &lt; - > false
+        /// Returns true if successful in switching spoilertag bool
+        /// Returns false is failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> ChangeSpoiler(Guid commentid);
+
+        /// <summary>
+        /// Deletes a comment from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteComment(Guid commentid);
+
+        /// <summary>
+        /// Deletes a discussion from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteDiscussion(Guid discussionid);
+
+        /// <summary>
+        /// Deletes a topic from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteTopic(Guid topicid);
+
+        /// <summary>
+        /// Adds a new user-discussion follow relationship
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        public Task<bool> FollowDiscussion(Guid discussionid, string userid);
+
+        /// <summary>
+        /// Returns the list of discussions that a user is following
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionT>> GetFollowDiscList(string userid);
+
+        /// <summary>
+        /// Increments a comment's likes
+        /// Returns true is successful
+        /// Returns fail is failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> LikeComment(Guid commentid, string userid);
     }
 }

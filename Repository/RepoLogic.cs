@@ -101,6 +101,82 @@ namespace Repository
             }
         }
 
+        public async Task<bool> DeleteComment(string commentid)
+        {
+            Comment delComment = await _dbContext.Comments.FirstOrDefaultAsync(x => x.CommentId == commentid);
+            if(delComment == null)
+            {
+                _logger.LogWarning($"RepoLogic.DeleteComment() was called for a comment that doesn't exist {commentid}.");
+                return false;
+            }
+
+            delComment.CommentText = "removed";
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> DeleteDiscussion(string discussionid)
+        {
+            Discussion delDisc = await _dbContext.Discussions.FirstOrDefaultAsync(x => x.DiscussionId == discussionid);
+            if(delDisc == null)
+            {
+                _logger.LogWarning($"RepoLogic.DeleteDiscussion() was called for a comment that doesn't exist {discussionid}.");
+                return false;
+            }
+            List<DiscussionTopic> discTopics = await _dbContext.DiscussionTopics.Where(x => x.DiscussionId == discussionid).ToListAsync();
+            _dbContext.DiscussionTopics.RemoveRange(discTopics);
+            await _dbContext.SaveChangesAsync();
+
+            List<Comment> discComments = await _dbContext.Comments.Where(x => x.DiscussionId == discussionid).ToListAsync();
+            _dbContext.Comments.RemoveRange(discComments);
+            await _dbContext.SaveChangesAsync();
+
+            List<DiscussionFollow> discFollows = await _dbContext.DiscussionFollows.Where(x => x.DiscussionId == discussionid).ToListAsync();
+            _dbContext.DiscussionFollows.RemoveRange(discFollows);
+            await _dbContext.SaveChangesAsync();
+
+            _dbContext.Discussions.Remove(delDisc);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> DeleteTopic(string topicid)
+        {
+            Topic delTopic = await _dbContext.Topics.FirstOrDefaultAsync(x => x.TopicId == topicid);
+            if(delTopic == null)
+            {
+                _logger.LogWarning($"RepoLogic.DeleteTopic() was called for a comment that doesn't exist {topicid}.");
+                return false;
+            }
+            List<DiscussionTopic> topicsRef = await _dbContext.DiscussionTopics.Where(x => x.TopicId == topicid).ToListAsync();
+            _dbContext.DiscussionTopics.RemoveRange(topicsRef);
+            await _dbContext.SaveChangesAsync();
+
+            _dbContext.Topics.Remove(delTopic);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> FollowDiscussion(DiscussionFollow newFollow)
+        {
+            if(!DiscussionExists(newFollow.DiscussionId))
+            {
+                _logger.LogWarning($"RepoLogic.FollowDiscussion() was called for a comment that doesn't exist {newFollow.DiscussionId}.");
+                return false;
+            }
+
+            await _dbContext.AddAsync<DiscussionFollow>(newFollow);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+        public async Task<List<DiscussionFollow>> GetFollowDiscussionList(string userid)
+        {
+            return await _dbContext.DiscussionFollows.Include(x => x.Discussion).Where(x => x.UserId == userid).ToListAsync();
+        }
+
         public async Task<List<Comment>> GetMovieComments(string discussionid)
         {
             var discussionExists = DiscussionExists(discussionid);
@@ -204,6 +280,48 @@ namespace Repository
             return true;
         }
 
+        public async Task<bool> ChangeCommentSpoiler(string commentid)
+        {
+            Comment getComment = await _dbContext.Comments.FirstOrDefaultAsync(x => x.CommentId == commentid);
+            if(getComment == null)
+            {
+                _logger.LogWarning($"RepoLogic.ChangeCommentSpoiler() was called for a comment that doesn't exist {commentid}.");
+                return false;
+            }
+            if(getComment.IsSpoiler)
+            {
+                getComment.IsSpoiler = false;
+            }
+            else
+            {
+                getComment.IsSpoiler = true;
+            }
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> LikeComment(string commentid, string userid)
+        {
+            Comment getComment = await _dbContext.Comments.FirstOrDefaultAsync(x => x.CommentId == commentid);
+            if(getComment == null)
+            {
+                return false;
+            }
+            UserLike getLikes = await _dbContext.UserLikes.Where(x => x.UserId == userid).FirstOrDefaultAsync(x => x.CommentId == commentid);
+            if(getLikes != null)
+            {
+                _logger.LogWarning($"RepoLogic.LikeComment(), but {userid} already liked {commentid}.");
+                return false;
+            }
+            UserLike newLike = new UserLike();
+            newLike.CommentId = commentid;
+            newLike.UserId = userid;
+            await _dbContext.AddAsync<UserLike>(newLike);
+            getComment.Likes++;
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<List<Discussion>> GetSortedDiscussionsDescending()
         {
             return await _dbContext.Discussions.Include(d => d.Comments).OrderByDescending(x => x.Comments.Count).ToListAsync<Discussion>();
@@ -248,6 +366,16 @@ namespace Repository
         }
 
         /// <summary>
+        /// Returns true iff the comment id, specified in the argument, exists in the database's Comments table.
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        private bool CommentExists(string commentid)
+        {
+            return (_dbContext.Comments.Where(d => d.CommentId == commentid).FirstOrDefault<Comment>() != null);
+        }
+
+        /// <summary>
         /// Returns true iff the Topic name, specified in the argument, exists in the database's Topics table.
         /// </summary>
         /// <param name="discussionid"></param>
@@ -278,8 +406,6 @@ namespace Repository
 
         public async Task<List<Discussion>> GetDiscussionsByTopicId(string topicid)
         {
-           
-
             return await _dbContext.Discussions.Include(dis => dis.DiscussionTopics).ToListAsync<Discussion>();
         }
     }
