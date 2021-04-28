@@ -183,5 +183,13 @@ namespace Repository
         /// <param name="userid"></param>
         /// <returns></returns>
         public Task<List<DiscussionFollow>> GetFollowDiscussionList(string userid);
+
+        /// <summary>
+        /// Likes a comment
+        /// Increment a comment's like value
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public Task<bool> LikeComment(string commentid);
     }
 }

@@ -170,5 +170,14 @@ namespace BusinessLogic.Interfaces
         /// <param name="userid"></param>
         /// <returns></returns>
         public Task<List<DiscussionT>> GetFollowDiscList(string userid);
+
+        /// <summary>
+        /// Increments a comment's likes
+        /// Returns true is successful
+        /// Returns fail is failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> LikeComment(Guid commentid);
     }
 }
