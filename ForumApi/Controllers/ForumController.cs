@@ -309,7 +309,6 @@ namespace CineAPI.Controllers
         [HttpGet("discussions/topic/{topicid}")]
         public async Task<ActionResult<List<DiscussionT>>> GetDiscussionsByTopicId(string topicid)
         {
-          
             List<DiscussionT> discussions = await _forumLogic.GetDiscussionsByTopicId(topicid);
             if (discussions == null)
             {
@@ -323,6 +322,104 @@ namespace CineAPI.Controllers
             return discussions;
         }
 
+        /// <summary>
+        /// Changes a spoiler tag from true &lt; - > false
+        /// Returns 400 if couldn't model bind the id guid.
+        /// Returns 404 if unable to find commentid.
+        /// Returns 200 if successful.
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        [HttpGet("spoiler/change/{commentid}")]
+        public async Task<ActionResult<bool>> ChangeSpoiler(Guid commentid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.ChangeSpoiler() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            bool changedComment = await _forumLogic.ChangeSpoiler(commentid);
+            if(!changedComment)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return changedComment;
+        }
 
+        /// <summary>
+        /// Deletes a comment from the database.
+        /// Returns 400 if couldn't model bind the id guid.
+        /// Returns 404 if unable to find commentid.
+        /// Returns 200 if successful.
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        [HttpDelete("comment/{commentid}")]
+        public async Task<ActionResult<bool>> DeleteComment(Guid commentid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.DeleteComment() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            bool delSuccess = await _forumLogic.DeleteComment(commentid);
+            if(!delSuccess)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return delSuccess;
+        }
+
+        /// <summary>
+        /// Deletes a discussion from the database.
+        /// Returns 400 if couldn't model bind the id guid.
+        /// Returns 404 if unable to find discussionid.
+        /// Returns 200 if successful.
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
+        [HttpDelete("discussion/{discussionid}")]
+        public async Task<ActionResult<bool>> DeleteDiscussion(Guid discussionid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.DeleteDiscussion() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            bool delSuccess = await _forumLogic.DeleteDiscussion(discussionid);
+            if(!delSuccess)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return delSuccess;
+        }
+
+        /// <summary>
+        /// Deletes a topic from the database.
+        /// Returns 400 if couldn't model bind the id guid.
+        /// Returns 404 if unable to find topicid.
+        /// Returns 200 if successful.
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        [HttpDelete("topic/{topicid}")]
+        public async Task<ActionResult<bool>> DeleteTopic(Guid topicid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.DeleteTopic() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            bool delSuccess = await _forumLogic.DeleteTopic(topicid);
+            if(!delSuccess)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return delSuccess;
+        }
     }
 }
