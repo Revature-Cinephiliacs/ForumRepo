@@ -208,19 +208,21 @@ namespace BusinessLogic
                 //     repoDiscussions = repoDiscussions.OrderBy(r => r.like).ToList<Repository.Models.Discussion>();
                 // break;
                 case "commentsA":
-                    repoDiscussions = repoDiscussions.OrderBy(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+                    repoDiscussions = sortByNumOfCommentsAsce(repoDiscussions);
                 break;
                 case "commentsD":
-                    repoDiscussions = repoDiscussions.OrderByDescending(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+                    repoDiscussions = sortByNumOfCommentsDesc(repoDiscussions);
                 break;
                 case "timeA":
-                    repoDiscussions = repoDiscussions.OrderBy(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+                    repoDiscussions = sortByCreationTimeAsce(repoDiscussions);
                 break;
                 case "timeD":
-                    repoDiscussions = repoDiscussions.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+                    repoDiscussions = sortByCreationTimeDesc(repoDiscussions);
+                break;
+                case "recent":
+                    repoDiscussions = sortByRecent(repoDiscussions);
                 break;
             }
-
 
             int numOfDiscussion = repoDiscussions.Count;
             int start = pageSize * (page -1);
@@ -259,7 +261,80 @@ namespace BusinessLogic
             return discussions;
         }
 
+        /// <summary>
+        /// sorting the Discussion list by number of likes
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        // private List<Repository.Models.Discussion> sortByNumOfLikes( List<Repository.Models.Discussion> discussions){
 
+        //  }
+
+        /// <summary>
+        /// sorting the Discussion list by number of comments in Ascending order
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByNumOfCommentsAsce( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderBy(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+         }
+
+        /// <summary>
+        /// sorting the Discussion list by number of comments in Descending order
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByNumOfCommentsDesc( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderByDescending(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+        }
+
+        /// <summary>
+        /// sorting the Discussion lsit by time created in ascending order  
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByCreationTimeAsce( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderBy(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+        }
+
+        /// <summary>
+        /// sorting the Discussion list by time it was created in Descending order
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByCreationTimeDesc( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+        }
+
+        /// <summary>
+        /// sorting the Discussion lsit by recent activity
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByRecent( List<Repository.Models.Discussion> discussions){
+            List<Repository.Models.Discussion> temp = new List<Repository.Models.Discussion>();
+            List<Repository.Models.Discussion> tempDiscussions = new List<Repository.Models.Discussion>();
+            foreach (var item in discussions)
+            {
+                if(item.Comments.Count != 0){
+                    temp.Add(item);
+                }
+            }
+            temp = temp.OrderByDescending(r => r.Comments.First().CreationTime).ToList<Repository.Models.Discussion>();
+            discussions = discussions.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+            foreach(var item in discussions)
+            {
+               foreach(var d in temp){
+                   if(d != item){
+                       if(d.Comments.First().CreationTime > d.CreationTime){
+                           tempDiscussions.Add(d);
+                       } 
+                   }
+               }
+               tempDiscussions.Add(item);
+            }  
+            return tempDiscussions;
+        }
         public async Task<Discussion> GetDiscussion(Guid discussionid)
         {
             Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());

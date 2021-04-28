@@ -109,7 +109,7 @@ namespace Repository
                 _logger.LogWarning($"RepoLogic.GetMovieComments() was called for a discussion that doesn't exist {discussionid}.");
                 return null;
             }
-            var commentList = await _dbContext.Comments.Where(c => c.DiscussionId == discussionid).ToListAsync();
+            var commentList = await _dbContext.Comments.Where(c => c.DiscussionId == discussionid).OrderByDescending(c => c.CreationTime).ToListAsync();
             return commentList;
         }
 

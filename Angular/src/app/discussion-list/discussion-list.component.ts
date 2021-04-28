@@ -24,7 +24,7 @@ export class DiscussionListComponent implements OnInit {
   DisplayList: boolean = true;
 
   pageNum: number = 1;
-  sortingOrder: string = "commentsD"   //Default sorting order will be based on total num of comments 
+  sortingOrder: string = "recent"   //Default sorting order will be based on total num of comments 
   numOfDiscussion: number;
 
   constructor(private _forum: ForumService, private router:  ActivatedRoute) { }
