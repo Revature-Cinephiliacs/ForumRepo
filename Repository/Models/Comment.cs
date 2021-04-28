@@ -7,6 +7,11 @@ namespace Repository.Models
 {
     public partial class Comment
     {
+        public Comment()
+        {
+            UserLikes = new HashSet<UserLike>();
+        }
+
         public string CommentId { get; set; }
         public string DiscussionId { get; set; }
         public string UserId { get; set; }
@@ -17,5 +22,6 @@ namespace Repository.Models
         public int? Likes { get; set; }
 
         public virtual Discussion Discussion { get; set; }
+        public virtual ICollection<UserLike> UserLikes { get; set; }
     }
 }

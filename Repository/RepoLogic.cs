@@ -300,22 +300,20 @@ namespace Repository
             return true;
         }
 
-        public async Task<bool> LikeComment(string commentid, string userid)
+        public async Task<bool> LikeComment(UserLike newLike)
         {
-            Comment getComment = await _dbContext.Comments.FirstOrDefaultAsync(x => x.CommentId == commentid);
+            Comment getComment = await _dbContext.Comments.FirstOrDefaultAsync(x => x.CommentId == newLike.CommentId);
             if(getComment == null)
             {
+                _logger.LogWarning($"RepoLogic.LikeComment() was called for a comment that doesn't exist {newLike.CommentId}.");
                 return false;
             }
-            UserLike getLikes = await _dbContext.UserLikes.Where(x => x.UserId == userid).FirstOrDefaultAsync(x => x.CommentId == commentid);
+            UserLike getLikes = await _dbContext.UserLikes.Where(x => x.UserId == newLike.UserId).FirstOrDefaultAsync(x => x.CommentId == newLike.CommentId);
             if(getLikes != null)
             {
-                _logger.LogWarning($"RepoLogic.LikeComment(), but {userid} already liked {commentid}.");
+                _logger.LogWarning($"RepoLogic.LikeComment(), but {newLike.UserId} already liked {newLike.CommentId}.");
                 return false;
             }
-            UserLike newLike = new UserLike();
-            newLike.CommentId = commentid;
-            newLike.UserId = userid;
             await _dbContext.AddAsync<UserLike>(newLike);
             getComment.Likes++;
             await _dbContext.SaveChangesAsync();
