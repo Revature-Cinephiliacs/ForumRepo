@@ -305,6 +305,7 @@ namespace Repository
             Comment getComment = await _dbContext.Comments.FirstOrDefaultAsync(x => x.CommentId == commentid);
             if(getComment == null)
             {
+                _logger.LogWarning($"RepoLogic.LikeComment() was called for a comment that doesn't exist {commentid}.");
                 return false;
             }
             UserLike getLikes = await _dbContext.UserLikes.Where(x => x.UserId == userid).FirstOrDefaultAsync(x => x.CommentId == commentid);
