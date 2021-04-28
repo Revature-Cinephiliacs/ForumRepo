@@ -67,36 +67,6 @@ export class DiscussionListComponent implements OnInit {
     this.getDiscussions();
   }
 
-  //Function that will take in a discussion object and will
-  //get the number of comments and add it to a new
-  //discussion object with an added property for comment count, which is then 
-  //added to a discussion list
-  // async addCommentCount(d: any) {
-  //   setTimeout(() => {
-  //     this._forum.getDiscussionComments(d.discussionid).subscribe(data =>{ 
-  //       this.comments = data;
-  //       if(this.comments == null)
-  //       {
-  //         this.commentCount = 0;
-  //       }
-  //       else
-  //       {
-  //         this.commentCount = this.comments.length;
-  //       }
-  //       this.newDiscussion = {
-  //         discussionid: d.discussionid,
-  //         movieid: d.movieid,
-  //         userid: d.userid,
-  //         subject: d.subject,
-  //         topic: d.topic,
-  //         comments: d.
-  //         commentCount: this.commentCount
-  //       }
-  //       this.newDiscussions.push(this.newDiscussion);
-  //     });
-  //   }, 1000);
-  // }
-
   //Function that will take in a search string and then filter
   //the dicussions to show matching results
   setTable(){

@@ -30,16 +30,4 @@ export interface User {
     isspoiler: boolean,
     parentcommentid: string
   }
-
-  export class NestedComment {
-    constructor(
-      public commentid: number,
-      public discussionid: number,
-      public userid: string,
-      public text: string,
-      public isspoiler: boolean,
-      public parentcommentid: string,
-      public replies: any
-    ){}
-  }
   

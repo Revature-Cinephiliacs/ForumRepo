@@ -62,9 +62,9 @@ namespace BusinessLogic
             return comments;
         }
 
-        public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
+        public async Task<List<NestedComment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
         {
-            if (page < 1)
+           if (page < 1)
             {
                 _logger.LogWarning($"ForumLogic.GetCommentsPage() was called with a negative or zero page number {page}.");
                 return null;
@@ -96,14 +96,36 @@ namespace BusinessLogic
                 // break;
                 case "timeA":
                     repoComments = repoComments.OrderBy(r => r.CreationTime).ToList<Repository.Models.Comment>();
-                break;
+                    break;
                 case "timeD":
                     repoComments = repoComments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Comment>();
-                break;
-                
+                    break;
+
             }
 
-            int numberOfComments = repoComments.Count;
+            //Create array of comments to store parent comments
+            List<Repository.Models.Comment> parentComments = new List<Repository.Models.Comment>();
+
+            foreach (Repository.Models.Comment rc in repoComments)
+            {
+                System.Console.WriteLine(rc.CommentText);
+                System.Console.WriteLine(rc.ParentCommentid);
+                if (rc.ParentCommentid == null)
+                {
+                    parentComments.Add(rc);
+                }
+            }
+
+            System.Console.WriteLine("Parent Comment Check");
+            foreach (Repository.Models.Comment pc in parentComments)
+            {
+                System.Console.WriteLine(pc.CommentText);
+                System.Console.WriteLine(pc.ParentCommentid);
+            }
+
+            //Change to number of parent comments
+            int numberOfComments = parentComments.Count;
+
             int startIndex = pageSize * (page - 1);
 
             if (startIndex > numberOfComments - 1)
@@ -118,11 +140,22 @@ namespace BusinessLogic
                 endIndex = numberOfComments - 1;
             }
 
-            List<Comment> comments = new List<Comment>();
-
+            List<NestedComment> comments = new List<NestedComment>();
+            System.Console.WriteLine("Start Index: " + startIndex);
+            System.Console.WriteLine("Emd Index: " + endIndex);
             for (int i = startIndex; i <= endIndex; i++)
             {
-                comments.Add(Mapper.RepoCommentToComment(repoComments[i]));
+                //change to mapper to a different DTO that has replies[]
+                comments.Add(Mapper.RepoCommentToNestedComment(parentComments[i]));
+                //System.Console.WriteLine(comments[i].Text);
+            }
+
+            //call a recursive function to send repoComments and add the children to the comments in page comments
+            foreach (NestedComment nc in comments)
+            {
+                System.Console.WriteLine("for each: -------------------");
+                Mapper.AddReplies(repoComments, nc);
+                System.Console.WriteLine(nc.Text);
             }
 
             return comments;
