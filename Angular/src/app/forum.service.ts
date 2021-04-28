@@ -76,4 +76,14 @@ export class ForumService {
   sortDiscussionByCommentsDesc(){
     return this.http.get( this.baseURL + "discussion/sort/comment/descend");
   }
+
+  //Function that will make a call to the Forum API endpoint to filter discussion by topic
+  filterDiscussionByTopic(topicid: string){
+    return this.http.get( this.baseURL + "discussions/topic/" + topicid);
+  }
+
+  //Function that will modify comment like
+  addLike(commentid: string){
+    return this.http.post( this.baseURL + "comment/like/" + commentid, null);
+  }
 }

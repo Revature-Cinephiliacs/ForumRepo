@@ -24,7 +24,7 @@ namespace Testing
         public void CreateComment_WithCommentObject_ReturnTrue()
         {
             // Arrange
-            NewComment nc = new NewComment(Guid.NewGuid(), "def", "fgh", true);
+            NewComment nc = new NewComment(Guid.NewGuid(), "def", "fgh", true, null);
 
             repoStub.Setup(repo => repo.AddComment(It.IsAny<Repository.Models.Comment>())).ReturnsAsync(true);
             var logic = new ForumLogic(repoStub.Object, logicLogger);

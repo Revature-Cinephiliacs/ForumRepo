@@ -13,7 +13,8 @@ import { ThisReceiver } from '@angular/compiler';
 export class DiscussionListComponent implements OnInit {
 
   discussions: any;
-  searchDiscussions = [];
+  // searchDiscussions = [];
+  topics: any;
   
   newDiscussions = [];
   sortDiscussions: any;
@@ -39,11 +40,16 @@ export class DiscussionListComponent implements OnInit {
       this.discussions = data;
       this.numOfDiscussion = this.discussions.length
       this.discussions = []})
+    this._forum.getTopics().subscribe(data => {
+      console.log(data);
+      this.topics = data;
+    });
   }
 
   //Function that will get a list of discussions associated with the
   //snapshot movie id
   async getDiscussions() {
+    this.discussions = [];
     setTimeout(() => {
       this._forum.getDiscussionPage(this.movieID, this.pageNum, this.sortingOrder).subscribe(data => {
         console.log(data);
@@ -56,46 +62,16 @@ export class DiscussionListComponent implements OnInit {
 
   //get next discussion page
   onNext(){
-    this.discussions = [];
+    //this.discussions = [];
     this.pageNum++;
     this.getDiscussions();
   }
   //get previous duscussuin page
   onPrev(){
-    this.discussions = [];
+    //this.discussions = [];
     this.pageNum--;
     this.getDiscussions();
   }
-
-  //Function that will take in a discussion object and will
-  //get the number of comments and add it to a new
-  //discussion object with an added property for comment count, which is then 
-  //added to a discussion list
-  // async addCommentCount(d: any) {
-  //   setTimeout(() => {
-  //     this._forum.getDiscussionComments(d.discussionid).subscribe(data =>{ 
-  //       this.comments = data;
-  //       if(this.comments == null)
-  //       {
-  //         this.commentCount = 0;
-  //       }
-  //       else
-  //       {
-  //         this.commentCount = this.comments.length;
-  //       }
-  //       this.newDiscussion = {
-  //         discussionid: d.discussionid,
-  //         movieid: d.movieid,
-  //         userid: d.userid,
-  //         subject: d.subject,
-  //         topic: d.topic,
-  //         comments: d.
-  //         commentCount: this.commentCount
-  //       }
-  //       this.newDiscussions.push(this.newDiscussion);
-  //     });
-  //   }, 1000);
-  // }
 
   //Function that will take in a search string and then filter
   //the dicussions to show matching results
@@ -117,30 +93,58 @@ export class DiscussionListComponent implements OnInit {
         }
       }       
     }
-    }
+  }
 
   //Function that will get a list of discussions for a movie
   //sorted in ascending order based on number of comments
   async sortDiscussionsByCommentsAsc() {
-    setTimeout(() => {
-      this._forum.sortDiscussionByCommentsAsc().subscribe(data => {
-        console.log(data);
-        this.sortDiscussions = data;
-        this.newDiscussions = [];   
-      });
-    }, 1000);
+    this.sortingOrder = "commentsA";
+    this.getDiscussions()
+    // setTimeout(() => {
+    //   this._forum.sortDiscussionByCommentsAsc().subscribe(data => {
+    //     console.log(data);
+    //     this.sortDiscussions = data;
+    //     this.discussions = [];   
+    //   });
+    // }, 1000);
   }
 
   //Function that will get a list of discussions for a movie
   //sorted in descending order based on number of comments
   async sortDiscussionsByCommentsDesc() {
+    this.sortingOrder = "commentsD";
+    this.getDiscussions();
+    // setTimeout(() => {
+    //   this._forum.sortDiscussionByCommentsDesc().subscribe(data => {
+    //     console.log(data);
+    //     this.sortDiscussions = data;
+    //     this.discussions = [];
+    //   });
+    // }, 1000);
+  }
+
+  sortByCreationA(){
+    this.sortingOrder = "timeA";
+    this.getDiscussions();
+  }
+  sortByCreationB(){
+    this.sortingOrder = "timeD";
+    this.getDiscussions();
+  }
+  sortByRecent(){
+    this.sortingOrder = "recent";
+    this.getDiscussions();
+  }
+
+  async filterByTopic(topicid: string)
+  {
+    console.log(topicid)
     setTimeout(() => {
-      this._forum.sortDiscussionByCommentsDesc().subscribe(data => {
+      this._forum.filterDiscussionByTopic(topicid).subscribe(data => {
         console.log(data);
-        this.sortDiscussions = data;
-        this.newDiscussions = [];
-      });
-    }, 1000);
+        this.discussions = data;
+      })
+    })
   }
 
 }
