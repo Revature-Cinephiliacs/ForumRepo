@@ -26,9 +26,9 @@ namespace CineAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("topics")]
-        public async Task<ActionResult<List<string>>> GetTopics()
+        public async Task<ActionResult<List<Topic>>> GetTopics()
         {
-            List<string> topics = await _forumLogic.GetTopics();
+            List<Topic> topics = await _forumLogic.GetTopics();
 
             if (topics.Count == 0)
             {
@@ -45,10 +45,10 @@ namespace CineAPI.Controllers
         /// <param name="movieid"></param>
         /// <returns></returns>
         [HttpGet("discussions/{movieid}")]
-        public async Task<ActionResult<List<Discussion>>> GetDiscussions(string movieid)
+        public async Task<ActionResult<List<DiscussionT>>> GetDiscussions(string movieid)
         {
             Console.WriteLine(movieid);
-            List<Discussion> discussions = await _forumLogic.GetDiscussions(movieid);
+            List<DiscussionT> discussions = await _forumLogic.GetDiscussions(movieid);
             if (discussions == null)
             {
                 return StatusCode(404);
@@ -68,10 +68,10 @@ namespace CineAPI.Controllers
         /// <param name="movieid"></param>
         /// <returns></returns>
         [HttpGet("discussions/{movieid}/{page}/{sortingOrder}")]
-        public async Task<ActionResult<List<Discussion>>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
+        public async Task<ActionResult<List<DiscussionT>>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
         {
             Console.WriteLine(movieid);
-            List<Discussion> discussions = await _forumLogic.GetDiscussionsPage(movieid, page, sortingOrder);
+            List<DiscussionT> discussions = await _forumLogic.GetDiscussionsPage(movieid, page, sortingOrder);
             if (discussions == null)
             {
                 return StatusCode(404);

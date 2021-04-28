@@ -7,8 +7,15 @@
 
 <button (click) = "sortDiscussionsByCommentsAsc()">Sort Ascending</button>
 <button (click) = "sortDiscussionsByCommentsDesc()">Sort Descending</button>
+<p>Filter by Topic</p>
+<div>
+    <ul *ngFor = "let t of topics">
+        <li><button (click) = "filterByTopic(t.topicId)">{{t.topicName}}</button></li>
+    </ul>
+</div>
 
-<table id="myTable" *ngIf="DisplayList">
+
+<!-- <table *ngIf="DisplayList">
     <thead>
         <tr>
             <th>Title</th>
@@ -25,29 +32,31 @@
             
         </tr>
     </tbody>
-</table>
+</table> -->
   
-<table *ngIf="DisplayList">
+<table id="myTable" *ngIf="DisplayList">
     <thead>
         <tr>
             <th>Title</th>
             <th>Username</th>
             <th>Replies</th>
+            <th>Likes</th>
         </tr>
 </thead>
     <tbody>
          <tr *ngFor = "let discussion of discussions">
              
-                <a routerLink="/discussion/{{discussion.discussionid}}"><td>{{discussion.subject}}</td></a>
+                <a routerLink="/discussion/{{discussion.discussionId}}"><td>{{discussion.subject}}</td></a>
                 <td>{{discussion.userid}}</td>
                 <td>{{discussion.comments.length}}</td>
+                <td>{{ discussion.likes}}</td>
             
         </tr>
-        <tr *ngFor = "let d of sortDiscussions">
+        <!-- <tr *ngFor = "let d of sortDiscussions">
             <a routerLink="/discussion/{{d.discussionId}}"><td>{{d.subject}}</td></a>
             <td>{{d.userid}}</td>  
             <td>{{d.comments.length}}</td>      
-        </tr>
+        </tr> -->
     </tbody>
 </table>
 

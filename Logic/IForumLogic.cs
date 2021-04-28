@@ -12,7 +12,7 @@ namespace BusinessLogic.Interfaces
         /// If there are no topics, return null
         /// </summary>
         /// <returns>List &lt; Topic ></returns>
-        public Task<List<string>> GetTopics();
+        public Task<List<Topic>> GetTopics();
 
         /// <summary>
         /// Method for getting all discussions for a specific movie 
@@ -21,7 +21,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="movieid"></param>
         /// <returns></returns>
-        public Task<List<Discussion>> GetDiscussions(string movieid);
+        public Task<List<DiscussionT>> GetDiscussions(string movieid);
         
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="movieid"></param>
         /// <returns></returns>
-        public Task<List<Discussion>> GetDiscussionsPage(string movieid, int page, string sortingOrder);
+        public Task<List<DiscussionT>> GetDiscussionsPage(string movieid, int page, string sortingOrder);
 
         /// <summary>
         /// Method to get a discussion by id

@@ -13,7 +13,8 @@ import { ThisReceiver } from '@angular/compiler';
 export class DiscussionListComponent implements OnInit {
 
   discussions: any;
-  searchDiscussions = [];
+  // searchDiscussions = [];
+  topics: any;
   
   newDiscussions = [];
   sortDiscussions: any;
@@ -39,6 +40,10 @@ export class DiscussionListComponent implements OnInit {
       this.discussions = data;
       this.numOfDiscussion = this.discussions.length
       this.discussions = []})
+    this._forum.getTopics().subscribe(data => {
+      console.log(data);
+      this.topics = data;
+    });
   }
 
   //Function that will get a list of discussions associated with the
@@ -87,7 +92,7 @@ export class DiscussionListComponent implements OnInit {
         }
       }       
     }
-    }
+  }
 
   //Function that will get a list of discussions for a movie
   //sorted in ascending order based on number of comments
@@ -96,7 +101,7 @@ export class DiscussionListComponent implements OnInit {
       this._forum.sortDiscussionByCommentsAsc().subscribe(data => {
         console.log(data);
         this.sortDiscussions = data;
-        this.newDiscussions = [];   
+        this.discussions = [];   
       });
     }, 1000);
   }
@@ -108,9 +113,20 @@ export class DiscussionListComponent implements OnInit {
       this._forum.sortDiscussionByCommentsDesc().subscribe(data => {
         console.log(data);
         this.sortDiscussions = data;
-        this.newDiscussions = [];
+        this.discussions = [];
       });
     }, 1000);
+  }
+
+  async filterByTopic(topicid: string)
+  {
+    console.log(topicid)
+    setTimeout(() => {
+      this._forum.filterDiscussionByTopic(topicid).subscribe(data => {
+        console.log(data);
+        this.discussions = data;
+      })
+    })
   }
 
 }

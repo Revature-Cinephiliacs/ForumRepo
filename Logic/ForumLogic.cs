@@ -175,7 +175,7 @@ namespace BusinessLogic
             return await _repo.SetSetting(setting);
         }
 
-        public async Task<List<Discussion>> GetDiscussions(string movieid)
+        public async Task<List<DiscussionT>> GetDiscussions(string movieid)
         {
             List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
             if (repoDiscussions == null)
@@ -189,7 +189,7 @@ namespace BusinessLogic
                 item.Comments = await _repo.GetMovieComments(item.DiscussionId);
             }
 
-            List<Discussion> discussions = new List<Discussion>();
+            List<DiscussionT> discussions = new List<DiscussionT>();
             foreach (var repoDiscussion in repoDiscussions)
             {
                 // Get the topic associated with this discussion
@@ -200,12 +200,12 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic));
+                discussions.Add(Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
             }
             return discussions;
         }
 
-        public async Task<List<Discussion>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
+        public async Task<List<DiscussionT>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
         {
             if(page < 1)
             {
@@ -274,7 +274,7 @@ namespace BusinessLogic
                 pageDiscussions.Add(repoDiscussions[i]);
             }
 
-            List<Discussion> discussions = new List<Discussion>();
+            List<DiscussionT> discussions = new List<DiscussionT>();
             foreach (var repoDiscussion in pageDiscussions)
             {
                 
@@ -285,7 +285,7 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic));
+                discussions.Add(Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
                 
             }
             return discussions;
@@ -311,7 +311,7 @@ namespace BusinessLogic
             return discussion;
         }
 
-        public async Task<List<string>> GetTopics()
+        public async Task<List<Topic>> GetTopics()
         {
             var repoTopics = await _repo.GetTopics();
             if (repoTopics == null)
@@ -320,10 +320,11 @@ namespace BusinessLogic
                 return null;
             }
 
-            var topics = new List<string>();
+            var topics = new List<Topic>();
             foreach (var repoTopic in repoTopics)
             {
-                topics.Add(repoTopic.TopicName);
+                var newTopic = new Topic(repoTopic.TopicId, repoTopic.TopicName);
+                topics.Add(newTopic);
             }
             return topics;
         }
@@ -377,7 +378,7 @@ namespace BusinessLogic
                 gdis.Subject = dis.Subject;
                 foreach (var ct in dis.Comments)
                 {
-                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid);
+                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid, (int)ct.Likes);
                     gdis.Comments.Add(nc);
                 }
 
