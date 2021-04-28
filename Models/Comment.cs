@@ -70,6 +70,14 @@ namespace GlobalModels
             return !(lhs == rhs);
         }
 
+        public static int CompareLikes(Comment c1, Comment c2)
+
+        {
+
+            return c1.Likes.CompareTo(c2.Likes);
+
+        }
+
         public override int GetHashCode()
         {
             return Commentid.GetHashCode();

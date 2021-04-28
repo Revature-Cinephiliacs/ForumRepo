@@ -446,9 +446,13 @@ namespace BusinessLogic
             return await _repo.LikeComment(commentid.ToString(), userid);
         }
 
-        private List<T> SortByLikes(List<T> li)
+        private List<Comment> SortByLikes(List<Comment> li)
         {
-            return null;
+            Comparison<Comment> likes = new Comparison<Comment>(Comment.CompareLikes);
+            li.Sort(likes);
+            return li;
         }
+
+      
     }
 }
