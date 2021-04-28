@@ -225,7 +225,7 @@ namespace Repository.Models
                     .WithMany(p => p.UserLikes)
                     .HasForeignKey(d => d.CommentId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__user_like__comme__18EBB532");
+                    .HasConstraintName("FK__user_like__comme__1CBC4616");
             });
 
             OnModelCreatingPartial(modelBuilder);

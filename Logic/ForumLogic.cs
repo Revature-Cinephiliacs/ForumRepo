@@ -443,7 +443,10 @@ namespace BusinessLogic
 
         public async Task<bool> LikeComment(Guid commentid, string userid)
         {
-            return await _repo.LikeComment(commentid.ToString(), userid);
+            Repository.Models.UserLike newLike = new Repository.Models.UserLike();
+            newLike.CommentId = commentid.ToString();
+            newLike.UserId = userid;
+            return await _repo.LikeComment(newLike);
         }
     }
 }

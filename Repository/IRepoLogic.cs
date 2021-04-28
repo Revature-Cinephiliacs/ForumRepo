@@ -140,7 +140,7 @@ namespace Repository
         /// Returns true if successful
         /// Returns false if failed
         /// </summary>
-        /// <param name="toString"></param>
+        /// <param name="commentid"></param>
         /// <returns></returns>
         public Task<bool> DeleteComment(string commentid);
 
@@ -152,7 +152,7 @@ namespace Repository
         /// Returns true if successful
         /// Returns false if failed
         /// </summary>
-        /// <param name="v"></param>
+        /// <param name="discussionid"></param>
         /// <returns></returns>
         public Task<bool> DeleteDiscussion(string discussionid);
 
@@ -163,7 +163,7 @@ namespace Repository
         /// Returns true if successful
         /// Return false if failed
         /// </summary>
-        /// <param name="v"></param>
+        /// <param name="topicid"></param>
         /// <returns></returns>
         public Task<bool> DeleteTopic(string topicid);
 
@@ -188,8 +188,8 @@ namespace Repository
         /// Likes a comment
         /// Increment a comment's like value
         /// </summary>
-        /// <param name="v"></param>
+        /// <param name="newLike"></param>
         /// <returns></returns>
-        public Task<bool> LikeComment(string commentid, string userid);
+        public Task<bool> LikeComment(UserLike newLike);
     }
 }
