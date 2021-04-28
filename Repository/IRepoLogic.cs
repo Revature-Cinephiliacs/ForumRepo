@@ -190,6 +190,6 @@ namespace Repository
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public Task<bool> LikeComment(string commentid);
+        public Task<bool> LikeComment(string commentid, string userid);
     }
 }

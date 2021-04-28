@@ -178,6 +178,6 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="commentid"></param>
         /// <returns></returns>
-        public Task<bool> LikeComment(Guid commentid);
+        public Task<bool> LikeComment(Guid commentid, string userid);
     }
 }

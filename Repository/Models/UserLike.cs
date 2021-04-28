@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace Repository.Models
 {
-    public partial class DiscussionFollow
+    public partial class UserLike
     {
-        public string DiscussionId { get; set; }
+        public string CommentId { get; set; }
         public string UserId { get; set; }
 
-        public virtual Discussion Discussion { get; set; }
+        public virtual Discussion Comment { get; set; }
     }
 }
