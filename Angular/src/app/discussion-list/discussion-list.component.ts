@@ -135,6 +135,10 @@ export class DiscussionListComponent implements OnInit {
     this.sortingOrder = "recent";
     this.getDiscussions();
   }
+  sortByLike(){
+    this.sortingOrder = "like";
+    this.getDiscussions();
+  }
 
   async filterByTopic(topicid: string)
   {

@@ -238,9 +238,9 @@ namespace BusinessLogic
             // Sort the list of Discussion according to sorting string
             switch (sortingOrder)
             {
-                // case "like":
-                //     repoDiscussions = repoDiscussions.OrderBy(r => r.like).ToList<Repository.Models.Discussion>();
-                // break;
+                case "like":
+                    repoDiscussions = sortByNumOfLikes(repoDiscussions);
+                break;
                 case "commentsA":
                     repoDiscussions = sortByNumOfCommentsAsce(repoDiscussions);
                 break;
@@ -300,9 +300,21 @@ namespace BusinessLogic
         /// </summary>
         /// <param name="discussions"></param>
         /// <returns></returns>
-        // private List<Repository.Models.Discussion> sortByNumOfLikes( List<Repository.Models.Discussion> discussions){
-
-        //  }
+        private List<Repository.Models.Discussion> sortByNumOfLikes( List<Repository.Models.Discussion> discussions){
+            List<Repository.Models.Discussion> DiscussionwithComments = new List<Repository.Models.Discussion>();
+            List<Repository.Models.Discussion> DiscussionWithNoComments = new List<Repository.Models.Discussion>();
+            foreach (var item in discussions)
+            {
+                if(item.Comments.Count != 0){
+                    DiscussionwithComments.Add(item);
+                }else{
+                    DiscussionWithNoComments.Add(item);
+                }
+            }
+            DiscussionwithComments.OrderByDescending(r => r.Comments.First().Likes).ToList<Repository.Models.Discussion>();
+            DiscussionwithComments.AddRange(DiscussionWithNoComments);
+            return DiscussionwithComments;
+         }
 
         /// <summary>
         /// sorting the Discussion list by number of comments in Ascending order
