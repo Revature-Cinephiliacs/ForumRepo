@@ -14,8 +14,8 @@ export class DiscussionListComponent implements OnInit {
 
   discussions: any;
   searchDiscussions = [];
-  newDiscussion: Discussion & {commentCount: number};
-  newDiscussions = [];
+  
+  // newDiscussions = [];
   sortDiscussions: any;
   comments: any;
   commentCount: any;
@@ -60,13 +60,13 @@ export class DiscussionListComponent implements OnInit {
 
   //get next discussion page
   onNext(){
-    this.newDiscussions = [];
+    this.discussions = [];
     this.pageNum++;
     this.getDiscussions();
   }
   //get previous duscussuin page
   onPrev(){
-    this.newDiscussions = [];
+    this.discussions = [];
     this.pageNum--;
     this.getDiscussions();
   }
@@ -87,7 +87,7 @@ export class DiscussionListComponent implements OnInit {
         {
           this.commentCount = this.comments.length;
         }
-        this.newDiscussion = {
+        this.discussions = {
           discussionid: d.discussionid,
           movieid: d.movieid,
           userid: d.userid,
@@ -95,7 +95,7 @@ export class DiscussionListComponent implements OnInit {
           topic: d.topic,
           commentCount: this.commentCount
         }
-        this.newDiscussions.push(this.newDiscussion);
+        this.discussions.push(this.discussions);
       });
     }, 1000);
   }
@@ -129,7 +129,7 @@ export class DiscussionListComponent implements OnInit {
       this._forum.sortDiscussionByCommentsAsc().subscribe(data => {
         console.log(data);
         this.sortDiscussions = data;
-        this.newDiscussions = [];   
+        this.discussions = [];   
       });
     }, 1000);
   }
@@ -141,7 +141,7 @@ export class DiscussionListComponent implements OnInit {
       this._forum.sortDiscussionByCommentsDesc().subscribe(data => {
         console.log(data);
         this.sortDiscussions = data;
-        this.newDiscussions = [];
+        this.discussions = [];
       });
     }, 1000);
   }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using GlobalModels;
 
 namespace BusinessLogic
@@ -15,6 +16,14 @@ namespace BusinessLogic
         public static Discussion RepoDiscussionToDiscussion(Repository.Models.Discussion
             repoDiscussion, Repository.Models.Topic topic)
         {
+            List<Comment> newComment = new List<Comment>();
+            foreach (var item in repoDiscussion.Comments)
+            {
+                if (item != null)
+                {
+                    newComment.Add(RepoCommentToComment(item));
+                }
+            }
             var discussion = new Discussion(Guid.Parse(repoDiscussion.DiscussionId), repoDiscussion.MovieId,
                 repoDiscussion.UserId, repoDiscussion.Subject, topic.TopicName);
             return discussion;
@@ -30,10 +39,49 @@ namespace BusinessLogic
         {
             // var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId),
             //     repoComment.UserId, repoComment.CommentText, repoComment.IsSpoiler);
-            
+
             var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), repoComment.UserId,
                     repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid);
             return comment;
+        }
+
+        /// <summary>
+        /// Maps an instance of Repository.Model.Comment onto a new instance of
+        /// GlobalModels.NestedComment
+        /// </summary>
+        /// <param name="repoComment"></param>
+        /// <returns></returns>
+        public static NestedComment RepoCommentToNestedComment(Repository.Models.Comment repoComment)
+        {
+            var nestedComment = new NestedComment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), repoComment.UserId,
+                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid);
+
+            return nestedComment;
+        }
+
+        /// <summary>
+        /// A helper recursive function that will take a list of discussion comments and a parent comment
+        /// and the child replies to the parent commment
+        /// </summary>
+        /// <param name="repoComments"></param>
+        /// <param name="parent"></param>
+        public static void AddReplies(List<Repository.Models.Comment> repoComments, NestedComment parent)
+        {
+            for (int i = 0; i < repoComments.Count; i++)
+            {
+                System.Console.WriteLine("Add Replies");
+                System.Console.WriteLine("Repo parent: " + repoComments[i].ParentCommentid);
+                System.Console.WriteLine("Parent parent: " + parent.ParentCommentid);
+                string parentId = parent.Commentid.ToString();
+                if (repoComments[i].ParentCommentid == parentId)
+                {
+                    var nestedComment = RepoCommentToNestedComment(repoComments[i]);
+                    parent.Replies.Add(nestedComment);
+                    System.Console.WriteLine("added");
+
+                    AddReplies(repoComments, nestedComment);
+                }
+            }
         }
 
         /// <summary>

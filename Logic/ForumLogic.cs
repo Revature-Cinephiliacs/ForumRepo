@@ -62,7 +62,7 @@ namespace BusinessLogic
             return comments;
         }
 
-        public async Task<List<Comment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
+        public async Task<List<NestedComment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
         {
             if (page < 1)
             {
@@ -96,14 +96,36 @@ namespace BusinessLogic
                 // break;
                 case "timeA":
                     repoComments = repoComments.OrderBy(r => r.CreationTime).ToList<Repository.Models.Comment>();
-                break;
+                    break;
                 case "timeD":
                     repoComments = repoComments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Comment>();
-                break;
-                
+                    break;
+
             }
 
-            int numberOfComments = repoComments.Count;
+            //Create array of comments to store parent comments
+            List<Repository.Models.Comment> parentComments = new List<Repository.Models.Comment>();
+
+            foreach (Repository.Models.Comment rc in repoComments)
+            {
+                System.Console.WriteLine(rc.CommentText);
+                System.Console.WriteLine(rc.ParentCommentid);
+                if (rc.ParentCommentid == null)
+                {
+                    parentComments.Add(rc);
+                }
+            }
+
+            System.Console.WriteLine("Parent Comment Check");
+            foreach (Repository.Models.Comment pc in parentComments)
+            {
+                System.Console.WriteLine(pc.CommentText);
+                System.Console.WriteLine(pc.ParentCommentid);
+            }
+
+            //Change to number of parent comments
+            int numberOfComments = parentComments.Count;
+
             int startIndex = pageSize * (page - 1);
 
             if (startIndex > numberOfComments - 1)
@@ -118,11 +140,22 @@ namespace BusinessLogic
                 endIndex = numberOfComments - 1;
             }
 
-            List<Comment> comments = new List<Comment>();
-
+            List<NestedComment> comments = new List<NestedComment>();
+            System.Console.WriteLine("Start Index: " + startIndex);
+            System.Console.WriteLine("Emd Index: " + endIndex);
             for (int i = startIndex; i <= endIndex; i++)
             {
-                comments.Add(Mapper.RepoCommentToComment(repoComments[i]));
+                //change to mapper to a different DTO that has replies[]
+                comments.Add(Mapper.RepoCommentToNestedComment(parentComments[i]));
+                //System.Console.WriteLine(comments[i].Text);
+            }
+
+            //call a recursive function to send repoComments and add the children to the comments in page comments
+            foreach (NestedComment nc in comments)
+            {
+                System.Console.WriteLine("for each: -------------------");
+                Mapper.AddReplies(repoComments, nc);
+                System.Console.WriteLine(nc.Text);
             }
 
             return comments;
@@ -169,16 +202,16 @@ namespace BusinessLogic
 
         public async Task<List<Discussion>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
         {
-            if(page < 1)
+            if (page < 1)
             {
                 Console.WriteLine("ForumLogic.GetDiscussionsPage() was called with a negative or zero page number.");
                 return null;
             }
 
             Repository.Models.Setting pageSizeSetting = _repo.GetSetting("Discussionpagesize");
-            
+
             int pageSize = pageSizeSetting.IntValue ?? default(int);
-            if(pageSize < 1)
+            if (pageSize < 1)
             {
                 Console.WriteLine("ForumLogic.GetDiscussionsPage() was called but the Duscussionspagesize is invalid");
                 return null;
@@ -204,35 +237,36 @@ namespace BusinessLogic
                 // break;
                 case "commentsA":
                     repoDiscussions = repoDiscussions.OrderBy(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
-                break;
+                    break;
                 case "commentsD":
                     repoDiscussions = repoDiscussions.OrderByDescending(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
-                break;
+                    break;
                 case "timeA":
                     repoDiscussions = repoDiscussions.OrderBy(r => r.CreationTime).ToList<Repository.Models.Discussion>();
-                break;
+                    break;
                 case "timeD":
                     repoDiscussions = repoDiscussions.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
-                break;
+                    break;
             }
 
 
             int numOfDiscussion = repoDiscussions.Count;
-            int start = pageSize * (page -1);
-            if(start > numOfDiscussion - 1)
+            int start = pageSize * (page - 1);
+            if (start > numOfDiscussion - 1)
             {
                 Console.WriteLine("ForumLogic.GetDiscussionsPage() was called for a page number without reviews.");
                 return null;
             }
 
-            int end = start + pageSize-1;
-            if(end > numOfDiscussion - 1)
+            int end = start + pageSize - 1;
+            if (end > numOfDiscussion - 1)
             {
                 end = numOfDiscussion - 1;
             }
 
             List<Repository.Models.Discussion> pageDiscussions = new List<Repository.Models.Discussion>();
-            for(int i = start; i <= end; i++){
+            for (int i = start; i <= end; i++)
+            {
 
                 pageDiscussions.Add(repoDiscussions[i]);
             }
@@ -240,7 +274,7 @@ namespace BusinessLogic
             List<Discussion> discussions = new List<Discussion>();
             foreach (var repoDiscussion in pageDiscussions)
             {
-                
+
                 // Get the topic associated with this discussion
                 Repository.Models.Topic topic = _repo.GetDiscussionTopic(repoDiscussion.DiscussionId);
                 if (topic == null)
@@ -249,7 +283,7 @@ namespace BusinessLogic
                     topic.TopicName = "None";
                 }
                 discussions.Add(Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic));
-                
+
             }
             return discussions;
         }

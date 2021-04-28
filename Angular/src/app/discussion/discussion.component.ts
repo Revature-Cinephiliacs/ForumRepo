@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { ForumService } from '../forum.service';
-import { NestedComment } from '../models'
+
 @Component({
   selector: 'app-discussion',
   templateUrl: './discussion.component.html',
@@ -12,16 +12,9 @@ import { NestedComment } from '../models'
 export class DiscussionComponent implements OnInit {
 
   comments: any;
-  nestedComments = [];
-  parentComments = [];
-
-  commentHolder = [];
-  currentPage = 1;
-  lowerCommentNum = 0;
-  higherCommentNum = 0;
-  numPerPage = 5;
+  pageComments: any;
   pageNum: number = 1;
-  numOfComments: number;
+  numOfComments = 0;
 
   discussionID:string = "";
   discussion: any;
@@ -54,52 +47,52 @@ export class DiscussionComponent implements OnInit {
       this.discussion = data;
       this.subject = this.discussion.subject;
     });
+    this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ 
+      // this.numOfComments = data.length;
+      this.comments = data;
+      this.getParentSize();
+      console.log("Setting number of comments");
+      console.log(this.numOfComments);
+      console.log(this.comments);
+    });
   }
 
   // Function that retrieves comments for a dicussion
   async getComments() {
     setTimeout(() => {
-      this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ 
+      this._forum.getDiscussionCommentsPage(this.discussionID, this.pageNum, this.sortingOrder).subscribe(data =>{ 
         console.log(data);
-        this.comments = data;
-        this.createNestedForm();
-        this.getFive();
+        this.pageComments = data;
       });
     }, 1000);
   }
 
-    //get first five
-    getFive(){
-      this.lowerCommentNum = (this.pageNum - 1) * this.numPerPage;
-      this.higherCommentNum = (this.pageNum * this.numPerPage);
-      console.log(this.lowerCommentNum);
-      console.log(this.higherCommentNum);
-      console.log("Number of parents");
-      console.log(this.numOfComments);
-      if(this.higherCommentNum > this.numOfComments)
+  //Function that will calculate the number of comments
+  //based on the number of parent comments
+  getParentSize()
+  {
+    this.comments.forEach(pc => {
+      if(pc.parentCommentid == null )
       {
-        this.higherCommentNum = this.numOfComments;
+        this.numOfComments++;
       }
+    });
 
-      for(let i = this.lowerCommentNum; i<this.higherCommentNum; i++)
-      {
-        this.commentHolder.push(this.parentComments[i]);
-      }
-      console.log(this.commentHolder);
-    }
+    console.log(this.numOfComments);
+  }
 
-    //get next comments page
-    onNext(){
-      this.commentHolder = [];
-      this.pageNum++;
-      this.getFive();
-    }
-    //get previous comments page
-    onPrev(){
-      this.commentHolder = [];
-      this.pageNum--;
-      this.getFive();
-    }
+  //get next comments page
+  onNext(){
+    this.pageComments = [];
+    this.pageNum++;
+    this.getComments();
+  }
+  //get previous comments page
+  onPrev(){
+    this.pageComments = [];
+    this.pageNum--;
+    this.getComments();
+  }
   
   //Function that will check if a user is logged in
   //if the user is not, elements on the page will be hidden
@@ -127,6 +120,7 @@ export class DiscussionComponent implements OnInit {
     }else{
       this.newComment.userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3"; // just for testing purpose, need to remove it later.
       this._forum.postComment(this.newComment).subscribe(data => console.log(data));
+      this.pageNum = 1;
       this.getComments();
     }
     console.log(this.newComment);
@@ -179,68 +173,4 @@ export class DiscussionComponent implements OnInit {
   isEmpty(testSTR:string){
     return (testSTR == "");
   }
-
-  //This method will take the list of comments from the database
-  //and rearrange them into a nested comment form
-  createNestedForm(){
-    this.nestedComments = [];
-    this.parentComments = [];
-    this.comments.forEach(ct => {
-      let newNestedComment = this.createNewNestedComment(ct);
-      this.nestedComments.push(newNestedComment);
-    });
-
-    console.log("New nested Comment list: ");
-    console.log(this.nestedComments);
-    this.nestedComments.forEach(nc => {
-      if(nc.parentcommentid == null)
-      {
-        this.parentComments.push(nc);
-      }
-    });
-    this.numOfComments = this.parentComments.length;
-    this.parentComments.forEach(pc => {
-      this.addReplies(pc);
-    });
-    
-    console.log("Added Replies");
-    console.log(this.nestedComments);
-
-  }
-
-  //Function will convert a comment from the backend
-  //to a new form of nest comment object
-  createNewNestedComment(comment:any)
-  {
-    let newNestedComment = new NestedComment(
-      comment.commentid,
-      comment.discussionid,
-      comment.userid,
-      comment.text,
-      comment.isspoiler,
-      comment.parentCommentid,
-      []
-    );
-    return newNestedComment;
-  }
-
-  //Recursive function that will take in a parent comment
-  //and add its children comments to its replies array
-  addReplies(parent: any)
-  {
-    console.log(parent);
-    for(let i = 0; i < this.nestedComments.length; i++)
-    {
-      if(this.nestedComments[i].parentcommentid == parent.commentid)
-      {
-        console.log(parent)
-        //child is found so add to its replies
-        parent.replies.push(this.nestedComments[i]);
-
-        //check if the child has replies
-        this.addReplies(this.nestedComments[i]);
-      }
-    }
-  }
-
 }

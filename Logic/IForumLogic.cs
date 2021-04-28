@@ -62,7 +62,7 @@ namespace BusinessLogic.Interfaces
         /// <param name="discussionid"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        public Task<List<Comment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder);
+        public Task<List<NestedComment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder);
 
         /// <summary>
         /// Method to set comments 

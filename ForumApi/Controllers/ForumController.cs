@@ -131,9 +131,9 @@ namespace CineAPI.Controllers
         /// <param name="page"></param>
         /// <returns></returns>
         [HttpGet("comments/{discussionid}/{page}/{sortingOrder}")]
-        public async Task<ActionResult<List<Comment>>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
+        public async Task<ActionResult<List<NestedComment>>> GetCommentsPage(Guid discussionid, int page, string sortingOrder)
         {
-            List<Comment> comments = await _forumLogic.GetCommentsPage(discussionid, page, sortingOrder);
+            List<NestedComment> comments = await _forumLogic.GetCommentsPage(discussionid, page, sortingOrder);
             if (comments == null)
             {
                 return StatusCode(404);
