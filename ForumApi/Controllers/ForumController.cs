@@ -483,15 +483,15 @@ namespace CineAPI.Controllers
         /// </summary>
         /// <param name="commentid"></param>
         /// <returns></returns>
-        [HttpPost("comment/like/{commentid}")]
-        public async Task<ActionResult<bool>> LikeComment(Guid commentid)
+        [HttpPost("comment/like/{commentid}/{userid}")]
+        public async Task<ActionResult<bool>> LikeComment(Guid commentid, string userid)
         {
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("ForumController.LikeComment() was called with invalid body data.");
                 return StatusCode(400);
             }
-            bool success = await _forumLogic.LikeComment(commentid);
+            bool success = await _forumLogic.LikeComment(commentid, userid);
             if(!success)
             {
                 return StatusCode(404);
