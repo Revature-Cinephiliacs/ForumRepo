@@ -309,6 +309,12 @@ namespace Repository
                 _logger.LogWarning($"RepoLogic.LikeComment() was called for a comment that doesn't exist {newLike.CommentId}.");
                 return false;
             }
+            Discussion getDiscussion = await _dbContext.Discussions.FirstOrDefaultAsync(x => x.DiscussionId == getComment.DiscussionId);
+            if(getDiscussion == null)
+            {
+                _logger.LogWarning($"RepoLogic.LikeComment() was called for a comment that doesn't exist {getComment.DiscussionId}.");
+                return false;
+            }
             UserLike getLikes = await _dbContext.UserLikes.Where(x => x.UserId == newLike.UserId).FirstOrDefaultAsync(x => x.CommentId == newLike.CommentId);
             if(getLikes != null)
             {
@@ -317,6 +323,7 @@ namespace Repository
             }
             await _dbContext.AddAsync<UserLike>(newLike);
             getComment.Likes++;
+            getDiscussion.Totalikes++;
             await _dbContext.SaveChangesAsync();
             return true;
         }

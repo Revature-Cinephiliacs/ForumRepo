@@ -19,6 +19,7 @@ namespace Repository.Models
         public string UserId { get; set; }
         public DateTime CreationTime { get; set; }
         public string Subject { get; set; }
+        public int? Totalikes { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<DiscussionFollow> DiscussionFollows { get; set; }
