@@ -43,7 +43,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="discussionid"></param>
         /// <returns></returns>
-        Task<Discussion> GetDiscussion(Guid discussionid);
+        Task<DiscussionT> GetDiscussion(Guid discussionid);
 
         /// <summary>
         /// Method to get all comments from a discussion
@@ -179,5 +179,14 @@ namespace BusinessLogic.Interfaces
         /// <param name="commentid"></param>
         /// <returns></returns>
         public Task<bool> LikeComment(Guid commentid, string userid);
+
+        /// <summary>
+        /// Adds a discussion topic
+        /// returns true if successful or false if unsuccessul
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        public Task<bool> AddDiscussionTopic(string discussionid, string topicid);
     }
 }
