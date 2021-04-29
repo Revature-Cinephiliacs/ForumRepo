@@ -153,6 +153,7 @@ namespace CineAPI.Controllers
         /// <param name="pagesize"></param>
         /// <returns></returns>
         [HttpPost("comments/page/{pagesize}")]
+        [Authorize("manage:awebsite")]
         public async Task<ActionResult> SetCommentsPageSize(int pagesize)
         {
             if (await _forumLogic.SetCommentsPageSize(pagesize))
@@ -172,6 +173,7 @@ namespace CineAPI.Controllers
         /// <param name="discussion"></param>
         /// <returns></returns>
         [HttpPost("discussion")]
+        [Authorize]
         public async Task<ActionResult> CreateDiscussion([FromBody] NewDiscussion discussion)
         {
             if (!ModelState.IsValid)
@@ -197,6 +199,7 @@ namespace CineAPI.Controllers
         /// <param name="comment"></param>
         /// <returns></returns>
         [HttpPost("comment")]
+        [Authorize]
         public async Task<ActionResult> CreateComment([FromBody] NewComment comment)
         {
             System.Console.WriteLine("Form Controller: " + comment);
@@ -216,46 +219,6 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
         }
-        
-        /// <summary>
-        /// Returns a list of sorted discussions based off number of comments (ascending)
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("discussion/sort/comment/ascend")]
-        public async Task<ActionResult<List<DiscussionT>>> GetSortedDiscussionsCommentsAscending()
-        {
-            List<DiscussionT> discussions = await _forumLogic.GetSortedDiscussionsByComments("a");
-            if (discussions == null)
-            {
-                return StatusCode(404);
-            }
-            if (discussions.Count == 0)
-            {
-                return StatusCode(204);
-            }
-            StatusCode(200);
-            return discussions;
-        }
-
-        /// <summary>
-        /// Returns a list of sorted discussions based off number of comments (descending)
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("discussion/sort/comment/descend")]
-        public async Task<ActionResult<List<DiscussionT>>> GetSortedDiscussionsCommentsDescending()
-        {
-            List<DiscussionT> discussions = await _forumLogic.GetSortedDiscussionsByComments("d");
-            if (discussions == null)
-            {
-                return StatusCode(404);
-            }
-            if (discussions.Count == 0)
-            {
-                return StatusCode(204);
-            }
-            StatusCode(200);
-            return discussions;
-        }
             
         /// <summary>
         /// Adds a new topic to the database
@@ -265,6 +228,7 @@ namespace CineAPI.Controllers
         /// <param name="topic"></param>
         /// <returns></returns>
         [HttpPost("topic/{topic}")]
+        [Authorize]
         public async Task<ActionResult> CreateTopic(string topic)
         {
             if (!ModelState.IsValid)
@@ -333,6 +297,7 @@ namespace CineAPI.Controllers
         /// <param name="userid"></param>
         /// <returns></returns>
         [HttpPost("discussions/follow/{discussionid}/{userid}")]
+        [Authorize]
         public async Task<ActionResult<bool>> FollowDiscussion(Guid discussionid, string userid)
         {
             if (!ModelState.IsValid)
@@ -359,6 +324,7 @@ namespace CineAPI.Controllers
         /// <param name="userid"></param>
         /// <returns></returns>
         [HttpGet("discussions/follow/{userid}")]
+        [Authorize]
         public async Task<ActionResult<List<DiscussionT>>> FollowDiscussionList(string userid)
         {
             if (!ModelState.IsValid)
@@ -376,6 +342,124 @@ namespace CineAPI.Controllers
         }
 
         /// <summary>
+        /// Returns a list of comments based on a list of ids
+        /// Used for getting all the comments that have a report about them
+        /// Returns 404 if couldn't find any comments
+        /// Returns 200 if successful, with list of comments
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        [HttpGet("comment/reports")]
+        [Authorize("manage:awebsite")]
+        public async Task<ActionResult<List<Comment>>> GetCommentReports([FromBody] List<string> idList)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetCommentReports() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            List<Comment> commentsList = await _forumLogic.GetCommentReports(idList);
+            if(commentsList == null)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return commentsList;
+        }
+
+        /// <summary>
+        /// Returns a list of discussions based on a list of ids
+        /// Used for getting all the discussions that have a report about them
+        /// Returns 404 if couldn't find any comments
+        /// Returns 200 if successful, with list of comments
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        [HttpGet("discussion/reports")]
+        [Authorize("manage:awebsite")]
+        public async Task<ActionResult<List<DiscussionT>>> GetDisucssionReports([FromBody] List<string> idList)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetDisucssionReports() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            List<DiscussionT> discussionsList = await _forumLogic.GetDiscucssionReports(idList);
+            if(discussionsList == null)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return discussionsList;
+        }
+
+        /// <summary>
+        /// Gets a specific topic from the database based on the topicid
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        [HttpGet("topic/{topicid}")]
+        public async Task<ActionResult<Topic>> GetTopicById(Guid topicid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetTopicById() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            Topic topic = await _forumLogic.GetTopicById(topicid);
+            if(topic == null)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return topic;
+        }
+
+        /// <summary>
+        /// Gets a specific discussion from the database based on the discussionid
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        [HttpGet("discussion/id/{discId}")]
+        public async Task<ActionResult<DiscussionT>> GetDiscussionById(Guid discId)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetDiscussionById() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            DiscussionT disc = await _forumLogic.GetDiscussionById(discId);
+            if(disc == null)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return disc;
+        }
+
+        /// <summary>
+        /// Gets a specific comment from the database based on the commentid
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        [HttpGet("comment/{commentid}")]
+        public async Task<ActionResult<Comment>> GetCommentById(Guid commentid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetCommentById() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            Comment comment = await _forumLogic.GetCommentById(commentid);
+            if(comment == null)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return comment;
+        }
+
+        /// <summary>
         /// Changes a spoiler tag from true &lt; - > false
         /// Returns 400 if couldn't model bind the id guid.
         /// Returns 404 if unable to find commentid.
@@ -384,6 +468,7 @@ namespace CineAPI.Controllers
         /// <param name="commentid"></param>
         /// <returns></returns>
         [HttpGet("spoiler/change/{commentid}")]
+        [Authorize("manage:awebsite")]
         public async Task<ActionResult<bool>> ChangeSpoiler(Guid commentid)
         {
             if (!ModelState.IsValid)
@@ -409,6 +494,7 @@ namespace CineAPI.Controllers
         /// <param name="commentid"></param>
         /// <returns></returns>
         [HttpDelete("comment/{commentid}")]
+        [Authorize("manage:awebsite")]
         public async Task<ActionResult<bool>> DeleteComment(Guid commentid)
         {
             if (!ModelState.IsValid)
@@ -434,6 +520,7 @@ namespace CineAPI.Controllers
         /// <param name="discussionid"></param>
         /// <returns></returns>
         [HttpDelete("discussion/{discussionid}")]
+        [Authorize("manage:awebsite")]
         public async Task<ActionResult<bool>> DeleteDiscussion(Guid discussionid)
         {
             if (!ModelState.IsValid)
@@ -459,6 +546,7 @@ namespace CineAPI.Controllers
         /// <param name="topicid"></param>
         /// <returns></returns>
         [HttpDelete("topic/{topicid}")]
+        [Authorize("manage:awebsite")]
         public async Task<ActionResult<bool>> DeleteTopic(Guid topicid)
         {
             if (!ModelState.IsValid)
@@ -484,6 +572,7 @@ namespace CineAPI.Controllers
         /// <param name="commentid"></param>
         /// <returns></returns>
         [HttpPost("comment/like/{commentid}/{userid}")]
+        [Authorize]
         public async Task<ActionResult<bool>> LikeComment(Guid commentid, string userid)
         {
             if (!ModelState.IsValid)
@@ -510,6 +599,7 @@ namespace CineAPI.Controllers
         /// <param name="topicid"></param>
         /// <returns></returns>
         [HttpPost("discussion/topic/{discussionid}/{topicid}")]
+        [Authorize]
         public async Task<ActionResult<bool>> AddTopicToDiscussion(string discussionid, string topicid)
         {
             if (!ModelState.IsValid)

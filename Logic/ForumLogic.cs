@@ -32,14 +32,27 @@ namespace BusinessLogic
 
         public async Task<bool> CreateComment(NewComment comment)
         {
+            var userExist = Mapper.GetUsernameFromAPI(comment.Userid);
+            if(userExist == null)
+            {
+                _logger.LogWarning($"ForumLogic.CreateDiscussion() was called with a userid that does not exist");
+                return false;
+            }
+
             var repoComment = Mapper.NewCommentToNewRepoComment(comment);
             return await _repo.AddComment(repoComment);
         }
 
         public async Task<bool> CreateDiscussion(NewDiscussion discussion)
         {
+            var userExist = Mapper.GetUsernameFromAPI(discussion.Userid);
+            if(userExist == null)
+            {
+                _logger.LogWarning($"ForumLogic.CreateDiscussion() was called with a userid that does not exist");
+                return false;
+            }
+
             var repoDiscussion = Mapper.NewDiscussionToNewRepoDiscussion(discussion);
-            Console.WriteLine(repoDiscussion.DiscussionId);
             var repoTopic = new Repository.Models.Topic();
             repoTopic.TopicName = discussion.Topic;
             return await _repo.AddDiscussion(repoDiscussion, repoTopic);
@@ -57,7 +70,7 @@ namespace BusinessLogic
             List<Comment> comments = new List<Comment>();
             foreach (var repoComment in repoComments)
             {
-                comments.Add(Mapper.RepoCommentToComment(repoComment));
+                comments.Add(await Task.Run(() => Mapper.RepoCommentToComment(repoComment)));
             }
             return comments;
         }
@@ -79,39 +92,40 @@ namespace BusinessLogic
             }
 
             List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid.ToString());
+
             if (repoComments == null)
             {
                 _logger.LogWarning($"ForumLogic.GetCommentsPage() was called with a discussionid that doesn't exist {discussionid}.");
                 return null;
             }
 
-
-            //Create array of comments to store parent comments
-            List<Repository.Models.Comment> parentComments = new List<Repository.Models.Comment>();
-
+            List<NestedComment> tempComments = new List<NestedComment>();
             foreach (Repository.Models.Comment rc in repoComments)
             {
-                System.Console.WriteLine(rc.CommentText);
-                System.Console.WriteLine(rc.ParentCommentid);
-                if (rc.ParentCommentid == null)
-                {
-                    parentComments.Add(rc);
-                }
+                var nc = Mapper.RepoCommentToNestedComment(rc);
+                tempComments.Add(await nc);
             }
 
-            System.Console.WriteLine("Parent Comment Check");
-            foreach (Repository.Models.Comment pc in parentComments)
+            //Create array of comments to store parent comments
+            List<NestedComment> parentComments = new List<NestedComment>();
+
+            foreach (NestedComment tc in tempComments)
             {
-                System.Console.WriteLine(pc.CommentText);
-                System.Console.WriteLine(pc.ParentCommentid);
+                if (tc.ParentCommentid == null)
+                {
+                    parentComments.Add(tc);
+                }
             }
 
             // Sort the list of comments
             switch (sortingOrder)
             {
-                case "likes":
-                    parentComments = sortByLikes(parentComments);
-                    break;
+                case "likesA":
+                    parentComments = SortByLikesAsc(parentComments);
+                break;
+                case "likesD":
+                    parentComments = SortByLikesDes(parentComments);
+                break;
                 case "timeA":
                     parentComments = sortByTimeCreationA(parentComments);
                     break;
@@ -138,23 +152,22 @@ namespace BusinessLogic
             }
 
             List<NestedComment> comments = new List<NestedComment>();
-
-            //if the sorting order is "comments" by number of nested comments 
-            if (sortingOrder.Equals("comments"))
+            
+            //if the sorting order was by num of nested comments 
+            if(sortingOrder.Equals("comments"))
             {
-
                 List<NestedComment> commentsTemp = new List<NestedComment>();
 
                 // convert all parent's comments into NestedComment
                 foreach (var item in parentComments)
                 {
-                    commentsTemp.Add(Mapper.RepoCommentToNestedComment(item));
+                    commentsTemp.Add(item);
                 }
 
                 //call a recursive function to send repoComments and add the children to the comments in page comments
                 foreach (NestedComment nc in commentsTemp)
                 {
-                    Mapper.AddReplies(repoComments, nc);
+                    Mapper.AddReplies(tempComments, nc);
                 }
 
                 commentsTemp = sortByComments(commentsTemp);
@@ -174,16 +187,13 @@ namespace BusinessLogic
                 //pagination
                 for (int i = startIndex; i <= endIndex; i++)
                 {
-                    //change to mapper to a different DTO that has replies[]
-                    comments.Add(Mapper.RepoCommentToNestedComment(parentComments[i]));
+                    comments.Add(parentComments[i]);
                 }
 
                 //call a recursive function to send repoComments and add the children to the comments in page comments
                 foreach (NestedComment nc in comments)
                 {
-                    System.Console.WriteLine("for each: -------------------");
-                    Mapper.AddReplies(repoComments, nc);
-                    System.Console.WriteLine(nc.Text);
+                    Mapper.AddReplies(tempComments, nc);
                 }
             }
 
@@ -206,6 +216,13 @@ namespace BusinessLogic
 
         public async Task<List<DiscussionT>> GetDiscussions(string movieid)
         {
+            var movieExist = Mapper.GetMovieFromAPI(movieid);
+
+            if(movieExist == null)
+            {
+                _logger.LogWarning($"ForumLogic.GetDiscussions() was called with a movie id that does not exist {movieid}");
+                return null;
+            }
             List<Repository.Models.Discussion> repoDiscussions = await _repo.GetMovieDiscussions(movieid);
             if (repoDiscussions == null)
             {
@@ -229,14 +246,22 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
+                discussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
             }
             return discussions;
         }
 
         public async Task<List<DiscussionT>> GetDiscussionsPage(string movieid, int page, string sortingOrder)
         {
-            if (page < 1)
+            var movieExist = Mapper.GetMovieFromAPI(movieid);
+
+            if(movieExist == null)
+            {
+                _logger.LogWarning($"ForumLogic.GetDiscussions() was called with a movie id that does not exist {movieid}");
+                return null;
+            }
+            
+            if(page < 1)
             {
                 Console.WriteLine("ForumLogic.GetDiscussionsPage() was called with a negative or zero page number.");
                 return null;
@@ -267,9 +292,12 @@ namespace BusinessLogic
             // Sort the list of Discussion according to sorting string
             switch (sortingOrder)
             {
-                case "like":
+                case "likeD":
                     repoDiscussions = sortByNumOfLikes(repoDiscussions);
-                    break;
+                break;
+                case "likeA":
+                    repoDiscussions = sortByNumOfLikesAsc(repoDiscussions);
+                break;
                 case "commentsA":
                     repoDiscussions = sortByNumOfCommentsAsce(repoDiscussions);
                     break;
@@ -319,48 +347,10 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
-
+                discussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
+                
             }
             return discussions;
-        }
-
-        public async Task<DiscussionT> GetDiscussion(Guid discussionid)
-        {
-            Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());
-            if (repoDiscussion == null)
-            {
-                _logger.LogWarning($"ForumLogic.GetDiscussion() was called for an invalid discussionid {discussionid}.");
-                return null;
-            }
-
-            // Get the topic associated with this discussion
-            // Repository.Models.Topic topic = _repo.GetDiscussionTopic(repoDiscussion.DiscussionId);
-            // if (topic == null)
-            // {
-            //     topic = new Repository.Models.Topic();
-            //     topic.TopicName = "None";
-            // }
-            DiscussionT discussion = Mapper.RepoDiscussionToDiscussionT(repoDiscussion);
-            return discussion;
-        }
-
-        public async Task<List<Topic>> GetTopics()
-        {
-            var repoTopics = await _repo.GetTopics();
-            if (repoTopics == null)
-            {
-                _logger.LogWarning($"ForumLogic.GetTopics() was called but there are no topics.");
-                return null;
-            }
-
-            var topics = new List<Topic>();
-            foreach (var repoTopic in repoTopics)
-            {
-                var newTopic = new Topic(repoTopic.TopicId, repoTopic.TopicName);
-                topics.Add(newTopic);
-            }
-            return topics;
         }
 
         public async Task<List<DiscussionT>> GetSortedDiscussionsByComments(string type)
@@ -384,7 +374,7 @@ namespace BusinessLogic
 
             foreach (Repository.Models.Discussion dis in repoDiscussions)
             {
-                globalDiscussions.Add(Mapper.RepoDiscussionToDiscussionT(dis));
+                globalDiscussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(dis)));
             }
             return globalDiscussions;
         }
@@ -397,33 +387,28 @@ namespace BusinessLogic
 
         public async Task<List<DiscussionT>> GetDiscussionsByTopicId(string topicid)
         {
-            List<Repository.Models.Discussion> repoDiscussions = new List<Repository.Models.Discussion>();
+            List<Repository.Models.DiscussionTopic> repoDiscussionTopics = new List<Repository.Models.DiscussionTopic>();
 
-            repoDiscussions = await Task.Run(() => _repo.GetDiscussionsByTopicId(topicid));
+            repoDiscussionTopics = await Task.Run(() => _repo.GetDiscussionsByTopicId(topicid));
 
-            List<DiscussionT> globalDiscussions = new List<DiscussionT>();
-            DiscussionT gdis;
-            foreach (Repository.Models.Discussion dis in repoDiscussions)
+            List<Repository.Models.Discussion> globalDiscussions = new List<Repository.Models.Discussion>();
+
+            foreach(Repository.Models.DiscussionTopic dt in repoDiscussionTopics)
             {
-                gdis = new();
-                gdis.DiscussionId = dis.DiscussionId;
-                gdis.MovieId = dis.MovieId;
-                gdis.Userid = dis.UserId;
-                gdis.Subject = dis.Subject;
-                foreach (var ct in dis.Comments)
-                {
-                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid, (int)ct.Likes);
-                    gdis.Comments.Add(nc);
-                }
-
-                foreach (var top in dis.DiscussionTopics)
-                {
-                    gdis.DiscussionTopics.Add(top.TopicId);
-                    if (top.TopicId.Equals(topicid))
-                        globalDiscussions.Add(gdis);
-                }
+                globalDiscussions.Add(dt.Discussion);
             }
-            return globalDiscussions;
+            
+
+            List<DiscussionT> newDiscussions = new List<DiscussionT>();
+
+            DiscussionT gdis;
+            foreach (Repository.Models.Discussion dis in globalDiscussions)
+            {
+                gdis = await Mapper.RepoDiscussionToDiscussionT(dis);
+                newDiscussions.Add(gdis);
+            }
+
+            return newDiscussions;
         }
 
         public async Task<bool> ChangeSpoiler(Guid commentid)
@@ -483,126 +468,62 @@ namespace BusinessLogic
             return await _repo.LikeComment(newLike);
         }
 
-        private List<Comment> SortByLikes(List<Comment> li)
+        
+
+        public async Task<List<Comment>> GetCommentReports(List<string> idList)
         {
-            Comparison<Comment> likes = new Comparison<Comment>(Comment.CompareLikes);
-            li.Sort(likes);
-            return li;
-        }
-
-
-        /// <summary>
-        /// soring comments by number of likes
-        /// </summary>
-        /// <param name="comments"></param>
-        /// <returns></returns>
-        private List<Repository.Models.Comment> sortByLikes(List<Repository.Models.Comment> comments)
-        {
-            return comments.OrderByDescending(r => r.Likes).ToList<Repository.Models.Comment>();
-        }
-
-        /// <summary>
-        /// sorting comments by number of nested comments
-        /// </summary>
-        /// <param name="comments"></param>
-        /// <returns></returns>
-        private List<NestedComment> sortByComments(List<NestedComment> comments)
-        {
-
-            return comments.OrderByDescending(r => r.Replies.Count).ToList<NestedComment>();
-        }
-
-        /// <summary>
-        /// sorting comments by creation time Asc 
-        /// </summary>
-        /// <param name="comments"></param>
-        /// <returns></returns>
-        private List<Repository.Models.Comment> sortByTimeCreationA(List<Repository.Models.Comment> comments)
-        {
-            return comments.OrderBy(r => r.CreationTime).ToList<Repository.Models.Comment>();
-        }
-
-        /// <summary>
-        /// sorting comments by creation time Desc
-        /// </summary>
-        /// <param name="comments"></param>
-        /// <returns></returns>
-        private List<Repository.Models.Comment> sortByTimeCreationD(List<Repository.Models.Comment> comments)
-        {
-            return comments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Comment>();
-        }
-
-        /// <summary>
-        /// sorting the Discussion list by number of comments in Ascending order
-        /// </summary>
-        /// <param name="discussions"></param>
-        /// <returns></returns>
-        private List<Repository.Models.Discussion> sortByNumOfCommentsAsce(List<Repository.Models.Discussion> discussions)
-        {
-            return discussions.OrderBy(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
-        }
-
-        /// <summary>
-        /// sorting the Discussion list by number of comments in Descending order
-        /// </summary>
-        /// <param name="discussions"></param>
-        /// <returns></returns>
-        private List<Repository.Models.Discussion> sortByNumOfCommentsDesc(List<Repository.Models.Discussion> discussions)
-        {
-            return discussions.OrderByDescending(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
-        }
-
-        /// <summary>
-        /// sorting the Discussion lsit by time created in ascending order  
-        /// </summary>
-        /// <param name="discussions"></param>
-        /// <returns></returns>
-        private List<Repository.Models.Discussion> sortByCreationTimeAsce(List<Repository.Models.Discussion> discussions)
-        {
-            return discussions.OrderBy(r => r.CreationTime).ToList<Repository.Models.Discussion>();
-        }
-
-        /// <summary>
-        /// sorting the Discussion list by time it was created in Descending order
-        /// </summary>
-        /// <param name="discussions"></param>
-        /// <returns></returns>
-        private List<Repository.Models.Discussion> sortByCreationTimeDesc(List<Repository.Models.Discussion> discussions)
-        {
-            return discussions.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
-        }
-
-        /// <summary>
-        /// sorting the Discussion list by number of likes
-        /// </summary>
-        /// <param name="discussions"></param>
-        /// <returns></returns>
-        private List<Repository.Models.Discussion> sortByNumOfLikes(List<Repository.Models.Discussion> discussions)
-        {
-            List<Repository.Models.Discussion> DiscussionwithComments = new List<Repository.Models.Discussion>();
-            List<Repository.Models.Discussion> DiscussionWithNoComments = new List<Repository.Models.Discussion>();
-            foreach (var item in discussions)
+            List<Repository.Models.Comment> repoComments = await _repo.GetCommentReportList(idList);
+            List<Comment> listComments = new List<Comment>();
+            foreach(Repository.Models.Comment item in repoComments)
             {
-                if (item.Comments.Count != 0)
-                {
-                    DiscussionwithComments.Add(item);
-                }
-                else
-                {
-                    DiscussionWithNoComments.Add(item);
-                }
+                listComments.Add(await Task.Run(() => Mapper.RepoCommentToComment(item)));
             }
-            DiscussionwithComments.OrderByDescending(r => r.Comments.First().Likes).ToList<Repository.Models.Discussion>();
-            DiscussionwithComments.AddRange(DiscussionWithNoComments);
-            return DiscussionwithComments;
+            return listComments;
         }
 
-        /// <summary>
-        /// sorting the Discussion lsit by recent activity
-        /// </summary>
-        /// <param name="discussions"></param>
-        /// <returns></returns>
-        private List<Repository.Models.Discussion> sortByRecent(List<Repository.Models.Discussion> discussions)
+        public async Task<List<DiscussionT>> GetDiscucssionReports(List<string> idList)
+        {
+            List<Repository.Models.Discussion> repoDisc = await _repo.GetDiscussionReportList(idList);
+            List<DiscussionT> listDisc = new List<DiscussionT>();
+            foreach(Repository.Models.Discussion item in repoDisc)
+            {
+                listDisc.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(item)));
+            }
+            return listDisc;
+        }
+
+        public async Task<Topic> GetTopicById(Guid topicid)
+        {
+            Repository.Models.Topic topic = await _repo.GetTopicById(topicid.ToString());
+            if(topic == null)
+            {
+                return null;
+            }
+            return Mapper.RepoTopicToTopic(topic);
+        }
+
+        public async Task<DiscussionT> GetDiscussionById(Guid discId)
+        {
+            Repository.Models.Discussion repoDisc = await _repo.GetDiscussionsById(discId.ToString());
+            if(repoDisc == null)
+            {
+                return null;
+            }
+            return await Mapper.RepoDiscussionToDiscussionT(repoDisc);
+        }
+
+        public async Task<Comment> GetCommentById(Guid commentid)
+        {
+            Repository.Models.Comment repoComment = await _repo.GetCommentById(commentid.ToString());
+            if(repoComment == null)
+            {
+                return null;
+            }
+            return await Mapper.RepoCommentToComment(repoComment);
+        }
+
+        
+        public async Task<bool> AddDiscussionTopic(string discussionid, string topicid)
         {
             List<Repository.Models.Discussion> DiscussionwithComments = new List<Repository.Models.Discussion>();
             List<Repository.Models.Discussion> DiscussionWithNoComments = new List<Repository.Models.Discussion>();
@@ -642,5 +563,182 @@ namespace BusinessLogic
             return discussions;
         }
 
+        public async Task<DiscussionT> GetDiscussion(Guid discussionid)
+        {
+            Repository.Models.Discussion repoDiscussion = await _repo.GetDiscussion(discussionid.ToString());
+            if (repoDiscussion == null)
+            {
+                _logger.LogWarning($"ForumLogic.GetDiscussion() was called for an invalid discussionid {discussionid}.");
+                return null;
+            }
+
+            DiscussionT discussion = await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
+
+            return discussion;
+        }
+
+        public async Task<List<Topic>> GetTopics()
+        {
+            var repoTopics = await _repo.GetTopics();
+            if (repoTopics == null)
+            {
+                _logger.LogWarning($"ForumLogic.GetTopics() was called but there are no topics.");
+                return null;
+            }
+
+            var topics = new List<Topic>();
+            foreach (var repoTopic in repoTopics)
+            {
+                var newTopic = new Topic(repoTopic.TopicId, repoTopic.TopicName);
+                topics.Add(newTopic);
+            }
+            return topics;
+        }
+
+        /// <summary>
+        /// sorting comments by number of likes
+        /// </summary>
+        /// <param name="comments"></param>
+        /// <returns></returns>
+        private List<NestedComment> SortByLikesDes(List<NestedComment> comments){
+            return comments.OrderByDescending(r => r.Likes).ToList<NestedComment>();
+        }
+
+        /// <summary>
+        /// Sort comments by likes ascending order
+        /// </summary>
+        /// <param name="li"></param>
+        /// <returns></returns>
+        private List<NestedComment> SortByLikesAsc(List<NestedComment> li)
+        {
+            Comparison<NestedComment> likes = new Comparison<NestedComment>(NestedComment.CompareLikes);
+            li.Sort(likes);
+            return li;
+        }
+
+        /// <summary>
+        /// sorting comments by number of nested comments
+        /// </summary>
+        /// <param name="comments"></param>
+        /// <returns></returns>
+        private List<NestedComment> sortByComments(List<NestedComment> comments){
+            
+            return comments.OrderByDescending(r => r.Replies.Count).ToList<NestedComment>();
+        }
+
+        /// <summary>
+        /// sorting comments by creation time Asc 
+        /// </summary>
+        /// <param name="comments"></param>
+        /// <returns></returns>
+        private List<NestedComment> sortByTimeCreationA(List<NestedComment> comments){
+            return comments.OrderBy(r => r.CreationTime).ToList<NestedComment>();
+        }
+
+        /// <summary>
+        /// sorting comments by creation time Desc
+        /// </summary>
+        /// <param name="comments"></param>
+        /// <returns></returns>
+        private List<NestedComment> sortByTimeCreationD(List<NestedComment> comments){
+            return comments.OrderByDescending(r => r.CreationTime).ToList<NestedComment>();
+        }
+
+        /// <summary>
+        /// sorting the Discussion list by number of likes
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByNumOfLikes( List<Repository.Models.Discussion> discussions){
+            var newDiscussions = discussions.OrderByDescending(d => d.Totalikes).ToList<Repository.Models.Discussion>();
+            return newDiscussions;
+         }
+
+        /// <summary>
+        /// Will sort discussions by likes in ascending order
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+         private List<Repository.Models.Discussion> sortByNumOfLikesAsc( List<Repository.Models.Discussion> discussions){            
+            var newDiscussions = discussions.OrderBy(d => d.Totalikes).ToList<Repository.Models.Discussion>();
+            return newDiscussions;
+         }
+
+        /// <summary>
+        /// sorting the Discussion list by number of comments in Ascending order
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByNumOfCommentsAsce( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderBy(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+         }
+
+        /// <summary>
+        /// sorting the Discussion list by number of comments in Descending order
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByNumOfCommentsDesc( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderByDescending(r => r.Comments.Count).ToList<Repository.Models.Discussion>();
+        }
+
+        /// <summary>
+        /// sorting the Discussion lsit by time created in ascending order  
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByCreationTimeAsce( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderBy(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+        }
+
+        /// <summary>
+        /// sorting the Discussion list by time it was created in Descending order
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByCreationTimeDesc( List<Repository.Models.Discussion> discussions){
+            return discussions.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+        }
+
+        /// <summary>
+        /// sorting the Discussion lsit by recent activity
+        /// </summary>
+        /// <param name="discussions"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Discussion> sortByRecent( List<Repository.Models.Discussion> discussions){
+            List<Repository.Models.Discussion> DiscussionwithComments = new List<Repository.Models.Discussion>();
+            List<Repository.Models.Discussion> DiscussionWithNoComments = new List<Repository.Models.Discussion>();
+            HashSet<Repository.Models.Discussion> tempDiscussions = new HashSet<Repository.Models.Discussion>();
+            foreach (var item in discussions)
+            {
+                if(item.Comments.Count != 0){
+                    DiscussionwithComments.Add(item);
+                    
+                }else{
+                    DiscussionWithNoComments.Add(item);
+                }
+            }
+            DiscussionwithComments = DiscussionwithComments.OrderByDescending(r => r.Comments.First().CreationTime).ToList<Repository.Models.Discussion>();
+            DiscussionWithNoComments = DiscussionWithNoComments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Discussion>();
+
+            foreach(var item in DiscussionWithNoComments)
+            {
+               foreach (var d in DiscussionwithComments)
+               { 
+                       if(DateTime.Compare(item.CreationTime, d.Comments.First().CreationTime) < 0){
+                           tempDiscussions.Add(d);
+                       } 
+                }
+                tempDiscussions.Add(item);
+            }  
+
+            discussions.Clear();
+            foreach (var item in tempDiscussions)
+            {   
+                discussions = tempDiscussions.ToList();
+            }
+            return discussions;
+        }
+        
     }
 }

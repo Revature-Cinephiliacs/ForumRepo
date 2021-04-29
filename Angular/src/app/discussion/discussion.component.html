@@ -2,13 +2,14 @@
 <button (click) = "sortByCreationA()">Sort By Creation Time Ascending</button>
 <button (click) = "sortByCreationB()">Sort BY Creation Time Descending</button>
 <button (click) = "sortByCommentD()">Sort By Number of Comments Descending</button>
-<button (click) = "sortByLike()">Sort By Like </button>
+<button (click) = "sortByLikeAsc()">Sort By Like A </button>
+<button (click) = "sortByLikeDesc()">Sort By Like D</button>
+
 <h5>Current Topics</h5>
 <ul>
     <li *ngFor = "let ct of currentTopics">{{ct}}</li>
 </ul>
-<button>Sort by Time</button>
-<button (click) = "sortByLikes('likes')">Sort by likes</button>
+
 <ul>
     <ng-container
       *ngTemplateOutlet="recursiveListTmpl; context:{ list: pageComments }"
@@ -23,7 +24,7 @@
     </div>
     <div class="commentContent" *ngIf="!item.isspoiler || spoilersShown()">
         <a routerLink="/user/{{item.userid}}" class="userid">{{ item.userid }}</a>
-        {{item.commentid}}
+        {{item.creationTime}}
         <div class="commenttext">{{item.text}}</div>
         <button (click) = "showReplyForm(item.commentid)">reply</button>
         <button (click) = "addLike(item.commentid)">Like {{item.likes}}</button>

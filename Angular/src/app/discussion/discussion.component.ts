@@ -60,9 +60,6 @@ export class DiscussionComponent implements OnInit {
     this._forum.getDiscussionComments(this.discussionID).subscribe(data =>{ 
       this.comments = data;
       this.getParentSize();
-      console.log("Setting number of comments");
-      console.log(this.numOfComments);
-      console.log(this.comments);
     });
   }
 
@@ -71,6 +68,7 @@ export class DiscussionComponent implements OnInit {
     this.pageComments = [];
     setTimeout(() => {
       this._forum.getDiscussionCommentsPage(this.discussionID, this.pageNum, this.sortingOrder).subscribe(data =>{ 
+        console.log("Get comments")
         console.log(data);
         this.pageComments = data;
         this.currentTopics = [];
@@ -81,18 +79,27 @@ export class DiscussionComponent implements OnInit {
 
   sortByCreationA(){
     this.sortingOrder = "timeA";
+    this.pageNum = 1;
     this.getComments();
   }
   sortByCreationB(){
     this.sortingOrder = "timeD";
+    this.pageNum = 1;
     this.getComments();
   }
-  sortByLike(){
-    this.sortingOrder = "likes";
+  sortByLikeAsc(){
+    this.sortingOrder = "likesA";
+    this.pageNum = 1;
+    this.getComments();
+  }
+  sortByLikeDesc(){
+    this.sortingOrder = "likesD";
+    this.pageNum = 1;
     this.getComments();
   }
   sortByCommentD(){
     this.sortingOrder = "comments";
+    this.pageNum = 1;
     this.getComments();
   }
 
@@ -150,6 +157,7 @@ export class DiscussionComponent implements OnInit {
       this.newComment.userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3"; // just for testing purpose, need to remove it later.
       this._forum.postComment(this.newComment).subscribe(data => console.log(data));
       this.pageNum = 1;
+      this.sortingOrder = "timeD"
       this.getComments();
     }
     console.log(this.newComment);
@@ -205,18 +213,11 @@ export class DiscussionComponent implements OnInit {
 
   //Function that will add a like to a comment
   addLike(commentid: string){
-    this._forum.addLike(commentid).subscribe(data => {
+    var userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3" //needs to be changed later
+    this._forum.addLike(commentid, userid).subscribe(data => {
       console.log(data);
       this.getComments();
     });
-  }
-
-  //Function will sort the comments by likes
-  sortByLikes(sortingorder: string)
-  {
-    console.log(sortingorder);
-    this.sortingOrder = sortingorder;
-    this.getComments();
   }
 
   //Function will check if the selected topic is already a topic of the

@@ -16,8 +16,8 @@ namespace GlobalModels
         public string ParentCommentid { get; set; }
         public int Likes { get; set; }
         public List<NestedComment> Replies { get; set; }
-
         public DateTime CreationTime { get; set; }
+        
         public NestedComment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid, int likes, DateTime creationTime)
         {
             Commentid = commentid;
@@ -29,6 +29,18 @@ namespace GlobalModels
             Replies = new List<NestedComment>();
             Likes = likes;
             CreationTime = creationTime;
+        }
+
+        public NestedComment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid, int likes)
+        {
+            Commentid = commentid;
+            Discussionid = discussionid;
+            Userid = uid;
+            Text = text;
+            Isspoiler = isspoiler;
+            ParentCommentid = parentcommentid;
+            Replies = new List<NestedComment>();
+            Likes = likes;
         }
 
         public bool Equals(NestedComment other)
@@ -68,6 +80,14 @@ namespace GlobalModels
                 return false;
             }
             return lhs.Equals(rhs);
+        }
+
+        public static int CompareLikes(NestedComment c1, NestedComment c2)
+
+        {
+
+            return c1.Likes.CompareTo(c2.Likes);
+
         }
 
         public static bool operator !=(NestedComment lhs, NestedComment rhs)

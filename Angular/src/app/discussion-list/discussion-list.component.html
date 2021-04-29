@@ -10,7 +10,8 @@
 <button (click) = "sortDiscussionsByCommentsDesc()">Sort By Number of Comments Descending</button>
 <button (click) = "sortDiscussionsByCommentsAsc()">Sort By Number of Comments Ascending</button>
 <button (click) = "sortByRecent()">Sort By Recent Activity </button>
-<button (click) = "sortByLike()">Sort By Like </button>
+<button (click) = "sortByLikeD()">Sort By Like D</button>
+<button (click) = "sortByLikeA()">Sort By Like A</button>
 <p>Filter by Topic</p>
 <div>
     <ul *ngFor = "let t of topics">
@@ -45,6 +46,7 @@
             <th>Username</th>
             <th>Replies</th>
             <th>Likes</th>
+            <th>Date Posted</th>
         </tr>
 </thead>
     <tbody>
@@ -54,6 +56,7 @@
                 <td>{{discussion.userid}}</td>
                 <td>{{discussion.comments.length}}</td>
                 <td>{{ discussion.likes}}</td>
+                <td>{{ discussion.creationTime }}</td>
             
         </tr>
         <!-- <tr *ngFor = "let d of sortDiscussions">

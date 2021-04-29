@@ -32,20 +32,23 @@ namespace ForumApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
                                 builder =>
                                 {
-                                     builder.WithOrigins("http://localhost:4200")//, "*")
+                                     builder.WithOrigins(
+                                         "http://localhost:4200",
+                                         "http://20.94.137.143/", //Frontend
+                                         "http://20.189.29.112/", //Admintools
+                                         "http://20.45.2.119/" //User
+                                         )
                                         .AllowAnyHeader()
                                         .AllowAnyMethod();
                                 });
             });
-
-
-
-            services.AddControllers();
 
             var myConnectionString = Configuration.GetConnectionString("Cinephiliacs_Forum");
             services.AddDbContext<Cinephiliacs_ForumContext>(
