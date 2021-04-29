@@ -79,18 +79,22 @@ export class DiscussionComponent implements OnInit {
 
   sortByCreationA(){
     this.sortingOrder = "timeA";
+    this.pageNum = 1;
     this.getComments();
   }
   sortByCreationB(){
     this.sortingOrder = "timeD";
+    this.pageNum = 1;
     this.getComments();
   }
   sortByLike(){
     this.sortingOrder = "likes";
+    this.pageNum = 1;
     this.getComments();
   }
   sortByCommentD(){
     this.sortingOrder = "comments";
+    this.pageNum = 1;
     this.getComments();
   }
 
@@ -148,6 +152,7 @@ export class DiscussionComponent implements OnInit {
       this.newComment.userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3"; // just for testing purpose, need to remove it later.
       this._forum.postComment(this.newComment).subscribe(data => console.log(data));
       this.pageNum = 1;
+      this.sortingOrder = "timeD"
       this.getComments();
     }
     console.log(this.newComment);
