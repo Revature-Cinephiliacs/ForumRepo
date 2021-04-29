@@ -321,6 +321,31 @@ namespace Repository
             return true;
         }
 
+        public async Task<Topic> GetTopicById(string topicid)
+        {
+            return await _dbContext.Topics.FirstOrDefaultAsync(x => x.TopicId == topicid);
+        }
+
+        public async Task<Discussion> GetDiscussionsById(string discid)
+        {
+            return await _dbContext.Discussions.FirstOrDefaultAsync(x => x.DiscussionId == discid);
+        }
+
+        public async Task<Comment> GetCommentById(string commentid)
+        {
+            return await _dbContext.Comments.FirstOrDefaultAsync(x => x.CommentId == commentid);
+        }
+
+        public async Task<List<Comment>> GetCommentReportList(List<string> idList)
+        {
+            return await _dbContext.Comments.Where(u => idList.Contains(u.CommentId)).ToListAsync();
+        }
+
+        public async Task<List<Discussion>> GetDiscussionReportList(List<string> idList)
+        {
+            return await _dbContext.Discussions.Where(u => idList.Contains(u.DiscussionId)).ToListAsync();
+        }
+
         public async Task<List<Discussion>> GetSortedDiscussionsDescending()
         {
             return await _dbContext.Discussions.Include(d => d.Comments).OrderByDescending(x => x.Comments.Count).ToListAsync<Discussion>();

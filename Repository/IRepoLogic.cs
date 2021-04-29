@@ -191,5 +191,40 @@ namespace Repository
         /// <param name="newLike"></param>
         /// <returns></returns>
         public Task<bool> LikeComment(UserLike newLike);
+
+        /// <summary>
+        /// Gets a list of comments based on a list of commentids
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        public Task<List<Comment>> GetCommentReportList(List<string> idList);
+
+        /// <summary>
+        /// Get a list of discussions based on a list of discussionids
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetDiscussionReportList(List<string> idList);
+
+        /// <summary>
+        /// Returns a topic based on a topic id.
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        public Task<Topic> GetTopicById(string topicid);
+        
+        /// <summary>
+        /// Returns a discussion based on a discussion id
+        /// </summary>
+        /// <param name="discid"></param>
+        /// <returns></returns>
+        public Task<Discussion> GetDiscussionsById(string discid);
+
+        /// <summary>
+        /// Returns a comment based on a comment id
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<Comment> GetCommentById(string commentid);
     }
 }

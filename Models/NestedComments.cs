@@ -31,6 +31,18 @@ namespace GlobalModels
             CreationTime = creationTime;
         }
 
+        public NestedComment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid, int likes)
+        {
+            Commentid = commentid;
+            Discussionid = discussionid;
+            Userid = uid;
+            Text = text;
+            Isspoiler = isspoiler;
+            ParentCommentid = parentcommentid;
+            Replies = new List<NestedComment>();
+            Likes = likes;
+        }
+
         public bool Equals(NestedComment other)
         {
             if (Object.ReferenceEquals(other, null))
