@@ -53,7 +53,7 @@ namespace BusinessLogic
         public static NestedComment RepoCommentToNestedComment(Repository.Models.Comment repoComment)
         {
             var nestedComment = new NestedComment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), repoComment.UserId,
-                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid, (int)repoComment.Likes);
+                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid, (int)repoComment.Likes, repoComment.CreationTime);
 
             return nestedComment;
         }

@@ -85,23 +85,6 @@ namespace BusinessLogic
                 return null;
             }
 
-            // Sort the list of comments
-            switch (sortingOrder)
-            {
-                // case "likes":
-                //     repoComments = repoComments.OrderBy(r => r.like).ToList<Repository.Models.Comment>();
-                // break;
-                // case "comments":
-                //     repoComments = repoComments.OrderByDescending(r => r.comments).ToList<Repository.Models.Comment>();
-                // break;
-                case "timeA":
-                    repoComments = repoComments.OrderBy(r => r.CreationTime).ToList<Repository.Models.Comment>();
-                    break;
-                case "timeD":
-                    repoComments = repoComments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Comment>();
-                    break;
-
-            }
 
             //Create array of comments to store parent comments
             List<Repository.Models.Comment> parentComments = new List<Repository.Models.Comment>();
@@ -123,6 +106,20 @@ namespace BusinessLogic
                 System.Console.WriteLine(pc.ParentCommentid);
             }
 
+                       // Sort the list of comments
+            switch (sortingOrder)
+            {
+                case "likes":
+                    parentComments = sortByLikes(parentComments);
+                break;
+                case "timeA":
+                    parentComments = sortByTimeCreationA(parentComments);
+                    break;
+                case "timeD":
+                    parentComments = sortByTimeCreationD(parentComments);
+                    break;
+            }
+
             //Change to number of parent comments
             int numberOfComments = parentComments.Count;
 
@@ -141,24 +138,89 @@ namespace BusinessLogic
             }
 
             List<NestedComment> comments = new List<NestedComment>();
-            System.Console.WriteLine("Start Index: " + startIndex);
-            System.Console.WriteLine("Emd Index: " + endIndex);
-            for (int i = startIndex; i <= endIndex; i++)
-            {
-                //change to mapper to a different DTO that has replies[]
-                comments.Add(Mapper.RepoCommentToNestedComment(parentComments[i]));
-                //System.Console.WriteLine(comments[i].Text);
-            }
 
-            //call a recursive function to send repoComments and add the children to the comments in page comments
-            foreach (NestedComment nc in comments)
-            {
-                System.Console.WriteLine("for each: -------------------");
-                Mapper.AddReplies(repoComments, nc);
-                System.Console.WriteLine(nc.Text);
+            //if the sorting order was by num of nested comments 
+            if(sortingOrder.Equals("comments")){
+                List<NestedComment> commentsTemp = new List<NestedComment>();
+
+                foreach (var item in parentComments)
+                {
+                    commentsTemp.Add(Mapper.RepoCommentToNestedComment(item));
+                }
+
+                 //call a recursive function to send repoComments and add the children to the comments in page comments
+                foreach (NestedComment nc in commentsTemp)
+                {
+                    //System.Console.WriteLine("for each: -------------------");
+                    Mapper.AddReplies(repoComments, nc);
+                    //System.Console.WriteLine(nc.Text);
+                }
+
+                commentsTemp = sortByComments(commentsTemp);
+
+                for (int i = startIndex; i <= endIndex; i++)
+                {
+                    comments.Add(commentsTemp[i]);
+                }
+
+            }else{
+                
+                System.Console.WriteLine("Start Index: " + startIndex);
+                System.Console.WriteLine("Emd Index: " + endIndex);
+                for (int i = startIndex; i <= endIndex; i++)
+                {
+                    //change to mapper to a different DTO that has replies[]
+                    comments.Add(Mapper.RepoCommentToNestedComment(parentComments[i]));
+                    //System.Console.WriteLine(comments[i].Text);
+                }
+
+                //call a recursive function to send repoComments and add the children to the comments in page comments
+                foreach (NestedComment nc in comments)
+                {
+                    System.Console.WriteLine("for each: -------------------");
+                    Mapper.AddReplies(repoComments, nc);
+                    System.Console.WriteLine(nc.Text);
+                }
             }
 
             return comments;
+        }
+
+        /// <summary>
+        /// soring comments by number of likes
+        /// </summary>
+        /// <param name="comments"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Comment> sortByLikes(List<Repository.Models.Comment> comments){
+            return comments.OrderByDescending(r => r.Likes).ToList<Repository.Models.Comment>();
+        }
+
+        /// <summary>
+        /// sorting comments by number of nested comments
+        /// </summary>
+        /// <param name="comments"></param>
+        /// <returns></returns>
+        private List<NestedComment> sortByComments(List<NestedComment> comments){
+            
+            return comments.OrderByDescending(r => r.Replies.Count).ToList<NestedComment>();
+        }
+
+        /// <summary>
+        /// sorting comments by creation time Asc 
+        /// </summary>
+        /// <param name="comments"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Comment> sortByTimeCreationA(List<Repository.Models.Comment> comments){
+            return comments.OrderBy(r => r.CreationTime).ToList<Repository.Models.Comment>();
+        }
+
+        /// <summary>
+        /// sorting comments by creation time Desc
+        /// </summary>
+        /// <param name="comments"></param>
+        /// <returns></returns>
+        private List<Repository.Models.Comment> sortByTimeCreationD(List<Repository.Models.Comment> comments){
+            return comments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Comment>();
         }
 
         public async Task<bool> SetCommentsPageSize(int pagesize)
