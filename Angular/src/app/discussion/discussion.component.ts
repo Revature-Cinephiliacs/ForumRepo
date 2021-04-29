@@ -87,8 +87,13 @@ export class DiscussionComponent implements OnInit {
     this.pageNum = 1;
     this.getComments();
   }
-  sortByLike(){
-    this.sortingOrder = "likes";
+  sortByLikeAsc(){
+    this.sortingOrder = "likesA";
+    this.pageNum = 1;
+    this.getComments();
+  }
+  sortByLikeDesc(){
+    this.sortingOrder = "likesD";
     this.pageNum = 1;
     this.getComments();
   }

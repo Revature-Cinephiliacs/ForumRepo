@@ -428,9 +428,9 @@ namespace Repository
             return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.CreationTime).ToListAsync<Discussion>();
         }
 
-        public async Task<List<Discussion>> GetDiscussionsByTopicId(string topicid)
+        public async Task<List<DiscussionTopic>> GetDiscussionsByTopicId(string topicid)
         {
-            return await _dbContext.Discussions.Include(dis => dis.DiscussionTopics).ToListAsync<Discussion>();
+            return await _dbContext.DiscussionTopics.Include(dis => dis.Discussion).Where(x => x.TopicId == topicid).ToListAsync<DiscussionTopic>();
         }
     }
 }

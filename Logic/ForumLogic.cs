@@ -108,8 +108,11 @@ namespace BusinessLogic
             // Sort the list of comments
             switch (sortingOrder)
             {
-                case "likes":
-                    parentComments = sortByLikes(parentComments);
+                case "likesA":
+                    parentComments = SortByLikesAsc(parentComments);
+                break;
+                case "likesD":
+                    parentComments = SortByLikesDes(parentComments);
                 break;
                 case "timeA":
                     parentComments = sortByTimeCreationA(parentComments);
@@ -197,8 +200,16 @@ namespace BusinessLogic
         /// </summary>
         /// <param name="comments"></param>
         /// <returns></returns>
-        private List<NestedComment> sortByLikes(List<NestedComment> comments){
+        private List<NestedComment> SortByLikesDes(List<NestedComment> comments){
             return comments.OrderByDescending(r => r.Likes).ToList<NestedComment>();
+        }
+
+        //Sort by likes ascending order
+        private List<NestedComment> SortByLikesAsc(List<NestedComment> li)
+        {
+            Comparison<NestedComment> likes = new Comparison<NestedComment>(NestedComment.CompareLikes);
+            li.Sort(likes);
+            return li;
         }
 
         /// <summary>
@@ -380,7 +391,13 @@ namespace BusinessLogic
                 }
             }
             DiscussionwithComments.OrderByDescending(r => r.Comments.First().Likes).ToList<Repository.Models.Discussion>();
+            foreach(Repository.Models.Discussion d in DiscussionwithComments)
+            {
+                System.Console.WriteLine(d.Comments.First().Likes);
+            }
+
             DiscussionwithComments.AddRange(DiscussionWithNoComments);
+            
             return DiscussionwithComments;
          }
 
@@ -532,33 +549,48 @@ namespace BusinessLogic
 
         public async Task<List<DiscussionT>> GetDiscussionsByTopicId(string topicid)
         {
-            List<Repository.Models.Discussion> repoDiscussions = new List<Repository.Models.Discussion>();
+            List<Repository.Models.DiscussionTopic> repoDiscussionTopics = new List<Repository.Models.DiscussionTopic>();
 
-            repoDiscussions = await Task.Run(() => _repo.GetDiscussionsByTopicId(topicid));
+            repoDiscussionTopics = await Task.Run(() => _repo.GetDiscussionsByTopicId(topicid));
 
-            List<DiscussionT> globalDiscussions = new List<DiscussionT>();
-            DiscussionT gdis;
-            foreach (Repository.Models.Discussion dis in repoDiscussions)
+            List<Repository.Models.Discussion> globalDiscussions = new List<Repository.Models.Discussion>();
+
+            foreach(Repository.Models.DiscussionTopic dt in repoDiscussionTopics)
             {
-                gdis = new();
-                gdis.DiscussionId = dis.DiscussionId;
-                gdis.MovieId = dis.MovieId;
-                gdis.Userid = dis.UserId;
-                gdis.Subject = dis.Subject;
-                foreach (var ct in dis.Comments)
-                {
-                    Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid, (int)ct.Likes);
-                    gdis.Comments.Add(nc);
-                }
-
-                foreach (var top in dis.DiscussionTopics)
-                {
-                    gdis.DiscussionTopics.Add(top.TopicId);
-                    if (top.TopicId.Equals(topicid))
-                        globalDiscussions.Add(gdis);
-                }
+                globalDiscussions.Add(dt.Discussion);
             }
-            return globalDiscussions;
+            
+
+            List<DiscussionT> newDiscussions = new List<DiscussionT>();
+
+            DiscussionT gdis;
+            foreach (Repository.Models.Discussion dis in globalDiscussions)
+            {
+                gdis = await Mapper.RepoDiscussionToDiscussionT(dis);
+                newDiscussions.Add(gdis);
+
+                // gdis.DiscussionId = dis.DiscussionId;
+                // gdis.MovieId = dis.MovieId;
+                // gdis.Userid = dis.UserId;
+                // gdis.Subject = dis.Subject;
+                // gdis.CreationTime = dis.CreationTime;
+
+                // foreach (var ct in dis.Comments)
+                // {
+                //     Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid, (int)ct.Likes);
+                //     gdis.Comments.Add(nc);
+                // }
+
+                // foreach (var top in dis.DiscussionTopics)
+                // {
+                //     gdis.DiscussionTopics.Add(top.TopicId);
+                //     if (top.TopicId.Equals(topicid))
+                //         newDiscussions.Add(gdis);
+                // }
+
+            }
+
+            return newDiscussions;
         }
 
         public async Task<bool> ChangeSpoiler(Guid commentid)
@@ -618,12 +650,7 @@ namespace BusinessLogic
             return await _repo.LikeComment(newLike);
         }
 
-        private List<Comment> SortByLikes(List<Comment> li)
-        {
-            Comparison<Comment> likes = new Comparison<Comment>(Comment.CompareLikes);
-            li.Sort(likes);
-            return li;
-        }
+        
 
         public async Task<List<Comment>> GetCommentReports(List<string> idList)
         {

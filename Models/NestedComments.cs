@@ -82,6 +82,14 @@ namespace GlobalModels
             return lhs.Equals(rhs);
         }
 
+        public static int CompareLikes(NestedComment c1, NestedComment c2)
+
+        {
+
+            return c1.Likes.CompareTo(c2.Likes);
+
+        }
+
         public static bool operator !=(NestedComment lhs, NestedComment rhs)
         {
             return !(lhs == rhs);

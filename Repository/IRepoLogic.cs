@@ -117,7 +117,7 @@ namespace Repository
         /// Get a list of dicussions sorted by topic
         /// </summary>
         /// <returns></returns>
-        public Task<List<Discussion>> GetDiscussionsByTopicId(string topicid);
+        public Task<List<DiscussionTopic>> GetDiscussionsByTopicId(string topicid);
         /// <summary>
         /// Saves the topic into the database
         /// Returns true if save is success
