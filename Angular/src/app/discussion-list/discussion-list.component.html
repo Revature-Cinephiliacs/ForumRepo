@@ -45,6 +45,7 @@
             <th>Username</th>
             <th>Replies</th>
             <th>Likes</th>
+            <th>Date Posted</th>
         </tr>
 </thead>
     <tbody>
@@ -54,6 +55,7 @@
                 <td>{{discussion.userid}}</td>
                 <td>{{discussion.comments.length}}</td>
                 <td>{{ discussion.likes}}</td>
+                <td>{{ discussion.creationTime }}</td>
             
         </tr>
         <!-- <tr *ngFor = "let d of sortDiscussions">

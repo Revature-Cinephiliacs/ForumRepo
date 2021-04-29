@@ -3,12 +3,12 @@
 <button (click) = "sortByCreationB()">Sort BY Creation Time Descending</button>
 <button (click) = "sortByCommentD()">Sort By Number of Comments Descending</button>
 <button (click) = "sortByLike()">Sort By Like </button>
+
 <h5>Current Topics</h5>
 <ul>
     <li *ngFor = "let ct of currentTopics">{{ct}}</li>
 </ul>
-<button>Sort by Time</button>
-<button (click) = "sortByLikes('likes')">Sort by likes</button>
+
 <ul>
     <ng-container
       *ngTemplateOutlet="recursiveListTmpl; context:{ list: pageComments }"

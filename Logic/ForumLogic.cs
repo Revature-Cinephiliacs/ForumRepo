@@ -79,34 +79,33 @@ namespace BusinessLogic
             }
 
             List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid.ToString());
+
             if (repoComments == null)
             {
                 _logger.LogWarning($"ForumLogic.GetCommentsPage() was called with a discussionid that doesn't exist {discussionid}.");
                 return null;
             }
 
-
-            //Create array of comments to store parent comments
-            List<Repository.Models.Comment> parentComments = new List<Repository.Models.Comment>();
-
+            List<NestedComment> tempComments = new List<NestedComment>();
             foreach (Repository.Models.Comment rc in repoComments)
             {
-                System.Console.WriteLine(rc.CommentText);
-                System.Console.WriteLine(rc.ParentCommentid);
-                if (rc.ParentCommentid == null)
+                var nc = Mapper.RepoCommentToNestedComment(rc);
+                tempComments.Add(await nc);
+            }
+
+            //Create array of comments to store parent comments
+            List<NestedComment> parentComments = new List<NestedComment>();
+
+            foreach (NestedComment tc in tempComments)
+            {
+                if (tc.ParentCommentid == null)
                 {
-                    parentComments.Add(rc);
+                    parentComments.Add(tc);
                 }
             }
 
-            System.Console.WriteLine("Parent Comment Check");
-            foreach (Repository.Models.Comment pc in parentComments)
-            {
-                System.Console.WriteLine(pc.CommentText);
-                System.Console.WriteLine(pc.ParentCommentid);
-            }
 
-                       // Sort the list of comments
+            // Sort the list of comments
             switch (sortingOrder)
             {
                 case "likes":
@@ -137,31 +136,34 @@ namespace BusinessLogic
                 endIndex = numberOfComments - 1;
             }
 
+            // foreach (NestedComment nc in parentComments)
+            // {
+            //     Mapper.AddReplies(tempComments, nc);
+            // }
+
             List<NestedComment> comments = new List<NestedComment>();
-            System.Console.WriteLine("Start Index: " + startIndex);
-            System.Console.WriteLine("Emd Index: " + endIndex);
-            for (int i = startIndex; i <= endIndex; i++)
-            {
-                //change to mapper to a different DTO that has replies[]
-                comments.Add(await Task.Run(() => Mapper.RepoCommentToNestedComment(parentComments[i])));
-                //System.Console.WriteLine(comments[i].Text);
-            }
+            // System.Console.WriteLine("Start Index: " + startIndex);
+            // System.Console.WriteLine("Emd Index: " + endIndex);
+            // for (int i = startIndex; i <= endIndex; i++)
+            // {
+            //     comments.Add(parentComments[i]);
+            // }
+
 
             //if the sorting order was by num of nested comments 
-            if(sortingOrder.Equals("comments")){
+            if(sortingOrder.Equals("comments"))
+            {
                 List<NestedComment> commentsTemp = new List<NestedComment>();
 
                 foreach (var item in parentComments)
                 {
-                    commentsTemp.Add(await Task.Run(() => Mapper.RepoCommentToNestedComment(item)));
+                    commentsTemp.Add(item);
                 }
 
                  //call a recursive function to send repoComments and add the children to the comments in page comments
                 foreach (NestedComment nc in commentsTemp)
                 {
-                    //System.Console.WriteLine("for each: -------------------");
-                    Mapper.AddReplies(repoComments, nc);
-                    //System.Console.WriteLine(nc.Text);
+                    Mapper.AddReplies(tempComments, nc);
                 }
 
                 commentsTemp = sortByComments(commentsTemp);
@@ -177,17 +179,13 @@ namespace BusinessLogic
                 System.Console.WriteLine("Emd Index: " + endIndex);
                 for (int i = startIndex; i <= endIndex; i++)
                 {
-                    //change to mapper to a different DTO that has replies[]
-                    comments.Add(await Task.Run(() => Mapper.RepoCommentToNestedComment(parentComments[i])));
-                    //System.Console.WriteLine(comments[i].Text);
+                    comments.Add(parentComments[i]);
                 }
 
                 //call a recursive function to send repoComments and add the children to the comments in page comments
                 foreach (NestedComment nc in comments)
                 {
-                    System.Console.WriteLine("for each: -------------------");
-                    Mapper.AddReplies(repoComments, nc);
-                    System.Console.WriteLine(nc.Text);
+                    Mapper.AddReplies(tempComments, nc);
                 }
             }
 
@@ -199,8 +197,8 @@ namespace BusinessLogic
         /// </summary>
         /// <param name="comments"></param>
         /// <returns></returns>
-        private List<Repository.Models.Comment> sortByLikes(List<Repository.Models.Comment> comments){
-            return comments.OrderByDescending(r => r.Likes).ToList<Repository.Models.Comment>();
+        private List<NestedComment> sortByLikes(List<NestedComment> comments){
+            return comments.OrderByDescending(r => r.Likes).ToList<NestedComment>();
         }
 
         /// <summary>
@@ -218,8 +216,8 @@ namespace BusinessLogic
         /// </summary>
         /// <param name="comments"></param>
         /// <returns></returns>
-        private List<Repository.Models.Comment> sortByTimeCreationA(List<Repository.Models.Comment> comments){
-            return comments.OrderBy(r => r.CreationTime).ToList<Repository.Models.Comment>();
+        private List<NestedComment> sortByTimeCreationA(List<NestedComment> comments){
+            return comments.OrderBy(r => r.CreationTime).ToList<NestedComment>();
         }
 
         /// <summary>
@@ -227,8 +225,8 @@ namespace BusinessLogic
         /// </summary>
         /// <param name="comments"></param>
         /// <returns></returns>
-        private List<Repository.Models.Comment> sortByTimeCreationD(List<Repository.Models.Comment> comments){
-            return comments.OrderByDescending(r => r.CreationTime).ToList<Repository.Models.Comment>();
+        private List<NestedComment> sortByTimeCreationD(List<NestedComment> comments){
+            return comments.OrderByDescending(r => r.CreationTime).ToList<NestedComment>();
         }
 
         public async Task<bool> SetCommentsPageSize(int pagesize)

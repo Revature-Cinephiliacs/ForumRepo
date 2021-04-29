@@ -452,22 +452,22 @@ namespace CineAPI.Controllers
         /// </summary>
         /// <param name="topicid"></param>
         /// <returns></returns>
-        [HttpGet("discussion/{discId}")]
-        public async Task<ActionResult<DiscussionT>> GetDiscussionById(Guid discId)
-        {
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("ForumController.GetDiscussionById() was called with invalid body data.");
-                return StatusCode(400);
-            }
-            DiscussionT disc = await _forumLogic.GetDiscussionById(discId);
-            if(disc == null)
-            {
-                return StatusCode(404);
-            }
-            StatusCode(200);
-            return disc;
-        }
+        // [HttpGet("discussion/{discId}")]
+        // public async Task<ActionResult<DiscussionT>> GetDiscussionById(Guid discId)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         _logger.LogWarning("ForumController.GetDiscussionById() was called with invalid body data.");
+        //         return StatusCode(400);
+        //     }
+        //     DiscussionT disc = await _forumLogic.GetDiscussionById(discId);
+        //     if(disc == null)
+        //     {
+        //         return StatusCode(404);
+        //     }
+        //     StatusCode(200);
+        //     return disc;
+        // }
 
         /// <summary>
         /// Gets a specific comment from the database based on the commentid

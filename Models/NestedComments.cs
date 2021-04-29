@@ -16,8 +16,8 @@ namespace GlobalModels
         public string ParentCommentid { get; set; }
         public int Likes { get; set; }
         public List<NestedComment> Replies { get; set; }
-
         public DateTime CreationTime { get; set; }
+        
         public NestedComment(Guid commentid, Guid discussionid, string uid, string text, bool isspoiler, string parentcommentid, int likes, DateTime creationTime)
         {
             Commentid = commentid;

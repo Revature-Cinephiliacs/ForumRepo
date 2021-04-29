@@ -7,7 +7,7 @@
             <option selected hidden disabled></option>
             <option *ngFor="let topic of topics"
                     [value]="topic">
-                    {{topic}}
+                    {{topic.topicName}}
             </option>
         </select><br>
         <label>Discussion Subject:</label><br>
@@ -21,14 +21,18 @@
                 <th>Title</th>
                 <th>Username</th>
                 <th>Replies</th>
+                <th>Likes</th>
+                <th>Date Posted</th>
             </tr>
         </thead>
         <tbody>
              <tr *ngFor = "let discussion of discussions">
                  
-                    <a routerLink="/discussion/{{discussion.discussionid}}"><td>{{discussion.subject}}</td></a>
+                    <a routerLink="/discussion/{{discussion.discussionId}}"><td>{{discussion.subject}}</td></a>
                     <td>{{discussion.userid}}</td>
                     <td>{{discussion.comments.length}}</td>
+                    <td> {{discussion.likes}}</td>
+                    <td> {{discussion.creationTime}}</td>
                 
             </tr>
         </tbody>

@@ -63,7 +63,7 @@ namespace BusinessLogic
             string username = await Task.Run(() => GetUsernameFromAPI(repoComment.UserId));
 
             var nestedComment = new NestedComment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), username,
-                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid, (int)repoComment.Likes);
+                    repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid, (int)repoComment.Likes, repoComment.CreationTime);
 
             return nestedComment;
         }
@@ -74,21 +74,18 @@ namespace BusinessLogic
         /// </summary>
         /// <param name="repoComments"></param>
         /// <param name="parent"></param>
-        public static async void AddReplies(List<Repository.Models.Comment> repoComments, NestedComment parent)
+        public static void AddReplies(List<NestedComment> repoComments, NestedComment parent)
         {
             for (int i = 0; i < repoComments.Count; i++)
             {
-                System.Console.WriteLine("Add Replies");
-                System.Console.WriteLine("Repo parent: " + repoComments[i].ParentCommentid);
-                System.Console.WriteLine("Parent parent: " + parent.ParentCommentid);
                 string parentId = parent.Commentid.ToString();
                 if (repoComments[i].ParentCommentid == parentId)
                 {
-                    var nestedComment = await RepoCommentToNestedComment(repoComments[i]);
-                    parent.Replies.Add(await Task.Run(() => nestedComment));
-                    System.Console.WriteLine("added");
-
-                    AddReplies(repoComments, nestedComment);
+                    //var nestedComment = await RepoCommentToNestedComment(repoComments[i]);
+                    //parent.Replies.Add(await Task.Run(() => nestedComment));
+                    parent.Replies.Add(repoComments[i]);
+                    // AddReplies(repoComments, nestedComment);
+                    AddReplies(repoComments, repoComments[i]);
                 }
             }
         }
@@ -147,7 +144,8 @@ namespace BusinessLogic
             gdis.MovieId = dis.MovieId;
             gdis.Userid = username;
             gdis.Subject = dis.Subject;
-            
+            gdis.CreationTime = dis.CreationTime;
+
             foreach (var ct in dis.Comments)
             {
                 username = await Task.Run(() => GetUsernameFromAPI(ct.UserId));
