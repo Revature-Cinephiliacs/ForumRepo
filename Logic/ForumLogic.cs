@@ -57,7 +57,7 @@ namespace BusinessLogic
             List<Comment> comments = new List<Comment>();
             foreach (var repoComment in repoComments)
             {
-                comments.Add(Mapper.RepoCommentToComment(repoComment));
+                comments.Add(await Task.Run(() => Mapper.RepoCommentToComment(repoComment)));
             }
             return comments;
         }
@@ -146,7 +146,7 @@ namespace BusinessLogic
             for (int i = startIndex; i <= endIndex; i++)
             {
                 //change to mapper to a different DTO that has replies[]
-                comments.Add(Mapper.RepoCommentToNestedComment(parentComments[i]));
+                comments.Add(await Task.Run(() => Mapper.RepoCommentToNestedComment(parentComments[i])));
                 //System.Console.WriteLine(comments[i].Text);
             }
 
@@ -200,7 +200,7 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
+                discussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
             }
             return discussions;
         }
@@ -289,7 +289,7 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
+                discussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
                 
             }
             return discussions;
@@ -407,7 +407,7 @@ namespace BusinessLogic
                 topic = new Repository.Models.Topic();
                 topic.TopicName = "None";
             }
-            Discussion discussion = Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic);
+            Discussion discussion = await Task.Run(() => Mapper.RepoDiscussionToDiscussion(repoDiscussion, topic));
             return discussion;
         }
 
@@ -450,7 +450,7 @@ namespace BusinessLogic
 
             foreach (Repository.Models.Discussion dis in repoDiscussions)
             {
-                globalDiscussions.Add(Mapper.RepoDiscussionToDiscussionT(dis));
+                globalDiscussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(dis)));
             }
             return globalDiscussions;
         }

@@ -1,11 +1,17 @@
 using System;
 using GlobalModels;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessLogic
 {
     public static class Mapper
     {
+        private static readonly string _userapi = "http://20.45.2.119/user/";
+
         /// <summary>
         /// Maps an instance of Repository.Models.Discussion and an instance of
         /// Repository.Models.Topic onto a new instance of GlobalModels.Discussion
@@ -13,18 +19,19 @@ namespace BusinessLogic
         /// <param name="repoDiscussion"></param>
         /// <param name="topic"></param>
         /// <returns></returns>
-        public static Discussion RepoDiscussionToDiscussion(Repository.Models.Discussion
+        public static async Task<Discussion> RepoDiscussionToDiscussion(Repository.Models.Discussion
             repoDiscussion, Repository.Models.Topic topic)
         {
             List<Comment> newComment = new List<Comment>();
             foreach (var item in repoDiscussion.Comments)
             {   
                 if(item != null){
-                    newComment.Add(RepoCommentToComment(item));
+                    newComment.Add(await Task.Run(() => RepoCommentToComment(item)));
                 }
             }
+            string username = await Task.Run(() => GetUsernameFromAPI(repoDiscussion.UserId));
             var discussion = new Discussion(Guid.Parse(repoDiscussion.DiscussionId), repoDiscussion.MovieId,
-                repoDiscussion.UserId, repoDiscussion.Subject, topic.TopicName, newComment);
+                username, repoDiscussion.Subject, topic.TopicName, newComment);
             return discussion;
         }
 
@@ -34,12 +41,13 @@ namespace BusinessLogic
         /// </summary>
         /// <param name="repoComment"></param>
         /// <returns></returns>
-        public static Comment RepoCommentToComment(Repository.Models.Comment repoComment)
+        public static async Task<Comment> RepoCommentToComment(Repository.Models.Comment repoComment)
         {
             // var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId),
             //     repoComment.UserId, repoComment.CommentText, repoComment.IsSpoiler);
-            
-            var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), repoComment.UserId,
+            string username = await Task.Run(() => GetUsernameFromAPI(repoComment.UserId));
+
+            var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), username,
                     repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid, (int)repoComment.Likes);
             return comment;
         }
@@ -50,9 +58,11 @@ namespace BusinessLogic
         /// </summary>
         /// <param name="repoComment"></param>
         /// <returns></returns>
-        public static NestedComment RepoCommentToNestedComment(Repository.Models.Comment repoComment)
+        public static async Task<NestedComment> RepoCommentToNestedComment(Repository.Models.Comment repoComment)
         {
-            var nestedComment = new NestedComment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), repoComment.UserId,
+            string username = await Task.Run(() => GetUsernameFromAPI(repoComment.UserId));
+
+            var nestedComment = new NestedComment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), username,
                     repoComment.CommentText, repoComment.IsSpoiler, repoComment.ParentCommentid, (int)repoComment.Likes);
 
             return nestedComment;
@@ -64,7 +74,7 @@ namespace BusinessLogic
         /// </summary>
         /// <param name="repoComments"></param>
         /// <param name="parent"></param>
-        public static void AddReplies(List<Repository.Models.Comment> repoComments, NestedComment parent)
+        public static async void AddReplies(List<Repository.Models.Comment> repoComments, NestedComment parent)
         {
             for (int i = 0; i < repoComments.Count; i++)
             {
@@ -74,8 +84,8 @@ namespace BusinessLogic
                 string parentId = parent.Commentid.ToString();
                 if (repoComments[i].ParentCommentid == parentId)
                 {
-                    var nestedComment = RepoCommentToNestedComment(repoComments[i]);
-                    parent.Replies.Add(nestedComment);
+                    var nestedComment = await RepoCommentToNestedComment(repoComments[i]);
+                    parent.Replies.Add(await Task.Run(() => nestedComment));
                     System.Console.WriteLine("added");
 
                     AddReplies(repoComments, nestedComment);
@@ -123,18 +133,25 @@ namespace BusinessLogic
             return repoComment;
         }
 
-        public static DiscussionT RepoDiscussionToDiscussionT(Repository.Models.Discussion dis)
+        /// <summary>
+        /// Convert a Repository Dicussion object to a frontend DiscussionT
+        /// </summary>
+        /// <param name="dis"></param>
+        /// <returns></returns>
+        public static async Task<DiscussionT> RepoDiscussionToDiscussionT(Repository.Models.Discussion dis)
         {
             int totalLikes = 0;
+            string username = await Task.Run(() => GetUsernameFromAPI(dis.UserId));
             DiscussionT gdis = new();
             gdis.DiscussionId = dis.DiscussionId;
             gdis.MovieId = dis.MovieId;
-            gdis.Userid = dis.UserId;
+            gdis.Userid = username;
             gdis.Subject = dis.Subject;
             
             foreach (var ct in dis.Comments)
             {
-                Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), ct.UserId, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid, (int)ct.Likes);
+                username = await Task.Run(() => GetUsernameFromAPI(ct.UserId));
+                Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), username, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid, (int)ct.Likes);
                 gdis.Comments.Add(nc);
                 totalLikes += nc.Likes;
             }
@@ -162,6 +179,24 @@ namespace BusinessLogic
             newTopic.TopicId = Guid.NewGuid().ToString();
             newTopic.TopicName = topic;
             return newTopic;
+        }
+
+        private static async Task<string> GetUsernameFromAPI(string userid)
+        {
+            HttpClient client = new HttpClient();
+            string path = _userapi + userid;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if(response.IsSuccessStatusCode)
+            {
+                string jsonContent = await response.Content.ReadAsStringAsync();
+                JObject json = JObject.Parse(jsonContent);
+                string username = json["username"].ToString();
+                return username;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }
