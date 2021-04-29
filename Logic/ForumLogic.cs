@@ -556,6 +556,56 @@ namespace BusinessLogic
             return li;
         }
 
-      
+        public async Task<List<Comment>> GetCommentReports(List<string> idList)
+        {
+            List<Repository.Models.Comment> repoComments = await _repo.GetCommentReportList(idList);
+            List<Comment> listComments = new List<Comment>();
+            foreach(Repository.Models.Comment item in repoComments)
+            {
+                listComments.Add(await Task.Run(() => Mapper.RepoCommentToComment(item)));
+            }
+            return listComments;
+        }
+
+        public async Task<List<DiscussionT>> GetDisucssionReports(List<string> idList)
+        {
+            List<Repository.Models.Discussion> repoDisc = await _repo.GetDiscussionReportList(idList);
+            List<DiscussionT> listDisc = new List<DiscussionT>();
+            foreach(Repository.Models.Discussion item in repoDisc)
+            {
+                listDisc.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(item)));
+            }
+            return listDisc;
+        }
+
+        public async Task<Topic> GetTopicById(Guid topicid)
+        {
+            Repository.Models.Topic topic = await _repo.GetTopicById(topicid.ToString());
+            if(topic == null)
+            {
+                return null;
+            }
+            return Mapper.RepoTopicToTopic(topic);
+        }
+
+        public async Task<DiscussionT> GetDiscussionById(Guid discId)
+        {
+            Repository.Models.Discussion repoDisc = await _repo.GetDiscussionsById(discId.ToString());
+            if(repoDisc == null)
+            {
+                return null;
+            }
+            return await Mapper.RepoDiscussionToDiscussionT(repoDisc);
+        }
+
+        public async Task<Comment> GetCommentById(Guid commentid)
+        {
+            Repository.Models.Comment repoComment = await _repo.GetCommentById(commentid.ToString());
+            if(repoComment == null)
+            {
+                return null;
+            }
+            return await Mapper.RepoCommentToComment(repoComment);
+        }
     }
 }

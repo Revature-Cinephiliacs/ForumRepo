@@ -376,6 +376,122 @@ namespace CineAPI.Controllers
         }
 
         /// <summary>
+        /// Returns a list of comments based on a list of ids
+        /// Used for getting all the comments that have a report about them
+        /// Returns 404 if couldn't find any comments
+        /// Returns 200 if successful, with list of comments
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        [HttpGet("comment/reports")]
+        public async Task<ActionResult<List<Comment>>> GetCommentReports([FromBody] List<string> idList)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetCommentReports() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            List<Comment> commentsList = await _forumLogic.GetCommentReports(idList);
+            if(commentsList == null)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return commentsList;
+        }
+
+        /// <summary>
+        /// Returns a list of discussions based on a list of ids
+        /// Used for getting all the discussions that have a report about them
+        /// Returns 404 if couldn't find any comments
+        /// Returns 200 if successful, with list of comments
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        [HttpGet("discussion/reports")]
+        public async Task<ActionResult<List<DiscussionT>>> GetDisucssionReports([FromBody] List<string> idList)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetDisucssionReports() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            List<DiscussionT> discussionsList = await _forumLogic.GetDisucssionReports(idList);
+            if(discussionsList == null)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return discussionsList;
+        }
+
+        /// <summary>
+        /// Gets a specific topic from the database based on the topicid
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        [HttpGet("topic/{topicid}")]
+        public async Task<ActionResult<Topic>> GetTopicById(Guid topicid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetTopicById() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            Topic topic = await _forumLogic.GetTopicById(topicid);
+            if(topic == null)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return topic;
+        }
+
+        /// <summary>
+        /// Gets a specific discussion from the database based on the discussionid
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        [HttpGet("discussion/{discId}")]
+        public async Task<ActionResult<DiscussionT>> GetDiscussionById(Guid discId)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetDiscussionById() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            DiscussionT disc = await _forumLogic.GetDiscussionById(discId);
+            if(disc == null)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return disc;
+        }
+
+        /// <summary>
+        /// Gets a specific comment from the database based on the commentid
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        [HttpGet("comment/{commentid}")]
+        public async Task<ActionResult<Comment>> GetCommentById(Guid commentid)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetCommentById() was called with invalid body data.");
+                return StatusCode(400);
+            }
+            Comment comment = await _forumLogic.GetCommentById(commentid);
+            if(comment == null)
+            {
+                return StatusCode(404);
+            }
+            StatusCode(200);
+            return comment;
+        }
+
+        /// <summary>
         /// Changes a spoiler tag from true &lt; - > false
         /// Returns 400 if couldn't model bind the id guid.
         /// Returns 404 if unable to find commentid.

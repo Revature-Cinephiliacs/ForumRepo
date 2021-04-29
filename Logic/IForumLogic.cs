@@ -179,5 +179,43 @@ namespace BusinessLogic.Interfaces
         /// <param name="commentid"></param>
         /// <returns></returns>
         public Task<bool> LikeComment(Guid commentid, string userid);
+
+        /// <summary>
+        /// Returns a list of comments based on a list of commentids
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        public Task<List<Comment>> GetCommentReports(List<string> idList);
+
+        /// <summary>
+        /// Returns a list of discussions based on a list of discussionids
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionT>> GetDisucssionReports(List<string> idList);
+
+        /// <summary>
+        /// Returns a topic based on a topic id.
+        /// Returns null if could not find topic
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        public Task<Topic> GetTopicById(Guid topicid);
+
+        /// <summary>
+        /// Returns a discussion based on a discussion id
+        /// Return null if could not find discussion
+        /// </summary>
+        /// <param name="discId"></param>
+        /// <returns></returns>
+        public Task<DiscussionT> GetDiscussionById(Guid discId);
+
+        /// <summary>
+        /// Returns a comment based on a commentid
+        /// Returns null if could not find comment
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<Comment> GetCommentById(Guid commentid);
     }
 }

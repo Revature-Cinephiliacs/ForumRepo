@@ -181,6 +181,21 @@ namespace BusinessLogic
             return newTopic;
         }
 
+        /// <summary>
+        /// Converts a RepoTopic object into a DTOTopic object
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        internal static Topic RepoTopicToTopic(Repository.Models.Topic topic)
+        {
+            return new Topic(topic.TopicId, topic.TopicName);
+        }
+
+        /// <summary>
+        /// Gets the username of the user from the userapi using userid
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <returns></returns>
         private static async Task<string> GetUsernameFromAPI(string userid)
         {
             HttpClient client = new HttpClient();
