@@ -86,4 +86,11 @@ export class ForumService {
   addLike(commentid: string){
     return this.http.post( this.baseURL + "comment/like/" + commentid, null);
   }
+
+  //Function that will make a call to the Forum API endpoint to add a given topic to a given discussion
+  addTopicToDiscussion(discussionid: string, topicid: string)
+  {
+    return this.http.post( this.baseURL + "discussion/topic/" + discussionid + "/" + topicid, null);
+  }
+  
 }
