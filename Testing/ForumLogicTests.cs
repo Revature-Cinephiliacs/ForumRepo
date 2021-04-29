@@ -44,10 +44,10 @@ namespace Testing
             nd.Movieid = "any_string";
             nd.Userid = "User Name";
             nd.Subject = "Subject";
-            Topic tp = new Topic();
+            Repository.Models.Topic tp = new Repository.Models.Topic();
             tp.TopicName = "Any Topic";
             
-            repoStub.Setup(repo => repo.AddDiscussion(It.IsAny<Repository.Models.Discussion>(), It.IsAny<Topic>())).ReturnsAsync(true);
+            repoStub.Setup(repo => repo.AddDiscussion(It.IsAny<Repository.Models.Discussion>(), It.IsAny<Repository.Models.Topic>())).ReturnsAsync(true);
 
             var logic = new ForumLogic(repoStub.Object, logicLogger);
 

@@ -57,7 +57,7 @@ namespace BusinessLogic
             List<Comment> comments = new List<Comment>();
             foreach (var repoComment in repoComments)
             {
-                comments.Add(Mapper.RepoCommentToComment(repoComment));
+                comments.Add(await Task.Run(() => Mapper.RepoCommentToComment(repoComment)));
             }
             return comments;
         }
@@ -138,6 +138,14 @@ namespace BusinessLogic
             }
 
             List<NestedComment> comments = new List<NestedComment>();
+            System.Console.WriteLine("Start Index: " + startIndex);
+            System.Console.WriteLine("Emd Index: " + endIndex);
+            for (int i = startIndex; i <= endIndex; i++)
+            {
+                //change to mapper to a different DTO that has replies[]
+                comments.Add(await Task.Run(() => Mapper.RepoCommentToNestedComment(parentComments[i])));
+                //System.Console.WriteLine(comments[i].Text);
+            }
 
             //if the sorting order was by num of nested comments 
             if(sortingOrder.Equals("comments")){
@@ -262,7 +270,7 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
+                discussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
             }
             return discussions;
         }
@@ -351,7 +359,7 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
+                discussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
                 
             }
             return discussions;
@@ -469,7 +477,8 @@ namespace BusinessLogic
             //     topic = new Repository.Models.Topic();
             //     topic.TopicName = "None";
             // }
-            DiscussionT discussion = Mapper.RepoDiscussionToDiscussionT(repoDiscussion);
+            DiscussionT discussion = await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion));
+
             return discussion;
         }
 
@@ -512,7 +521,7 @@ namespace BusinessLogic
 
             foreach (Repository.Models.Discussion dis in repoDiscussions)
             {
-                globalDiscussions.Add(Mapper.RepoDiscussionToDiscussionT(dis));
+                globalDiscussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(dis)));
             }
             return globalDiscussions;
         }
