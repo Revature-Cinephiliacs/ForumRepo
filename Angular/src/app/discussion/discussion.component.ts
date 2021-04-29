@@ -213,7 +213,8 @@ export class DiscussionComponent implements OnInit {
 
   //Function that will add a like to a comment
   addLike(commentid: string){
-    this._forum.addLike(commentid).subscribe(data => {
+    var userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3" //needs to be changed later
+    this._forum.addLike(commentid, userid).subscribe(data => {
       console.log(data);
       this.getComments();
     });

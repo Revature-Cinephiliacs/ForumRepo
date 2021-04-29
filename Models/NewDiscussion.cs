@@ -35,12 +35,6 @@ namespace GlobalModels
             Subject = subject;
             Topic = topic;
         }
-        public NewDiscussion(Discussion discussion)
-        {
-            Movieid = discussion.Movieid;
-            Userid = discussion.Userid;
-            Subject = discussion.Subject;
-            Topic = discussion.Topic;
-        }
+        
     }
 }

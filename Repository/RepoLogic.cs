@@ -30,12 +30,6 @@ namespace Repository
 
         public async Task<bool> AddComment(Comment repoComment)
         {
-            var userExists = UserExists(repoComment.UserId);
-            if (!userExists)
-            {
-                _logger.LogWarning($"RepoLogic.AddComment() was called for a user that doesn't exist {repoComment.UserId}.");
-                return false;
-            }
             var discussionExists = DiscussionExists(repoComment.DiscussionId);
             if (!discussionExists)
             {
@@ -64,20 +58,6 @@ namespace Repository
 
         public async Task<bool> AddDiscussion(Discussion repoDiscussion, Topic repoTopic)
         {
-            var userExists = UserExists(repoDiscussion.UserId);
-            if (!userExists || repoDiscussion.UserId == null)
-            {
-
-                _logger.LogWarning($"RepoLogic.AddDiscussion() was called for a user that doesn't exist {repoDiscussion.UserId}.");
-                return false;
-            }
-            var movieExists = MovieExists(repoDiscussion.MovieId);
-            if (!movieExists)
-            {
-                _logger.LogWarning($"RepoLogic.AddDiscussion() was called for a movie that doesn't exist {repoDiscussion.MovieId}.");
-                return false;
-            }
-
             await _dbContext.Discussions.AddAsync(repoDiscussion);
 
             var topicExists = TopicExists(repoTopic.TopicId);
@@ -224,12 +204,6 @@ namespace Repository
 
         public async Task<List<Discussion>> GetMovieDiscussions(string movieid)
         {
-            var movieExists = MovieExists(movieid);
-            if (!movieExists)
-            {
-                _logger.LogWarning($"RepoLogic.GetMovieDiscussions() was called for a movie that doesn't exist {movieid}.");
-                return null;
-            }
             return await _dbContext.Discussions.Where(d => d.MovieId == movieid).ToListAsync();
         }
 
@@ -249,7 +223,6 @@ namespace Repository
         public async Task<Discussion> GetDiscussion(string discussionid)
         {
             return await _dbContext.Discussions.Where(d => d.DiscussionId == discussionid).Include(dis => dis.DiscussionTopics).FirstOrDefaultAsync<Discussion>();
-            //return await _dbContext.Discussions.Where(d => d.DiscussionId == discussionid).FirstOrDefaultAsync<Discussion>();
         }
 
         public async Task<List<Topic>> GetTopics()
@@ -363,6 +336,16 @@ namespace Repository
             return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.Comments.Count).ToListAsync<Discussion>();
         }
 
+        public async Task<List<Discussion>> GetSortedDiscussionsRecent()
+        {
+            return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.CreationTime).ToListAsync<Discussion>();
+        }
+
+        public async Task<List<DiscussionTopic>> GetDiscussionsByTopicId(string topicid)
+        {
+            return await _dbContext.DiscussionTopics.Include(dis => dis.Discussion).ThenInclude(c => c.Comments).Where(x => x.TopicId == topicid).ToListAsync<DiscussionTopic>();
+        }
+
         /// <summary>
         /// Returns true iff the setting key, specified in the argument, exists in the database's Settings table.
         /// </summary>
@@ -371,19 +354,6 @@ namespace Repository
         private bool SettingExists(string key)
         {
             return (_dbContext.Settings.Where(s => s.Setting1 == key).FirstOrDefault<Setting>() != null);
-        }
-
-        /// Returns true iff the username, specified in the argument, exists in the database's Users table.
-        /// ---------------
-        /// Placeholder until services set up
-        /// ---------------
-        /// </summary>
-        /// <param name="username"></param>
-        /// <returns></returns>
-        private bool UserExists(string username)
-        {
-            //return (_dbContext.Users.Where(u => u.Username == username).FirstOrDefault<User>() != null);
-            return true;
         }
 
         /// <summary>
@@ -415,29 +385,6 @@ namespace Repository
         {
             return (_dbContext.Topics.Where(t => t.TopicId == topicid).FirstOrDefault<Topic>() != null);
         }
-
-        /// <summary>
-        /// Returns true iff the movie ID, specified in the argument, exists in the database's Movies table.
-        /// ---------------
-        /// Placeholder until services set up
-        /// ---------------
-        /// </summary>
-        /// <param name="movieid"></param>
-        /// <returns></returns>
-        private bool MovieExists(string movieid)
-        {
-            //return (_dbContext.Movies.Where(m => m.MovieId == movieid).FirstOrDefault<Movie>() != null);
-            return true;
-        }
-
-        public async Task<List<Discussion>> GetSortedDiscussionsRecent()
-        {
-            return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.CreationTime).ToListAsync<Discussion>();
-        }
-
-        public async Task<List<DiscussionTopic>> GetDiscussionsByTopicId(string topicid)
-        {
-            return await _dbContext.DiscussionTopics.Include(dis => dis.Discussion).Where(x => x.TopicId == topicid).ToListAsync<DiscussionTopic>();
-        }
+        
     }
 }

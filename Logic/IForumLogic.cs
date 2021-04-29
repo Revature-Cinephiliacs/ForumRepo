@@ -188,11 +188,11 @@ namespace BusinessLogic.Interfaces
         public Task<List<Comment>> GetCommentReports(List<string> idList);
 
         /// <summary>
-        /// Returns a list of discussions based on a list of discussionids
+        /// Returns a list of discussions based on a list of discussion ids
         /// </summary>
         /// <param name="idList"></param>
         /// <returns></returns>
-        public Task<List<DiscussionT>> GetDisucssionReports(List<string> idList);
+        public Task<List<DiscussionT>> GetDiscucssionReports(List<string> idList);
 
         /// <summary>
         /// Returns a topic based on a topic id.
@@ -218,6 +218,7 @@ namespace BusinessLogic.Interfaces
         /// <returns></returns>
         public Task<Comment> GetCommentById(Guid commentid);
 
+        /// <summary>
         /// Adds a discussion topic
         /// returns true if successful or false if unsuccessul
         /// </summary>

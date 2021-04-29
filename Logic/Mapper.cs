@@ -11,29 +11,7 @@ namespace BusinessLogic
     public static class Mapper
     {
         private static readonly string _userapi = "http://20.45.2.119/user/";
-
-        /// <summary>
-        /// Maps an instance of Repository.Models.Discussion and an instance of
-        /// Repository.Models.Topic onto a new instance of GlobalModels.Discussion
-        /// </summary>
-        /// <param name="repoDiscussion"></param>
-        /// <param name="topic"></param>
-        /// <returns></returns>
-        public static async Task<Discussion> RepoDiscussionToDiscussion(Repository.Models.Discussion
-            repoDiscussion, Repository.Models.Topic topic)
-        {
-            List<Comment> newComment = new List<Comment>();
-            foreach (var item in repoDiscussion.Comments)
-            {   
-                if(item != null){
-                    newComment.Add(await Task.Run(() => RepoCommentToComment(item)));
-                }
-            }
-            string username = await Task.Run(() => GetUsernameFromAPI(repoDiscussion.UserId));
-            var discussion = new Discussion(Guid.Parse(repoDiscussion.DiscussionId), repoDiscussion.MovieId,
-                username, repoDiscussion.Subject, topic.TopicName, newComment);
-            return discussion;
-        }
+        private static readonly string _movieapi = "http://20.94.153.81/";
 
         /// <summary>
         /// Maps an instance of Repository.Models.Comment onto a new instance of
@@ -43,8 +21,6 @@ namespace BusinessLogic
         /// <returns></returns>
         public static async Task<Comment> RepoCommentToComment(Repository.Models.Comment repoComment)
         {
-            // var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId),
-            //     repoComment.UserId, repoComment.CommentText, repoComment.IsSpoiler);
             string username = await Task.Run(() => GetUsernameFromAPI(repoComment.UserId));
 
             var comment = new Comment(Guid.Parse(repoComment.CommentId), Guid.Parse(repoComment.DiscussionId), username,
@@ -81,10 +57,7 @@ namespace BusinessLogic
                 string parentId = parent.Commentid.ToString();
                 if (repoComments[i].ParentCommentid == parentId)
                 {
-                    //var nestedComment = await RepoCommentToNestedComment(repoComments[i]);
-                    //parent.Replies.Add(await Task.Run(() => nestedComment));
                     parent.Replies.Add(repoComments[i]);
-                    // AddReplies(repoComments, nestedComment);
                     AddReplies(repoComments, repoComments[i]);
                 }
             }
@@ -137,7 +110,6 @@ namespace BusinessLogic
         /// <returns></returns>
         public static async Task<DiscussionT> RepoDiscussionToDiscussionT(Repository.Models.Discussion dis)
         {
-            int totalLikes = 0;
             string username = await Task.Run(() => GetUsernameFromAPI(dis.UserId));
             DiscussionT gdis = new();
             gdis.DiscussionId = dis.DiscussionId;
@@ -145,15 +117,13 @@ namespace BusinessLogic
             gdis.Userid = username;
             gdis.Subject = dis.Subject;
             gdis.CreationTime = dis.CreationTime;
-
+            gdis.Likes = (int)dis.Totalikes;
             foreach (var ct in dis.Comments)
             {
                 username = await Task.Run(() => GetUsernameFromAPI(ct.UserId));
                 Comment nc = new Comment(Guid.Parse(ct.CommentId), Guid.Parse(ct.DiscussionId), username, ct.CommentText, ct.IsSpoiler, ct.ParentCommentid, (int)ct.Likes);
                 gdis.Comments.Add(nc);
-                totalLikes += nc.Likes;
             }
-            gdis.Likes = totalLikes;
             
             foreach (var top in dis.DiscussionTopics)
             {
@@ -194,7 +164,7 @@ namespace BusinessLogic
         /// </summary>
         /// <param name="userid"></param>
         /// <returns></returns>
-        private static async Task<string> GetUsernameFromAPI(string userid)
+        public static async Task<string> GetUsernameFromAPI(string userid)
         {
             HttpClient client = new HttpClient();
             string path = _userapi + userid;
@@ -205,6 +175,29 @@ namespace BusinessLogic
                 JObject json = JObject.Parse(jsonContent);
                 string username = json["username"].ToString();
                 return username;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the movie title from the movie id
+        /// </summary>
+        /// <param name="movieid"></param>
+        /// <returns></returns>
+        public static async Task<string> GetMovieFromAPI(string movieid)
+        {
+            HttpClient client = new HttpClient();
+            string path = _movieapi + movieid;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if(response.IsSuccessStatusCode)
+            {
+                string jsonContent = await response.Content.ReadAsStringAsync();
+                JObject json = JObject.Parse(jsonContent);
+                string moviename = json["Title"].ToString();
+                return moviename;
             }
             else
             {
