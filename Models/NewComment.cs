@@ -23,6 +23,7 @@ namespace GlobalModels
         public bool Isspoiler { get; set; }
 
         public string ParentCommentid {get; set;}
+
         public NewComment()
         {
             
@@ -34,6 +35,7 @@ namespace GlobalModels
             Text = text;
             Isspoiler = isspoiler;
             ParentCommentid = parentcommentid;
+           
         }
         public NewComment(Comment comment)
         {

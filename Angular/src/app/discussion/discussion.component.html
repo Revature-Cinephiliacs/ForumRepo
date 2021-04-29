@@ -1,11 +1,15 @@
 <h1>{{subject}}</h1>
-
+<button (click) = "sortByCreationA()">Sort By Creation Time Ascending</button>
+<button (click) = "sortByCreationB()">Sort BY Creation Time Descending</button>
+<button (click) = "sortByCommentD()">Sort By Number of Comments Descending</button>
+<button (click) = "sortByLike()">Sort By Like </button>
 <ul>
     <ng-container
       *ngTemplateOutlet="recursiveListTmpl; context:{ list: pageComments }"
     ></ng-container>
 </ul>
-  
+
+
 <ng-template #recursiveListTmpl let-list="list">
 <li *ngFor="let item of list">
     <div  class="spoilerCover" *ngIf="item.isspoiler && !spoilersShown()">

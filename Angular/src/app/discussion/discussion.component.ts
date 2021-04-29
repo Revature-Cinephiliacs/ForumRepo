@@ -24,7 +24,7 @@ export class DiscussionComponent implements OnInit {
   displayReplyForm = false;
   displayMessageForm = true;
   parentid: string;
-  sortingOrder:string = "timeD";
+  sortingOrder:string = "comments";
   
   newComment: any = {
     discussionid: 0,
@@ -59,12 +59,30 @@ export class DiscussionComponent implements OnInit {
 
   // Function that retrieves comments for a dicussion
   async getComments() {
+    this.pageComments = [];
     setTimeout(() => {
       this._forum.getDiscussionCommentsPage(this.discussionID, this.pageNum, this.sortingOrder).subscribe(data =>{ 
         console.log(data);
         this.pageComments = data;
       });
     }, 1000);
+  }
+
+  sortByCreationA(){
+    this.sortingOrder = "timeA";
+    this.getComments();
+  }
+  sortByCreationB(){
+    this.sortingOrder = "timeD";
+    this.getComments();
+  }
+  sortByLike(){
+    this.sortingOrder = "likes";
+    this.getComments();
+  }
+  sortByCommentD(){
+    this.sortingOrder = "comments";
+    this.getComments();
   }
 
   //Function that will calculate the number of comments
