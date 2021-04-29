@@ -108,6 +108,10 @@ namespace Repository.Models
                     .IsUnicode(false)
                     .HasColumnName("subject");
 
+                entity.Property(e => e.Totalikes)
+                    .HasColumnName("totalikes")
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.UserId)
                     .IsRequired()
                     .HasMaxLength(50)
