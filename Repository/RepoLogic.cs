@@ -248,7 +248,8 @@ namespace Repository
 
         public async Task<Discussion> GetDiscussion(string discussionid)
         {
-            return await _dbContext.Discussions.Where(d => d.DiscussionId == discussionid).FirstOrDefaultAsync<Discussion>();
+            return await _dbContext.Discussions.Where(d => d.DiscussionId == discussionid).Include(dis => dis.DiscussionTopics).FirstOrDefaultAsync<Discussion>();
+            //return await _dbContext.Discussions.Where(d => d.DiscussionId == discussionid).FirstOrDefaultAsync<Discussion>();
         }
 
         public async Task<List<Topic>> GetTopics()
