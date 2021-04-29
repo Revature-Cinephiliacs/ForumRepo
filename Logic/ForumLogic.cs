@@ -106,7 +106,7 @@ namespace BusinessLogic
                 System.Console.WriteLine(pc.ParentCommentid);
             }
 
-                       // Sort the list of comments
+            // Sort the list of comments
             switch (sortingOrder)
             {
                 case "likes":
