@@ -385,6 +385,5 @@ namespace Repository
         {
             return (_dbContext.Topics.Where(t => t.TopicId == topicid).FirstOrDefault<Topic>() != null);
         }
-        
     }
 }

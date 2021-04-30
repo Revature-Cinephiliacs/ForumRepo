@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace Repository.Models
 {
+    /// <summary>
+    /// Repo Model from database-first scaffolding
+    /// </summary>
     public partial class Setting
     {
         public string Setting1 { get; set; }
