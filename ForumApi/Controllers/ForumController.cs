@@ -616,5 +616,51 @@ namespace CineAPI.Controllers
             StatusCode(200);
             return success;
         }
+
+        /// <summary>
+        /// Returns All discussion based on userid
+        /// return 400 if couldn't model bind
+        /// return 404 if discussions is null
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("discussions/{userId}")]
+        [Authorize]
+        public async Task<ActionResult<List<DiscussionT>>> GetDiscussionByUserId(string userId){
+             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetDiscussionByUserId() was called with invalid body data.");
+                return StatusCode(400);
+            }
+
+            List<DiscussionT> NewDiscussions = await _forumLogic.GetDiscussionByUserId(userId);
+            if(NewDiscussions == null){
+
+                return StatusCode(404);
+            }
+
+            return NewDiscussions;
+
+        }
+
+        [HttpGet("discussions/{userId}")]
+        [Authorize]
+        public async Task<ActionResult<List<Comment>>> GetCommentByUserId(string userId){
+             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetCommentByUserId() was called with invalid body data.");
+                return StatusCode(400);
+            }
+
+            List<Comment> newComments = await _forumLogic.GetCommentsByUserId(userId);
+            if(newComments == null){
+
+                return StatusCode(404);
+            }
+
+            return newComments;
+
+        }
+        
     }
 }
