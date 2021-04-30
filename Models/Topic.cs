@@ -4,6 +4,10 @@ namespace GlobalModels
 {
     public class Topic
     {
+        /// <summary>
+        /// DTO model for Topic
+        /// </summary>
+        /// <value></value>
         public Guid TopicId { get; set; }
         public string TopicName { get; set; }
 

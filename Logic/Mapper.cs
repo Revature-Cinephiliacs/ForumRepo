@@ -11,7 +11,7 @@ namespace BusinessLogic
     public static class Mapper
     {
         private static readonly string _userapi = "http://20.45.2.119/user/";
-        private static readonly string _movieapi = "http://20.94.153.81/";
+        private static readonly string _movieapi = "http://20.94.153.81/movie/";
 
         /// <summary>
         /// Maps an instance of Repository.Models.Comment onto a new instance of
