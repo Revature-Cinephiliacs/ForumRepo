@@ -220,7 +220,8 @@ namespace BusinessLogic.Interfaces
 
         /// <summary>
         /// Adds a discussion topic
-        /// returns true if successful or false if unsuccessul
+        /// Returns true if successful
+        /// Returns false if failed
         /// </summary>
         /// <param name="discussionid"></param>
         /// <param name="topicid"></param>
