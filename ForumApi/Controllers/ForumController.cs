@@ -349,7 +349,7 @@ namespace CineAPI.Controllers
         /// </summary>
         /// <param name="idList"></param>
         /// <returns></returns>
-        [HttpGet("comment/reports")]
+        [HttpPost("comment/reports")]
         [Authorize("manage:awebsite")]
         public async Task<ActionResult<List<Comment>>> GetCommentReports([FromBody] List<string> idList)
         {
@@ -363,6 +363,10 @@ namespace CineAPI.Controllers
             {
                 return StatusCode(404);
             }
+            if(commentsList.Count == 0)
+            {
+                return StatusCode(204);
+            }
             StatusCode(200);
             return commentsList;
         }
@@ -375,7 +379,7 @@ namespace CineAPI.Controllers
         /// </summary>
         /// <param name="idList"></param>
         /// <returns></returns>
-        [HttpGet("discussion/reports")]
+        [HttpPost("discussion/reports")]
         [Authorize("manage:awebsite")]
         public async Task<ActionResult<List<DiscussionT>>> GetDisucssionReports([FromBody] List<string> idList)
         {
@@ -388,6 +392,10 @@ namespace CineAPI.Controllers
             if(discussionsList == null)
             {
                 return StatusCode(404);
+            }
+            if(discussionsList.Count == 0)
+            {
+                return StatusCode(204);
             }
             StatusCode(200);
             return discussionsList;
