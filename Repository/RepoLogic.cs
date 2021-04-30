@@ -346,6 +346,14 @@ namespace Repository
             return await _dbContext.DiscussionTopics.Include(dis => dis.Discussion).ThenInclude(c => c.Comments).Where(x => x.TopicId == topicid).ToListAsync<DiscussionTopic>();
         }
 
+        public async Task<List<Discussion>> GetDiscussionsByUserId(string userId){
+            return await _dbContext.Discussions.Where(d => d.UserId == userId).ToListAsync<Discussion>();
+        }
+
+        public async Task<List<Comment>> GetCommentByUserId(string userId){
+            return await _dbContext.Comments.Where(c => c.UserId == userId).ToListAsync<Comment>();
+        }
+
         /// <summary>
         /// Returns true iff the setting key, specified in the argument, exists in the database's Settings table.
         /// </summary>

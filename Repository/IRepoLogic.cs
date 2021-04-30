@@ -226,5 +226,20 @@ namespace Repository
         /// <param name="commentid"></param>
         /// <returns></returns>
         public Task<Comment> GetCommentById(string commentid);
+
+        /// <summary>
+        /// Returns all discussion based on a user id
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetDiscussionsByUserId(string userId);
+
+        /// <summary>
+        /// Returns all the comment based on a userId
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public Task<List<Comment>> GetCommentByUserId(string userId);
+
     }
 }
