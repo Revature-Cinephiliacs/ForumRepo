@@ -228,5 +228,19 @@ namespace BusinessLogic.Interfaces
         /// <returns></returns>
         public Task<bool> AddDiscussionTopic(string discussionid, string topicid);
 
+        /// <summary>
+        /// Returns all duscussion based on UserID
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionT>> GetDiscussionByUserId(string userId);
+
+        /// <summary>
+        /// Returns all comments based on userID
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public Task<List<Comment>> GetCommentsByUserId(string userId);
+
     }
 }

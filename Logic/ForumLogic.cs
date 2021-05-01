@@ -550,6 +550,31 @@ namespace BusinessLogic
             return topics;
         }
 
+         public async Task<List<DiscussionT>> GetDiscussionByUserId(string userId){
+
+            List<Repository.Models.Discussion> discussions = await _repo.GetDiscussionsByUserId(userId);
+            List<DiscussionT> newDiscussionList = new List<DiscussionT>();
+            foreach (var item in discussions)
+            {
+                DiscussionT newDiscussion = await Mapper.RepoDiscussionToDiscussionT(item);
+                newDiscussionList.Add(newDiscussion);
+            }
+            
+            return newDiscussionList;
+        }
+
+        public async Task<List<Comment>> GetCommentsByUserId(string userId){
+            List<Repository.Models.Comment> comments = await _repo.GetCommentByUserId(userId);
+            List<Comment> newComments = new List<Comment>();
+            foreach (var item in comments)
+            {
+                Comment comment = await Mapper.RepoCommentToComment(item);
+                newComments.Add(comment);
+            }
+            
+            return newComments;
+        }
+
         /// <summary>
         /// Sorts comments by number of likes (descending)
         /// </summary>

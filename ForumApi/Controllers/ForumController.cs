@@ -349,7 +349,7 @@ namespace CineAPI.Controllers
         /// </summary>
         /// <param name="idList"></param>
         /// <returns></returns>
-        [HttpGet("comment/reports")]
+        [HttpPost("comment/reports")]
         [Authorize("manage:awebsite")]
         public async Task<ActionResult<List<Comment>>> GetCommentReports([FromBody] List<string> idList)
         {
@@ -363,6 +363,10 @@ namespace CineAPI.Controllers
             {
                 return StatusCode(404);
             }
+            if(commentsList.Count == 0)
+            {
+                return StatusCode(204);
+            }
             StatusCode(200);
             return commentsList;
         }
@@ -375,7 +379,7 @@ namespace CineAPI.Controllers
         /// </summary>
         /// <param name="idList"></param>
         /// <returns></returns>
-        [HttpGet("discussion/reports")]
+        [HttpPost("discussion/reports")]
         [Authorize("manage:awebsite")]
         public async Task<ActionResult<List<DiscussionT>>> GetDisucssionReports([FromBody] List<string> idList)
         {
@@ -388,6 +392,10 @@ namespace CineAPI.Controllers
             if(discussionsList == null)
             {
                 return StatusCode(404);
+            }
+            if(discussionsList.Count == 0)
+            {
+                return StatusCode(204);
             }
             StatusCode(200);
             return discussionsList;
@@ -615,6 +623,58 @@ namespace CineAPI.Controllers
             }
             StatusCode(200);
             return success;
+        }
+
+        /// <summary>
+        /// Returns All discussion based on userid
+        /// return 400 if couldn't model bind
+        /// return 404 if discussions is null
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("userdiscussion/{userId}")]
+        [Authorize]
+        public async Task<ActionResult<List<DiscussionT>>> GetDiscussionByUserId(string userId){
+             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetDiscussionByUserId() was called with invalid body data.");
+                return StatusCode(400);
+            }
+
+            List<DiscussionT> NewDiscussions = await _forumLogic.GetDiscussionByUserId(userId);
+            if(NewDiscussions == null){
+
+                return StatusCode(404);
+            }
+
+            return NewDiscussions;
+
+        }
+
+        /// <summary>
+        /// Returns All comments based on userid
+        /// return 400 if couldn't model bind
+        /// return 404 if discussions is null
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("usercomments/{userId}")]
+        [Authorize]
+        public async Task<ActionResult<List<Comment>>> GetCommentByUserId(string userId){
+             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ForumController.GetCommentByUserId() was called with invalid body data.");
+                return StatusCode(400);
+            }
+
+            List<Comment> newComments = await _forumLogic.GetCommentsByUserId(userId);
+            if(newComments == null){
+
+                return StatusCode(404);
+            }
+
+            return newComments;
+
         }
     }
 }
