@@ -18,7 +18,8 @@ export interface User {
     movieid: string,
     userid: string,
     subject: string,
-    topic: string
+    topic: string,
+    comments: [Comment]
   }
 
   export interface Comment {
@@ -26,6 +27,7 @@ export interface User {
     discussionid: number,
     userid: string,
     text: string,
-    isspoiler: boolean
+    isspoiler: boolean,
+    parentcommentid: string
   }
   

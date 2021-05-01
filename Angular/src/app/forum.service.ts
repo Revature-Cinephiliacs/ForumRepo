@@ -65,15 +65,20 @@ export class ForumService {
     return this.http.get( this.baseURL + "topics");
   }
 
-  //Function that will make a call to the Forum API discussion/sort/comment/ascend
-  //endpoint to sort a list of discussions in ascending order by the number of comments
-  sortDiscussionByCommentsAsc(){
-    return this.http.get( this.baseURL + "discussion/sort/comment/ascend");
+  //Function that will make a call to the Forum API endpoint to filter discussion by topic
+  filterDiscussionByTopic(topicid: string){
+    return this.http.get( this.baseURL + "discussions/topic/" + topicid);
   }
 
-  //Function that will make a call to the Forum API discussion/sort/comment/descending
-  //endpoint to sort a list of discussions in descending order by the number of comments
-  sortDiscussionByCommentsDesc(){
-    return this.http.get( this.baseURL + "discussion/sort/comment/descend");
+  //Function that will modify comment like comment/like/{commentid}/{userid}
+  addLike(commentid: string, userid:string){
+    return this.http.post( this.baseURL + "comment/like/" + commentid + "/" + userid, null);
   }
+
+  //Function that will make a call to the Forum API endpoint to add a given topic to a given discussion
+  addTopicToDiscussion(discussionid: string, topicid: string)
+  {
+    return this.http.post( this.baseURL + "discussion/topic/" + discussionid + "/" + topicid, null);
+  }
+  
 }

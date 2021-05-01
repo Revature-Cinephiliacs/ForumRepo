@@ -12,7 +12,7 @@ namespace BusinessLogic.Interfaces
         /// If there are no topics, return null
         /// </summary>
         /// <returns>List &lt; Topic ></returns>
-        public Task<List<string>> GetTopics();
+        public Task<List<Topic>> GetTopics();
 
         /// <summary>
         /// Method for getting all discussions for a specific movie 
@@ -21,7 +21,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="movieid"></param>
         /// <returns></returns>
-        public Task<List<Discussion>> GetDiscussions(string movieid);
+        public Task<List<DiscussionT>> GetDiscussions(string movieid);
         
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="movieid"></param>
         /// <returns></returns>
-        public Task<List<Discussion>> GetDiscussionsPage(string movieid, int page, string sortingOrder);
+        public Task<List<DiscussionT>> GetDiscussionsPage(string movieid, int page, string sortingOrder);
 
         /// <summary>
         /// Method to get a discussion by id
@@ -43,7 +43,7 @@ namespace BusinessLogic.Interfaces
         /// </summary>
         /// <param name="discussionid"></param>
         /// <returns></returns>
-        Task<Discussion> GetDiscussion(Guid discussionid);
+        Task<DiscussionT> GetDiscussion(Guid discussionid);
 
         /// <summary>
         /// Method to get all comments from a discussion
@@ -62,7 +62,7 @@ namespace BusinessLogic.Interfaces
         /// <param name="discussionid"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        public Task<List<Comment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder);
+        public Task<List<NestedComment>> GetCommentsPage(Guid discussionid, int page, string sortingOrder);
 
         /// <summary>
         /// Method to set comments 
@@ -101,6 +101,15 @@ namespace BusinessLogic.Interfaces
         public Task<List<DiscussionT>> GetSortedDiscussionsByComments(string type);
 
         /// <summary>
+        /// Gets a sorted list of Discussions based off number of comments.
+        /// Parameter type determines is it's an ascending list, or descending
+        /// type = "a" for ascending, type = "d" for descending
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionT>> GetDiscussionsByTopicId(string type);
+
+        /// <summary>
         /// Creates a new topic in the database 
         /// Returns true if successfully created
         /// Returns false if failed to create
@@ -108,5 +117,130 @@ namespace BusinessLogic.Interfaces
         /// <param name="topic"></param>
         /// <returns></returns>
         public Task<bool> CreateTopic(string topic);
+
+        /// <summary>
+        /// Changes a spoiler tag from true &lt; - > false
+        /// Returns true if successful in switching spoilertag bool
+        /// Returns false is failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> ChangeSpoiler(Guid commentid);
+
+        /// <summary>
+        /// Deletes a comment from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteComment(Guid commentid);
+
+        /// <summary>
+        /// Deletes a discussion from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteDiscussion(Guid discussionid);
+
+        /// <summary>
+        /// Deletes a topic from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteTopic(Guid topicid);
+
+        /// <summary>
+        /// Adds a new user-discussion follow relationship
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        public Task<bool> FollowDiscussion(Guid discussionid, string userid);
+
+        /// <summary>
+        /// Returns the list of discussions that a user is following
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionT>> GetFollowDiscList(string userid);
+
+        /// <summary>
+        /// Increments a comment's likes
+        /// Returns true is successful
+        /// Returns fail is failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> LikeComment(Guid commentid, string userid);
+
+        /// <summary>
+        /// Returns a list of comments based on a list of commentids
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        public Task<List<Comment>> GetCommentReports(List<string> idList);
+
+        /// <summary>
+        /// Returns a list of discussions based on a list of discussion ids
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionT>> GetDiscucssionReports(List<string> idList);
+
+        /// <summary>
+        /// Returns a topic based on a topic id.
+        /// Returns null if could not find topic
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        public Task<Topic> GetTopicById(Guid topicid);
+
+        /// <summary>
+        /// Returns a discussion based on a discussion id
+        /// Return null if could not find discussion
+        /// </summary>
+        /// <param name="discId"></param>
+        /// <returns></returns>
+        public Task<DiscussionT> GetDiscussionById(Guid discId);
+
+        /// <summary>
+        /// Returns a comment based on a commentid
+        /// Returns null if could not find comment
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<Comment> GetCommentById(Guid commentid);
+
+        /// <summary>
+        /// Adds a discussion topic
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        public Task<bool> AddDiscussionTopic(string discussionid, string topicid);
+
+        /// <summary>
+        /// Returns all duscussion based on UserID
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionT>> GetDiscussionByUserId(string userId);
+
+        /// <summary>
+        /// Returns all comments based on userID
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public Task<List<Comment>> GetCommentsByUserId(string userId);
+
     }
 }

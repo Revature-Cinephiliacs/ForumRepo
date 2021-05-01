@@ -23,6 +23,7 @@ namespace Repository.Models
         public virtual DbSet<DiscussionTopic> DiscussionTopics { get; set; }
         public virtual DbSet<Setting> Settings { get; set; }
         public virtual DbSet<Topic> Topics { get; set; }
+        public virtual DbSet<UserLike> UserLikes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -107,6 +108,10 @@ namespace Repository.Models
                     .IsUnicode(false)
                     .HasColumnName("subject");
 
+                entity.Property(e => e.Totalikes)
+                    .HasColumnName("totalikes")
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.UserId)
                     .IsRequired()
                     .HasMaxLength(50)
@@ -116,27 +121,26 @@ namespace Repository.Models
 
             modelBuilder.Entity<DiscussionFollow>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => new { e.DiscussionId, e.UserId })
+                    .HasName("discussionID_userID_pk");
 
                 entity.ToTable("discussion_follows");
 
                 entity.Property(e => e.DiscussionId)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("discussionID");
 
                 entity.Property(e => e.UserId)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("userID");
 
                 entity.HasOne(d => d.Discussion)
-                    .WithMany()
+                    .WithMany(p => p.DiscussionFollows)
                     .HasForeignKey(d => d.DiscussionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__discussio__discu__08B54D69");
+                    .HasConstraintName("FK__discussio__discu__114A936A");
             });
 
             modelBuilder.Entity<DiscussionTopic>(entity =>
@@ -203,6 +207,29 @@ namespace Repository.Models
                     .HasMaxLength(25)
                     .IsUnicode(false)
                     .HasColumnName("topic_name");
+            });
+
+            modelBuilder.Entity<UserLike>(entity =>
+            {
+                entity.HasKey(e => new { e.CommentId, e.UserId })
+                    .HasName("commentID_userID_pk");
+
+                entity.ToTable("user_likes");
+
+                entity.Property(e => e.CommentId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("commentID");
+
+                entity.Property(e => e.UserId)
+                    .HasMaxLength(50)
+                    .HasColumnName("userID");
+
+                entity.HasOne(d => d.Comment)
+                    .WithMany(p => p.UserLikes)
+                    .HasForeignKey(d => d.CommentId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__user_like__comme__1CBC4616");
             });
 
             OnModelCreatingPartial(modelBuilder);

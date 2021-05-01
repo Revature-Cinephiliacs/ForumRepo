@@ -22,6 +22,7 @@ namespace GlobalModels
         public string Userid { get; set; }
         public DateTime CreationTime { get; set; }
         public string Subject { get; set; }
+        public int Likes { get; set; }
 
         public List<Comment> Comments { get; set; }
         public List<string> DiscussionTopics { get; set; }
