@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GlobalModels;
+using Logic;
 using Microsoft.Extensions.Logging;
 using Repository;
 using Repository.Models;
@@ -50,8 +51,12 @@ namespace BusinessLogic
             }
             if (commentId != null)
             {
+                CommentNotification cn = new CommentNotification(repoComment.UserId, repoComment.DiscussionId, commentId, followers);
+                cn.SendNotification();
                 return true;
             }
+            else
+                return false;
         }
 
         public async Task<bool> CreateDiscussion(NewDiscussion discussion)
@@ -69,7 +74,12 @@ namespace BusinessLogic
             var discussionId = await _repo.AddDiscussion(repoDiscussion, repoTopic);
 
             if (discussionId != null)
+            {
+                DiscussionNotification dn = new DiscussionNotification(repoDiscussion.MovieId, repoDiscussion.UserId, discussionId);
+                dn.SendNotification();
                 return true;
+            }
+                
             else
                 return false;
         }
