@@ -45,8 +45,8 @@ namespace ForumApi
                         "http://localhost:4200",
                         "https://cinephiliacsapp.azurewebsites.net"
                     )
-                    .AllowAnyHeader()
                     .AllowAnyMethod()
+                    .AllowAnyHeader()
                 );
             });
 
