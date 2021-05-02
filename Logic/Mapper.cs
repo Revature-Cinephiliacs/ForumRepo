@@ -188,9 +188,10 @@ namespace BusinessLogic
             if(response.IsSuccessStatusCode)
             {
                 string jsonContent = await response.Content.ReadAsStringAsync();
-                JObject json = JObject.Parse(jsonContent);
-                string username = json.ToString();
-                return username;
+                Console.WriteLine(jsonContent);
+                // JObject json = JObject.Parse(jsonContent);
+                // string username = json.ToString();
+                return jsonContent;
             }
             else
             {
