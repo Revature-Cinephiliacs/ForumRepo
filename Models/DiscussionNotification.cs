@@ -6,7 +6,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Logic
+namespace GlobalModels
 {
     /// <summary>
     /// Facillitates passing of notifications.
@@ -43,7 +43,7 @@ namespace Logic
             dn.Discussionid = this.Discussionid;
 
             HttpResponseMessage response = await client.PostAsJsonAsync(
-        "api/Movie/notification/discussion", dn);
+        "http://20.94.153.81/Movie/notification/discussion", dn);
             response.EnsureSuccessStatusCode();
 
             // return URI of the created resource.

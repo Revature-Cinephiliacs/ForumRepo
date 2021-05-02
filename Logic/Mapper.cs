@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Json;
 
 namespace BusinessLogic
 {
@@ -157,6 +158,21 @@ namespace BusinessLogic
         internal static Topic RepoTopicToTopic(Repository.Models.Topic topic)
         {
             return new Topic(topic.TopicId, topic.TopicName);
+        }
+
+        /// <summary>
+        /// Sends a notification to the movie api
+        /// </summary>
+        /// <param name="repoDisc"></param>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
+        public static async Task<bool> SendNotification(Repository.Models.Discussion repoDisc, string discussionid)
+        {
+            DiscussionNotification dn = new DiscussionNotification(repoDisc.MovieId, repoDisc.UserId, discussionid);
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.PostAsJsonAsync($"{_movieapi}notification/discussion", dn);
+            response.EnsureSuccessStatusCode();
+            return true;
         }
 
         /// <summary>

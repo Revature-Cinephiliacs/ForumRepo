@@ -1,5 +1,4 @@
-﻿using Repository.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -7,7 +6,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Logic
+namespace GlobalModels
 {
     public class CommentNotification
     {
@@ -51,7 +50,7 @@ namespace Logic
            
 
             HttpResponseMessage response = await client.PostAsJsonAsync(
-        "api/User/notification/comment", cn);
+        "http://20.45.2.119/User/notification/comment", cn);
             response.EnsureSuccessStatusCode();
 
             // return URI of the created resource.

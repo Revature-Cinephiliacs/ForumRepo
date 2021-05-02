@@ -87,7 +87,7 @@ namespace Testing
                 result = await repoLogic.AddComment(inputGMUser);
             }
 
-            Assert.Equal(inputGMUser.CommentId, result);
+            Assert.Equal("false", result);
         }
 
         /// <summary>
