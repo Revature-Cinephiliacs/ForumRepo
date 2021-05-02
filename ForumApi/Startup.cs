@@ -36,19 +36,19 @@ namespace ForumApi
 
             services.AddCors(options =>
             {
-                options.AddDefaultPolicy(
-                                builder =>
-                                {
-                                    builder.WithOrigins(
-                                        "http://20.94.137.143/", //Frontend
-                                        "http://20.189.29.112/", //Admintools
-                                        "http://20.45.2.119/", //User
-                                        "http://localhost:4200/",
-                                        "https://cinephiliacsapp.azurewebsites.net/"
-                                        )
-                                       .AllowAnyHeader()
-                                       .AllowAnyMethod();
-                                });
+                options.AddPolicy(name: "_testingPolicy",
+                builder =>
+                {
+                    builder.WithOrigins(
+                        "http://20.94.137.143/", //Frontend
+                        "http://20.189.29.112/", //Admintools
+                        "http://20.45.2.119/", //User
+                        "http://localhost:4200/",
+                        "https://cinephiliacsapp.azurewebsites.net/"
+                        )
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
             });
 
             var myConnectionString = Configuration.GetConnectionString("Cinephiliacs_Forum");
@@ -102,7 +102,7 @@ namespace ForumApi
             app.UseRouting();
 
             // Enables the CORS policty for all controller endpoints. Must come between UseRouting() and UseEndpoints()
-            app.UseCors();
+            app.UseCors("_testingPolicy");
 
             app.UseAuthentication();
 
