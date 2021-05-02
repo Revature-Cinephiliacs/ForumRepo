@@ -33,7 +33,7 @@ namespace Testing
             // Arrange
             NewComment nc = new NewComment(Guid.NewGuid(), "def", "fgh", true, null);
 
-            repoStub.Setup(repo => repo.AddComment(It.IsAny<Repository.Models.Comment>())).ReturnsAsync(true);
+            repoStub.Setup(repo => repo.AddComment(It.IsAny<Repository.Models.Comment>())).ReturnsAsync("true");
             var logic = new ForumLogic(repoStub.Object, logicLogger);
 
             // Act
@@ -54,7 +54,7 @@ namespace Testing
             Repository.Models.Topic tp = new Repository.Models.Topic();
             tp.TopicName = "Any Topic";
             
-            repoStub.Setup(repo => repo.AddDiscussion(It.IsAny<Repository.Models.Discussion>(), It.IsAny<Repository.Models.Topic>())).ReturnsAsync(true);
+            repoStub.Setup(repo => repo.AddDiscussion(It.IsAny<Repository.Models.Discussion>(), It.IsAny<Repository.Models.Topic>())).ReturnsAsync("true");
 
             var logic = new ForumLogic(repoStub.Object, logicLogger);
 
