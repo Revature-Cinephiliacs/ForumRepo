@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GlobalModels;
+using Logic;
 using Microsoft.Extensions.Logging;
 using Repository;
+using Repository.Models;
 
 namespace BusinessLogic
 {
@@ -40,7 +42,21 @@ namespace BusinessLogic
             }
 
             var repoComment = Mapper.NewCommentToNewRepoComment(comment);
-            return await _repo.AddComment(repoComment);
+            string commentId = await _repo.AddComment(repoComment);
+            var listDfollow = _repo.GetFollowDiscussionListByDiscussionId(repoComment.DiscussionId).Result;
+            List<string> followers = new List<string>();
+            foreach(var follower in listDfollow)
+            {
+                followers.Add(follower.UserId);
+            }
+            if (commentId != null)
+            {
+                CommentNotification cn = new CommentNotification(repoComment.UserId, repoComment.DiscussionId, commentId, followers);
+                cn.SendNotification();
+                return true;
+            }
+            else
+                return false;
         }
 
         public async Task<bool> CreateDiscussion(NewDiscussion discussion)
@@ -55,7 +71,17 @@ namespace BusinessLogic
             var repoDiscussion = Mapper.NewDiscussionToNewRepoDiscussion(discussion);
             var repoTopic = new Repository.Models.Topic();
             repoTopic.TopicName = discussion.Topic;
-            return await _repo.AddDiscussion(repoDiscussion, repoTopic);
+            var discussionId = await _repo.AddDiscussion(repoDiscussion, repoTopic);
+
+            if (discussionId != null)
+            {
+                DiscussionNotification dn = new DiscussionNotification(repoDiscussion.MovieId, repoDiscussion.UserId, discussionId);
+                dn.SendNotification();
+                return true;
+            }
+                
+            else
+                return false;
         }
 
         public async Task<List<Comment>> GetComments(Guid discussionid)
