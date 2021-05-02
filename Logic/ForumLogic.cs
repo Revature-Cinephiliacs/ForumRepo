@@ -68,9 +68,15 @@ namespace BusinessLogic
             }
 
             List<Comment> comments = new List<Comment>();
+            List<Task<Comment>> tasks = new List<Task<Comment>>();
             foreach (var repoComment in repoComments)
             {
-                comments.Add(await Task.Run(() => Mapper.RepoCommentToComment(repoComment)));
+                tasks.Add(Task.Run(() => Mapper.RepoCommentToComment(repoComment)));
+            }
+            var results = await Task.WhenAll(tasks);
+            foreach (var item in results)
+            {
+                comments.Add(item);
             }
             return comments;
         }
@@ -100,15 +106,19 @@ namespace BusinessLogic
             }
 
             List<NestedComment> tempComments = new List<NestedComment>();
+            List<Task<NestedComment>> tasksNC = new List<Task<NestedComment>>();
             foreach (Repository.Models.Comment rc in repoComments)
             {
-                var nc = Mapper.RepoCommentToNestedComment(rc);
-                tempComments.Add(await nc);
+                tasksNC.Add(Task.Run(() => Mapper.RepoCommentToNestedComment(rc)));
+            }
+            var results = await Task.WhenAll(tasksNC);
+            foreach (var item in results)
+            {
+                tempComments.Add(item);
             }
 
             //Create array of comments to store parent comments
             List<NestedComment> parentComments = new List<NestedComment>();
-
             foreach (NestedComment tc in tempComments)
             {
                 if (tc.ParentCommentid == null)
@@ -221,24 +231,29 @@ namespace BusinessLogic
                 _logger.LogWarning($"ForumLogic.GetDiscussions() was called with a movieid that doesn't exist {movieid}.");
                 return null;
             }
-            
+
             foreach (var item in repoDiscussions)
             {
                 item.Comments = await _repo.GetMovieComments(item.DiscussionId);
             }
 
             List<DiscussionT> discussions = new List<DiscussionT>();
+            List<Task<DiscussionT>> tasks = new List<Task<DiscussionT>>();
             foreach (var repoDiscussion in repoDiscussions)
             {
                 // Get the topic associated with this discussion
-
                 Repository.Models.Topic topic = _repo.GetDiscussionTopic(repoDiscussion.DiscussionId);
                 if (topic == null)
                 {
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
+                tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
+            }
+            var results = await Task.WhenAll(tasks);
+            foreach(var items in results)
+            {
+                discussions.Add(items);
             }
             return discussions;
         }
@@ -331,6 +346,7 @@ namespace BusinessLogic
             }
 
             List<DiscussionT> discussions = new List<DiscussionT>();
+            List<Task<DiscussionT>> tasks = new List<Task<DiscussionT>>();
             foreach (var repoDiscussion in pageDiscussions)
             {
                 
@@ -342,7 +358,13 @@ namespace BusinessLogic
                     topic.TopicName = "None";
                 }
                 discussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
+                tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
                 
+            }
+            var results = await Task.WhenAll(tasks);
+            foreach(var items in results)
+            {
+                discussions.Add(items);
             }
             return discussions;
         }
@@ -365,10 +387,15 @@ namespace BusinessLogic
             }
 
             List<DiscussionT> globalDiscussions = new List<DiscussionT>();
-
+            List<Task<DiscussionT>> tasks = new List<Task<DiscussionT>>();
             foreach (Repository.Models.Discussion dis in repoDiscussions)
             {
-                globalDiscussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(dis)));
+                tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(dis)));
+            }
+            var results = await Task.WhenAll(tasks);
+            foreach(var items in results)
+            {
+                globalDiscussions.Add(items);
             }
             return globalDiscussions;
         }
@@ -393,14 +420,16 @@ namespace BusinessLogic
             }
 
             List<DiscussionT> newDiscussions = new List<DiscussionT>();
-
-            DiscussionT gdis;
+            List<Task<DiscussionT>> tasks = new List<Task<DiscussionT>>();
             foreach (Repository.Models.Discussion dis in globalDiscussions)
             {
-                gdis = await Mapper.RepoDiscussionToDiscussionT(dis);
-                newDiscussions.Add(gdis);
+                tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(dis)));
             }
-
+            var results = await Task.WhenAll(tasks);
+            foreach(var items in results)
+            {
+                newDiscussions.Add(items);
+            }
             return newDiscussions;
         }
 
@@ -465,9 +494,15 @@ namespace BusinessLogic
         {
             List<Repository.Models.Comment> repoComments = await _repo.GetCommentReportList(idList);
             List<Comment> listComments = new List<Comment>();
+            List<Task<Comment>> tasks = new List<Task<Comment>>();
             foreach(Repository.Models.Comment item in repoComments)
             {
-                listComments.Add(await Task.Run(() => Mapper.RepoCommentToComment(item)));
+                tasks.Add(Task.Run(() => Mapper.RepoCommentToComment(item)));
+            }
+            var results = await Task.WhenAll(tasks);
+            foreach(var item in results)
+            {
+                listComments.Add(item);
             }
             return listComments;
         }
@@ -476,9 +511,15 @@ namespace BusinessLogic
         {
             List<Repository.Models.Discussion> repoDisc = await _repo.GetDiscussionReportList(idList);
             List<DiscussionT> listDisc = new List<DiscussionT>();
+            List<Task<DiscussionT>> tasks = new List<Task<DiscussionT>>();
             foreach(Repository.Models.Discussion item in repoDisc)
             {
-                listDisc.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(item)));
+                tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(item)));
+            }
+            var results = await Task.WhenAll(tasks);
+            foreach(var item in results)
+            {
+                listDisc.Add(item);
             }
             return listDisc;
         }
@@ -554,24 +595,32 @@ namespace BusinessLogic
 
             List<Repository.Models.Discussion> discussions = await _repo.GetDiscussionsByUserId(userId);
             List<DiscussionT> newDiscussionList = new List<DiscussionT>();
+            List<Task<DiscussionT>> tasks = new List<Task<DiscussionT>>();
             foreach (var item in discussions)
             {
-                DiscussionT newDiscussion = await Mapper.RepoDiscussionToDiscussionT(item);
-                newDiscussionList.Add(newDiscussion);
+                tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(item)));
             }
-            
+            var results = await Task.WhenAll(tasks);
+            foreach(var item in results)
+            {
+                newDiscussionList.Add(item);
+            }
             return newDiscussionList;
         }
 
         public async Task<List<Comment>> GetCommentsByUserId(string userId){
             List<Repository.Models.Comment> comments = await _repo.GetCommentByUserId(userId);
             List<Comment> newComments = new List<Comment>();
+            List<Task<Comment>> tasks = new List<Task<Comment>>();
             foreach (var item in comments)
             {
-                Comment comment = await Mapper.RepoCommentToComment(item);
-                newComments.Add(comment);
+                tasks.Add(Task.Run(() => Mapper.RepoCommentToComment(item)));
             }
-            
+            var results = await Task.WhenAll(tasks);
+            foreach (var item in results)
+            {
+                newComments.Add(item);
+            }
             return newComments;
         }
 
