@@ -17,17 +17,17 @@ namespace Repository
         /// </summary>
         /// <param name="repoComment"></param>
         /// <returns></returns>
-        Task<bool> AddComment(Comment repoComment);
+        Task<string> AddComment(Comment repoComment);
 
         /// <summary>
         /// Saving Discussion into database
-        /// Return ture if saved succeffully 
-        /// Return false if user or movie doesn't exist  
+        /// Return discussionid if saved succeffully 
+        /// Return empty if user or movie doesn't exist  
         /// </summary>
         /// <param name="repoDiscussion"></param>
         /// <param name="repoTopic"></param>
         /// <returns></returns>
-        Task<bool> AddDiscussion(Discussion repoDiscussion, Topic repoTopic);
+        Task<string> AddDiscussion(Discussion repoDiscussion, Topic repoTopic);
 
         /// <summary>
         /// Returns a list of all Comment objects from the database that match the discussion ID specified
@@ -108,11 +108,146 @@ namespace Repository
         public Task<List<Discussion>> GetSortedDiscussionsAscending();
 
         /// <summary>
+        /// Get a list of dicussions sorted by most recent discussions
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetSortedDiscussionsRecent();
+
+        /// <summary>
+        /// Get a list of dicussions sorted by topic
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<DiscussionTopic>> GetDiscussionsByTopicId(string topicid);
+        /// <summary>
         /// Saves the topic into the database
         /// Returns true if save is success
         /// </summary>
         /// <param name="topic"></param>
         /// <returns></returns>
         public Task<bool> AddTopic(Topic topic);
+
+        /// <summary>
+        /// Changes a comment spoiler tag from true &lt; - > false
+        /// Returns true is successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> ChangeCommentSpoiler(string commentid);
+
+        /// <summary>
+        /// Deletes a comment from the database
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteComment(string commentid);
+
+        /// <summary>
+        /// Deletes a discussion from the database
+        /// First deletes all references in discussiontopics table
+        /// Second deletes all references in comments table
+        /// Lastly deletes the discussion itself
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteDiscussion(string discussionid);
+
+        /// <summary>
+        /// Deletes a topic from the database
+        /// First deletes all references of the topic
+        /// Then deletes the topic itself
+        /// Returns true if successful
+        /// Return false if failed
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteTopic(string topicid);
+
+        /// <summary>
+        /// Adds a new DiscussionFollow object into database
+        /// Creates a user-discussion follow relationship
+        /// Returns true if successful
+        /// Returns false if failed
+        /// </summary>
+        /// <param name="newFollow"></param>
+        /// <returns></returns>
+        public Task<bool> FollowDiscussion(DiscussionFollow newFollow);
+
+        /// <summary>
+        /// Returns a list of followed discussions based on userid
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionFollow>> GetFollowDiscussionList(string userid);
+
+
+        /// <summary>
+        /// Returns a list of followed discussions based on userid
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionFollow>> GetFollowDiscussionListByDiscussionId(string discussionid);
+
+        /// <summary>
+        /// Likes a comment
+        /// Increment a comment's like value
+        /// </summary>
+        /// <param name="newLike"></param>
+        /// <returns></returns>
+        public Task<bool> LikeComment(UserLike newLike);
+
+        /// <summary>
+        /// Gets a list of comments based on a list of commentids
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        public Task<List<Comment>> GetCommentReportList(List<string> idList);
+
+        /// <summary>
+        /// Get a list of discussions based on a list of discussionids
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetDiscussionReportList(List<string> idList);
+
+        /// <summary>
+        /// Returns a topic based on a topic id.
+        /// </summary>
+        /// <param name="topicid"></param>
+        /// <returns></returns>
+        public Task<Topic> GetTopicById(string topicid);
+        
+        /// <summary>
+        /// Returns a discussion based on a discussion id
+        /// </summary>
+        /// <param name="discid"></param>
+        /// <returns></returns>
+        public Task<Discussion> GetDiscussionsById(string discid);
+
+        /// <summary>
+        /// Returns a comment based on a comment id
+        /// </summary>
+        /// <param name="commentid"></param>
+        /// <returns></returns>
+        public Task<Comment> GetCommentById(string commentid);
+
+        /// <summary>
+        /// Returns all discussion based on a user id
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public Task<List<Discussion>> GetDiscussionsByUserId(string userId);
+
+        /// <summary>
+        /// Returns all the comment based on a userId
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public Task<List<Comment>> GetCommentByUserId(string userId);
+
     }
 }

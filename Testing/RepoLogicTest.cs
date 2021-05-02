@@ -58,41 +58,6 @@ namespace Testing
         }
 
         /// <summary>
-        /// Testing AddDiscussion function in RepoLogic 
-        /// if username is null the AddDiscussion should not presist the data 
-        /// and return false so this test is for chekging that.
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task NoUserAddDiscussionTest()
-        {
-            bool result;
-
-            NewDiscussion dataSetA = new NewDiscussion();
-            dataSetA.Movieid = "string movieid";
-            dataSetA.Subject = "stringsubject";
-            dataSetA.Topic = "string";
-            
-
-            Repository.Models.Topic newTopic = new Repository.Models.Topic();
-
-            using(var context = new Repository.Models.Cinephiliacs_ForumContext(dbOptions))
-            {              
-                context.Database.EnsureDeleted();
-                context.Database.EnsureCreated();
-
-                RepoLogic repoLogic = new RepoLogic(context, repoLogger);
-
-                Repository.Models.Discussion inputGMUser = BusinessLogic.Mapper.NewDiscussionToNewRepoDiscussion(dataSetA);
-
-                // Test AddDiscussion() without User dependency
-                result = await repoLogic.AddDiscussion(inputGMUser, newTopic);
-            }
-
-            Assert.False(result);
-        }
-
-        /// <summary>
         /// Testing AddComment() from RepoLgic
         /// AddConnet should return false if the discussion is null
         /// </summary>
@@ -100,7 +65,7 @@ namespace Testing
         [Fact]
         public async Task NoDiscussionAddComment()
         {
-            bool result;
+            string result;
 
             NewComment dataSetA = new NewComment();
             dataSetA.Userid = "username1";
@@ -109,7 +74,7 @@ namespace Testing
             
 
             Repository.Models.Topic newTopic = new Repository.Models.Topic();
-
+            Repository.Models.Comment inputGMUser = BusinessLogic.Mapper.NewCommentToNewRepoComment(dataSetA);
             using(var context = new Repository.Models.Cinephiliacs_ForumContext(dbOptions))
             {              
                 context.Database.EnsureDeleted();
@@ -117,12 +82,12 @@ namespace Testing
 
                 RepoLogic repoLogic = new RepoLogic(context, repoLogger);
 
-                Repository.Models.Comment inputGMUser = BusinessLogic.Mapper.NewCommentToNewRepoComment(dataSetA);
+                
 
                 result = await repoLogic.AddComment(inputGMUser);
             }
 
-            Assert.False(result);
+            Assert.Equal("false", result);
         }
 
         /// <summary>
