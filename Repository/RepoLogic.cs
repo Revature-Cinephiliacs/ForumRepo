@@ -28,19 +28,19 @@ namespace Repository
             _logger = logger;
         }
 
-        public async Task<bool> AddComment(Comment repoComment)
+        public async Task<string> AddComment(Comment repoComment)
         {
             var discussionExists = DiscussionExists(repoComment.DiscussionId);
             if (!discussionExists)
             {
                 _logger.LogWarning($"RepoLogic.AddComment() was called for a discussion that doesn't exist {repoComment.DiscussionId}.");
-                return false;
+                return "false";
             }
 
             await _dbContext.Comments.AddAsync(repoComment);
 
             await _dbContext.SaveChangesAsync();
-            return true;
+            return repoComment.CommentId;
         }
 
         public async Task<bool> AddTopic(Topic topic)
@@ -56,7 +56,7 @@ namespace Repository
             return true;
         }
 
-        public async Task<bool> AddDiscussion(Discussion repoDiscussion, Topic repoTopic)
+        public async Task<string> AddDiscussion(Discussion repoDiscussion, Topic repoTopic)
         {
             await _dbContext.Discussions.AddAsync(repoDiscussion);
 
@@ -69,15 +69,15 @@ namespace Repository
                      && d.UserId == repoDiscussion.UserId && d.Subject == repoDiscussion.Subject)
                     .FirstOrDefault<Discussion>()) == null)
                 {
-                    return true;
+                    return discussion.DiscussionId;
                 }
                 await AddDiscussionTopic(discussion.DiscussionId, repoTopic.TopicId);
-                return true;
+                return discussion.DiscussionId;
             }
             else
             {
                 await _dbContext.SaveChangesAsync();
-                return true;
+                return repoDiscussion.DiscussionId;
             }
         }
 
@@ -156,6 +156,12 @@ namespace Repository
         {
             return await _dbContext.DiscussionFollows.Include(x => x.Discussion).Where(x => x.UserId == userid).ToListAsync();
         }
+
+        public async Task<List<DiscussionFollow>> GetFollowDiscussionListByDiscussionId(string discussionid)
+        {
+            return await _dbContext.DiscussionFollows.Include(x => x.Discussion).Where(x => x.DiscussionId == discussionid).ToListAsync();
+        }
+
 
         public async Task<List<Comment>> GetMovieComments(string discussionid)
         {

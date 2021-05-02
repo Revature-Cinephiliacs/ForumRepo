@@ -17,17 +17,17 @@ namespace Repository
         /// </summary>
         /// <param name="repoComment"></param>
         /// <returns></returns>
-        Task<bool> AddComment(Comment repoComment);
+        Task<string> AddComment(Comment repoComment);
 
         /// <summary>
         /// Saving Discussion into database
-        /// Return ture if saved succeffully 
-        /// Return false if user or movie doesn't exist  
+        /// Return discussionid if saved succeffully 
+        /// Return empty if user or movie doesn't exist  
         /// </summary>
         /// <param name="repoDiscussion"></param>
         /// <param name="repoTopic"></param>
         /// <returns></returns>
-        Task<bool> AddDiscussion(Discussion repoDiscussion, Topic repoTopic);
+        Task<string> AddDiscussion(Discussion repoDiscussion, Topic repoTopic);
 
         /// <summary>
         /// Returns a list of all Comment objects from the database that match the discussion ID specified
@@ -183,6 +183,14 @@ namespace Repository
         /// <param name="userid"></param>
         /// <returns></returns>
         public Task<List<DiscussionFollow>> GetFollowDiscussionList(string userid);
+
+
+        /// <summary>
+        /// Returns a list of followed discussions based on userid
+        /// </summary>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
+        public Task<List<DiscussionFollow>> GetFollowDiscussionListByDiscussionId(string discussionid);
 
         /// <summary>
         /// Likes a comment

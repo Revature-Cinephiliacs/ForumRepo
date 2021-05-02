@@ -65,7 +65,7 @@ namespace Testing
         [Fact]
         public async Task NoDiscussionAddComment()
         {
-            bool result;
+            string result;
 
             NewComment dataSetA = new NewComment();
             dataSetA.Userid = "username1";
@@ -74,7 +74,7 @@ namespace Testing
             
 
             Repository.Models.Topic newTopic = new Repository.Models.Topic();
-
+            Repository.Models.Comment inputGMUser = BusinessLogic.Mapper.NewCommentToNewRepoComment(dataSetA);
             using(var context = new Repository.Models.Cinephiliacs_ForumContext(dbOptions))
             {              
                 context.Database.EnsureDeleted();
@@ -82,12 +82,12 @@ namespace Testing
 
                 RepoLogic repoLogic = new RepoLogic(context, repoLogger);
 
-                Repository.Models.Comment inputGMUser = BusinessLogic.Mapper.NewCommentToNewRepoComment(dataSetA);
+                
 
                 result = await repoLogic.AddComment(inputGMUser);
             }
 
-            Assert.False(result);
+            Assert.Equal("false", result);
         }
 
         /// <summary>

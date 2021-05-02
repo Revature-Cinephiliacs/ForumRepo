@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Json;
 
 namespace BusinessLogic
 {
@@ -160,6 +161,21 @@ namespace BusinessLogic
         }
 
         /// <summary>
+        /// Sends a notification to the movie api
+        /// </summary>
+        /// <param name="repoDisc"></param>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
+        public static async Task<bool> SendNotification(Repository.Models.Discussion repoDisc, string discussionid)
+        {
+            DiscussionNotification dn = new DiscussionNotification(repoDisc.MovieId, repoDisc.UserId, discussionid);
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.PostAsJsonAsync($"{_movieapi}notification/discussion", dn);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+
+        /// <summary>
         /// Gets the username of the user from the userapi using userid
         /// </summary>
         /// <param name="userid"></param>
@@ -167,14 +183,12 @@ namespace BusinessLogic
         public static async Task<string> GetUsernameFromAPI(string userid)
         {
             HttpClient client = new HttpClient();
-            string path = _userapi + userid;
+            string path = _userapi + "username/" + userid;
             HttpResponseMessage response = await client.GetAsync(path);
             if(response.IsSuccessStatusCode)
             {
                 string jsonContent = await response.Content.ReadAsStringAsync();
-                JObject json = JObject.Parse(jsonContent);
-                string username = json["username"].ToString();
-                return username;
+                return jsonContent;
             }
             else
             {
