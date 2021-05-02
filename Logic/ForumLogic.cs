@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using GlobalModels;
-using Logic;
 using Microsoft.Extensions.Logging;
 using Repository;
 
@@ -69,13 +70,13 @@ namespace BusinessLogic
 
             var repoDiscussion = Mapper.NewDiscussionToNewRepoDiscussion(discussion);
             var repoTopic = new Repository.Models.Topic();
+            repoTopic.TopicId = Guid.NewGuid().ToString();
             repoTopic.TopicName = discussion.Topic;
             var discussionId = await _repo.AddDiscussion(repoDiscussion, repoTopic);
 
             if (discussionId != null)
             {
-                DiscussionNotification dn = new DiscussionNotification(repoDiscussion.MovieId, repoDiscussion.UserId, discussionId);
-                await dn.SendNotification();
+                await Mapper.SendNotification(repoDiscussion, discussionId);
                 return true;
             }
                 

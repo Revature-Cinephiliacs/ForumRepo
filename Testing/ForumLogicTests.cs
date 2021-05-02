@@ -26,45 +26,7 @@ namespace Testing
         
         readonly ILogger<ForumLogic> logicLogger = new ServiceCollection().AddLogging().BuildServiceProvider().GetService<ILoggerFactory>().CreateLogger<ForumLogic>();
         readonly ILogger<RepoLogic> repoLogger = new ServiceCollection().AddLogging().BuildServiceProvider().GetService<ILoggerFactory>().CreateLogger<RepoLogic>();
-
-        [Fact]
-        public void CreateComment_WithCommentObject_ReturnTrue()
-        {
-            // Arrange
-            NewComment nc = new NewComment(Guid.NewGuid(), "def", "fgh", true, null);
-
-            repoStub.Setup(repo => repo.AddComment(It.IsAny<Repository.Models.Comment>())).ReturnsAsync("true");
-            var logic = new ForumLogic(repoStub.Object, logicLogger);
-
-            // Act
-            var result = logic.CreateComment(nc);
-
-            //Assert
-            Assert.True(result.Result);
-        }
-
-        [Fact]
-        public void CreateDiscussion_WithDiscusssionObject_ReturnTrue()
-        {
-            // Arrange
-            NewDiscussion nd = new NewDiscussion();
-            nd.Movieid = "any_string";
-            nd.Userid = "User Name";
-            nd.Subject = "Subject";
-            Repository.Models.Topic tp = new Repository.Models.Topic();
-            tp.TopicName = "Any Topic";
-            
-            repoStub.Setup(repo => repo.AddDiscussion(It.IsAny<Repository.Models.Discussion>(), It.IsAny<Repository.Models.Topic>())).ReturnsAsync("true");
-
-            var logic = new ForumLogic(repoStub.Object, logicLogger);
-
-            // Act
-            var result = logic.CreateDiscussion(nd);
-
-            //Assert
-            Assert.True(result.Result);
-        }
-
+        
         [Fact]
         public void GetDiscussions_WithUnExisintDiscussion_ReturnsNull()
         {
