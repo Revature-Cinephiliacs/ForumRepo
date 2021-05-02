@@ -167,13 +167,13 @@ namespace BusinessLogic
         public static async Task<string> GetUsernameFromAPI(string userid)
         {
             HttpClient client = new HttpClient();
-            string path = _userapi + userid;
+            string path = _userapi + "username/" + userid;
             HttpResponseMessage response = await client.GetAsync(path);
             if(response.IsSuccessStatusCode)
             {
                 string jsonContent = await response.Content.ReadAsStringAsync();
                 JObject json = JObject.Parse(jsonContent);
-                string username = json["username"].ToString();
+                string username = json.ToString();
                 return username;
             }
             else
