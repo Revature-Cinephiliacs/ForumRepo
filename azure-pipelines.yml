@@ -58,7 +58,7 @@ stages:
 
       - task: SonarCloudPrepare@1
         inputs:
-          SonarCloud: 'SonarCloudForum'
+          SonarCloud: 'ForumRepo'
           organization: 'revature-cinephiliacs'
           scannerMode: 'MSBuild'
           projectKey: 'Revature-Cinephiliacs_ForumRepo'
