@@ -6,7 +6,6 @@ using GlobalModels;
 using Logic;
 using Microsoft.Extensions.Logging;
 using Repository;
-using Repository.Models;
 
 namespace BusinessLogic
 {
@@ -52,7 +51,7 @@ namespace BusinessLogic
             if (commentId != null)
             {
                 CommentNotification cn = new CommentNotification(repoComment.UserId, repoComment.DiscussionId, commentId, followers);
-                cn.SendNotification();
+                await cn.SendNotification();
                 return true;
             }
             else
@@ -76,7 +75,7 @@ namespace BusinessLogic
             if (discussionId != null)
             {
                 DiscussionNotification dn = new DiscussionNotification(repoDiscussion.MovieId, repoDiscussion.UserId, discussionId);
-                dn.SendNotification();
+                await dn.SendNotification();
                 return true;
             }
                 
