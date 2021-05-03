@@ -173,7 +173,7 @@ namespace CineAPI.Controllers
         /// <param name="discussion"></param>
         /// <returns></returns>
         [HttpPost("discussion")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> CreateDiscussion([FromBody] NewDiscussion discussion)
         {
             if (!ModelState.IsValid)

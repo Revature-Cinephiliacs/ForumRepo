@@ -383,7 +383,6 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
                 tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
                 
             }
