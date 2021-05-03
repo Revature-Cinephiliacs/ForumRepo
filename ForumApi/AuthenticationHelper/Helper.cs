@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using RestSharp;
@@ -7,7 +8,7 @@ namespace ForumApi.AuthenticationHelper
 {
     static class Helper
     {
-        private static readonly string _authUrl = "https://localhost:5001/Authentication";
+        private static string _authUrl = "";
 
         /// <summary>
         /// Extract token from request
@@ -28,6 +29,14 @@ namespace ForumApi.AuthenticationHelper
         /// <returns>The response of the request</returns>
         public async static Task<IRestResponse> Sendrequest(string urlExtension, Method method, string token)
         {
+            if (Debugger.IsAttached)
+            {
+                Helper._authUrl = "https://localhost:5005/Authentication";
+            }
+            else
+            {
+                Helper._authUrl = "http://20.45.0.16/Authentication";
+            }
             var client = new RestClient(_authUrl + urlExtension);
             client.Timeout = -1;
             var request = new RestRequest(method);

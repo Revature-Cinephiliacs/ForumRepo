@@ -203,7 +203,7 @@ namespace CineAPI.Controllers
         public async Task<ActionResult> CreateComment([FromBody] NewComment comment)
         {
             System.Console.WriteLine("Form Controller: " + comment);
-            
+
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("ForumController.CreateComment() was called with invalid body data.");
@@ -219,7 +219,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
         }
-            
+
         /// <summary>
         /// Adds a new topic to the database
         /// Returns 201 if successful
@@ -306,7 +306,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             bool addSuccess = await _forumLogic.FollowDiscussion(discussionid, userid);
-            if(!addSuccess)
+            if (!addSuccess)
             {
                 return StatusCode(404);
             }
@@ -324,7 +324,6 @@ namespace CineAPI.Controllers
         /// <param name="userid"></param>
         /// <returns></returns>
         [HttpGet("discussions/follow/{userid}")]
-        [Authorize]
         public async Task<ActionResult<List<DiscussionT>>> FollowDiscussionList(string userid)
         {
             if (!ModelState.IsValid)
@@ -333,7 +332,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             List<DiscussionT> followList = await _forumLogic.GetFollowDiscList(userid);
-            if(followList == null)
+            if (followList == null)
             {
                 return StatusCode(204);
             }
@@ -350,7 +349,6 @@ namespace CineAPI.Controllers
         /// <param name="idList"></param>
         /// <returns></returns>
         [HttpPost("comment/reports")]
-        [Authorize("manage:awebsite")]
         public async Task<ActionResult<List<Comment>>> GetCommentReports([FromBody] List<string> idList)
         {
             if (!ModelState.IsValid)
@@ -359,11 +357,11 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             List<Comment> commentsList = await _forumLogic.GetCommentReports(idList);
-            if(commentsList == null)
+            if (commentsList == null)
             {
                 return StatusCode(404);
             }
-            if(commentsList.Count == 0)
+            if (commentsList.Count == 0)
             {
                 return StatusCode(204);
             }
@@ -380,7 +378,6 @@ namespace CineAPI.Controllers
         /// <param name="idList"></param>
         /// <returns></returns>
         [HttpPost("discussion/reports")]
-        [Authorize("manage:awebsite")]
         public async Task<ActionResult<List<DiscussionT>>> GetDisucssionReports([FromBody] List<string> idList)
         {
             if (!ModelState.IsValid)
@@ -389,11 +386,11 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             List<DiscussionT> discussionsList = await _forumLogic.GetDiscucssionReports(idList);
-            if(discussionsList == null)
+            if (discussionsList == null)
             {
                 return StatusCode(404);
             }
-            if(discussionsList.Count == 0)
+            if (discussionsList.Count == 0)
             {
                 return StatusCode(204);
             }
@@ -415,7 +412,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             Topic topic = await _forumLogic.GetTopicById(topicid);
-            if(topic == null)
+            if (topic == null)
             {
                 return StatusCode(404);
             }
@@ -437,7 +434,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             DiscussionT disc = await _forumLogic.GetDiscussionById(discId);
-            if(disc == null)
+            if (disc == null)
             {
                 return StatusCode(404);
             }
@@ -459,7 +456,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             Comment comment = await _forumLogic.GetCommentById(commentid);
-            if(comment == null)
+            if (comment == null)
             {
                 return StatusCode(404);
             }
@@ -485,7 +482,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             bool changedComment = await _forumLogic.ChangeSpoiler(commentid);
-            if(!changedComment)
+            if (!changedComment)
             {
                 return StatusCode(404);
             }
@@ -511,7 +508,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             bool delSuccess = await _forumLogic.DeleteComment(commentid);
-            if(!delSuccess)
+            if (!delSuccess)
             {
                 return StatusCode(404);
             }
@@ -537,7 +534,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             bool delSuccess = await _forumLogic.DeleteDiscussion(discussionid);
-            if(!delSuccess)
+            if (!delSuccess)
             {
                 return StatusCode(404);
             }
@@ -563,7 +560,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             bool delSuccess = await _forumLogic.DeleteTopic(topicid);
-            if(!delSuccess)
+            if (!delSuccess)
             {
                 return StatusCode(404);
             }
@@ -589,7 +586,7 @@ namespace CineAPI.Controllers
                 return StatusCode(400);
             }
             bool success = await _forumLogic.LikeComment(commentid, userid);
-            if(!success)
+            if (!success)
             {
                 return StatusCode(404);
             }
@@ -617,7 +614,7 @@ namespace CineAPI.Controllers
             }
 
             bool success = await _forumLogic.AddDiscussionTopic(discussionid, topicid);
-            if(!success)
+            if (!success)
             {
                 return StatusCode(404);
             }
@@ -633,16 +630,17 @@ namespace CineAPI.Controllers
         /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet("userdiscussion/{userId}")]
-        [Authorize]
-        public async Task<ActionResult<List<DiscussionT>>> GetDiscussionByUserId(string userId){
-             if (!ModelState.IsValid)
+        public async Task<ActionResult<List<DiscussionT>>> GetDiscussionByUserId(string userId)
+        {
+            if (!ModelState.IsValid)
             {
                 _logger.LogWarning("ForumController.GetDiscussionByUserId() was called with invalid body data.");
                 return StatusCode(400);
             }
 
             List<DiscussionT> NewDiscussions = await _forumLogic.GetDiscussionByUserId(userId);
-            if(NewDiscussions == null){
+            if (NewDiscussions == null)
+            {
 
                 return StatusCode(404);
             }
@@ -659,16 +657,17 @@ namespace CineAPI.Controllers
         /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet("usercomments/{userId}")]
-        [Authorize]
-        public async Task<ActionResult<List<Comment>>> GetCommentByUserId(string userId){
-             if (!ModelState.IsValid)
+        public async Task<ActionResult<List<Comment>>> GetCommentByUserId(string userId)
+        {
+            if (!ModelState.IsValid)
             {
                 _logger.LogWarning("ForumController.GetCommentByUserId() was called with invalid body data.");
                 return StatusCode(400);
             }
 
             List<Comment> newComments = await _forumLogic.GetCommentsByUserId(userId);
-            if(newComments == null){
+            if (newComments == null)
+            {
 
                 return StatusCode(404);
             }
