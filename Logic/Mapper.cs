@@ -170,7 +170,7 @@ namespace BusinessLogic
         {
             DiscussionNotification dn = new DiscussionNotification(repoDisc.MovieId, repoDisc.UserId, discussionid);
             HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.PostAsJsonAsync($"{_movieapi}notification/discussion", dn);
+            HttpResponseMessage response = await client.PostAsJsonAsync($"{_movieapi}discussion/notification", dn);
             response.EnsureSuccessStatusCode();
             return true;
         }
