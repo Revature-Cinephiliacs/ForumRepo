@@ -84,7 +84,7 @@ namespace BusinessLogic
                 return false;
         }
 
-        public async Task<List<Comment>> GetComments(Guid discussionid)
+        public async Task<List<GlobalModels.Comment>> GetComments(Guid discussionid)
         {
             List<Repository.Models.Comment> repoComments = await _repo.GetMovieComments(discussionid.ToString());
             if (repoComments == null)
@@ -93,7 +93,7 @@ namespace BusinessLogic
                 return null;
             }
 
-            List<Comment> comments = new List<Comment>();
+            List<GlobalModels.Comment> comments = new List<GlobalModels.Comment>();
             foreach (var repoComment in repoComments)
             {
                 comments.Add(await Task.Run(() => Mapper.RepoCommentToComment(repoComment)));
@@ -487,10 +487,10 @@ namespace BusinessLogic
             return await _repo.LikeComment(newLike);
         }
 
-        public async Task<List<Comment>> GetCommentReports(List<string> idList)
+        public async Task<List<GlobalModels.Comment>> GetCommentReports(List<string> idList)
         {
             List<Repository.Models.Comment> repoComments = await _repo.GetCommentReportList(idList);
-            List<Comment> listComments = new List<Comment>();
+            List<GlobalModels.Comment> listComments = new List<GlobalModels.Comment>();
             foreach(Repository.Models.Comment item in repoComments)
             {
                 listComments.Add(await Task.Run(() => Mapper.RepoCommentToComment(item)));
@@ -509,7 +509,7 @@ namespace BusinessLogic
             return listDisc;
         }
 
-        public async Task<Topic> GetTopicById(Guid topicid)
+        public async Task<GlobalModels.Topic> GetTopicById(Guid topicid)
         {
             Repository.Models.Topic topic = await _repo.GetTopicById(topicid.ToString());
             if(topic == null)
@@ -529,7 +529,7 @@ namespace BusinessLogic
             return await Mapper.RepoDiscussionToDiscussionT(repoDisc);
         }
 
-        public async Task<Comment> GetCommentById(Guid commentid)
+        public async Task<GlobalModels.Comment> GetCommentById(Guid commentid)
         {
             Repository.Models.Comment repoComment = await _repo.GetCommentById(commentid.ToString());
             if(repoComment == null)
@@ -558,7 +558,7 @@ namespace BusinessLogic
             return discussion;
         }
 
-        public async Task<List<Topic>> GetTopics()
+        public async Task<List<GlobalModels.Topic>> GetTopics()
         {
             var repoTopics = await _repo.GetTopics();
             if (repoTopics == null)
@@ -567,10 +567,10 @@ namespace BusinessLogic
                 return null;
             }
 
-            var topics = new List<Topic>();
+            var topics = new List<GlobalModels.Topic>();
             foreach (var repoTopic in repoTopics)
             {
-                var newTopic = new Topic(repoTopic.TopicId, repoTopic.TopicName);
+                var newTopic = new GlobalModels.Topic(repoTopic.TopicId, repoTopic.TopicName);
                 topics.Add(newTopic);
             }
             return topics;
@@ -589,12 +589,12 @@ namespace BusinessLogic
             return newDiscussionList;
         }
 
-        public async Task<List<Comment>> GetCommentsByUserId(string userId){
+        public async Task<List<GlobalModels.Comment>> GetCommentsByUserId(string userId){
             List<Repository.Models.Comment> comments = await _repo.GetCommentByUserId(userId);
-            List<Comment> newComments = new List<Comment>();
+            List<GlobalModels.Comment> newComments = new List<GlobalModels.Comment>();
             foreach (var item in comments)
             {
-                Comment comment = await Mapper.RepoCommentToComment(item);
+                GlobalModels.Comment comment = await Mapper.RepoCommentToComment(item);
                 newComments.Add(comment);
             }
             
