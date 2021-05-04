@@ -152,9 +152,10 @@ namespace Repository
             await _dbContext.SaveChangesAsync();
             return true;
         }
-        public async Task<List<DiscussionFollow>> GetFollowDiscussionList(string userid)
+        public async Task<List<Discussion>> GetFollowDiscussionList(string userid)
         {
-            return await _dbContext.DiscussionFollows.Include(x => x.Discussion).Where(x => x.UserId == userid).ToListAsync();
+           return await _dbContext.Discussions.Include(d => d.DiscussionFollows.Where(df => df.UserId == userid)).Include(d => d.DiscussionTopics).ThenInclude(dt => dt.Discussion).ToListAsync();
+          //  return await _dbContext.DiscussionFollows.Include(x => x.Discussion).Where(x => x.UserId == userid).ToListAsync();
         }
 
         public async Task<List<DiscussionFollow>> GetFollowDiscussionListByDiscussionId(string discussionid)
@@ -210,7 +211,7 @@ namespace Repository
 
         public async Task<List<Discussion>> GetMovieDiscussions(string movieid)
         {
-            return await _dbContext.Discussions.Where(d => d.MovieId == movieid).ToListAsync();
+            return await _dbContext.Discussions.Where(d => d.MovieId == movieid).Include(d => d.DiscussionTopics).ThenInclude(dt => dt.Discussion).ToListAsync();
         }
 
         public Topic GetDiscussionTopic(string discussionId)
@@ -228,7 +229,7 @@ namespace Repository
 
         public async Task<Discussion> GetDiscussion(string discussionid)
         {
-            return await _dbContext.Discussions.Where(d => d.DiscussionId == discussionid).Include(dis => dis.DiscussionTopics).FirstOrDefaultAsync<Discussion>();
+            return await _dbContext.Discussions.Where(d => d.DiscussionId == discussionid).Include(dis => dis.DiscussionTopics).ThenInclude(dt => dt.Discussion).FirstOrDefaultAsync<Discussion>();
         }
 
         public async Task<List<Topic>> GetTopics()
@@ -314,7 +315,7 @@ namespace Repository
 
         public async Task<Discussion> GetDiscussionsById(string discid)
         {
-            return await _dbContext.Discussions.FirstOrDefaultAsync(x => x.DiscussionId == discid);
+            return await _dbContext.Discussions.Include(d => d.DiscussionTopics).ThenInclude(dt => dt.Discussion).FirstOrDefaultAsync(x => x.DiscussionId == discid);
         }
 
         public async Task<Comment> GetCommentById(string commentid)
@@ -334,17 +335,17 @@ namespace Repository
 
         public async Task<List<Discussion>> GetSortedDiscussionsDescending()
         {
-            return await _dbContext.Discussions.Include(d => d.Comments).OrderByDescending(x => x.Comments.Count).ToListAsync<Discussion>();
+            return await _dbContext.Discussions.Include(d => d.Comments).OrderByDescending(x => x.Comments.Count).Include(d => d.DiscussionTopics).ThenInclude(dt => dt.Discussion).ToListAsync<Discussion>();
         }
         
         public async Task<List<Discussion>> GetSortedDiscussionsAscending()
         {
-            return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.Comments.Count).ToListAsync<Discussion>();
+            return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.Comments.Count).Include(d => d.DiscussionTopics).ThenInclude(dt => dt.Discussion).ToListAsync<Discussion>();
         }
 
         public async Task<List<Discussion>> GetSortedDiscussionsRecent()
         {
-            return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.CreationTime).ToListAsync<Discussion>();
+            return await _dbContext.Discussions.Include(d => d.Comments).OrderBy(x => x.CreationTime).Include(d => d.DiscussionTopics).ThenInclude(dt => dt.Discussion).ToListAsync<Discussion>();
         }
 
         public async Task<List<DiscussionTopic>> GetDiscussionsByTopicId(string topicid)
@@ -353,7 +354,7 @@ namespace Repository
         }
 
         public async Task<List<Discussion>> GetDiscussionsByUserId(string userId){
-            return await _dbContext.Discussions.Where(d => d.UserId == userId).ToListAsync<Discussion>();
+            return await _dbContext.Discussions.Where(d => d.UserId == userId).Include(d => d.DiscussionTopics).ThenInclude(dt => dt.Discussion).ToListAsync<Discussion>();
         }
 
         public async Task<List<Comment>> GetCommentByUserId(string userId){
