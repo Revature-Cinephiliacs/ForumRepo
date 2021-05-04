@@ -32,18 +32,15 @@ namespace ForumApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
                                 builder =>
                                 {
                                     builder.WithOrigins(
-                                        "http://20.94.137.143/", //Frontend
-                                        "http://20.189.29.112/", //Admintools
-                                        "http://20.45.2.119/", //User
-                                        "http://localhost:4200/", //for testing
+                                        "http://20.189.29.112", //Admintools
+                                        "http://20.45.2.119", //User
+                                        "http://localhost:4200", //for testing
                                         "https://cinephiliacsapp.azurewebsites.net",
                                         "https://cinephiliacs.org"
                                         )
@@ -51,7 +48,8 @@ namespace ForumApi
                                        .AllowAnyMethod();
                                 });
             });
-
+            services.AddControllers();
+            
             var myConnectionString = Configuration.GetConnectionString("Cinephiliacs_Forum");
             services.AddDbContext<Cinephiliacs_ForumContext>(
                 options => options.UseSqlServer(myConnectionString)
