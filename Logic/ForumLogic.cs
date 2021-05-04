@@ -71,8 +71,6 @@ namespace BusinessLogic
 
             var repoDiscussion = Mapper.NewDiscussionToNewRepoDiscussion(discussion);
             var repoTopic = await _repo.GetTopicById(discussion.Topic);
-            //repoTopic.TopicId = Guid.NewGuid().ToString();
-            //repoTopic.TopicName = discussion.Topic;
             var discussionId = await _repo.AddDiscussion(repoDiscussion, repoTopic);
 
             if (discussionId != null)
