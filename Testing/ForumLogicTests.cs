@@ -13,6 +13,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Autofac.Extras.Moq;
+using Castle.DynamicProxy.Generators.Emitters;
 
 namespace Testing
 {
@@ -37,21 +39,56 @@ namespace Testing
                 .ReturnsAsync(new string("abc"));
             var logic = new ForumLogic(repoStub.Object, loggerStub.Object);
             var result = logic.CreateComment(nc);
-            Assert.IsType<Task<bool>>(result);
+            Assert.IsType<Task<bool>>(result
+                );
            
         }
 
         [Fact]
-        public void CreateComment_ShouldBeFaultedWhenCommentIsNotSaved()
+        public async Task CreateComment_ShouldBeFaultedWhenCommentIsNotSaved()
         {
             NewComment nc = new() { Discussionid = Guid.NewGuid(), Isspoiler = true, ParentCommentid = "sde", Text = "klo", Userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3" };
 
             repoStub.Setup(rs => rs.AddComment(It.IsAny<Repository.Models.Comment>()))
                 .ReturnsAsync("abc");
             var logic = new ForumLogic(repoStub.Object, loggerStub.Object);
-            var result = logic.CreateComment(nc);
-            Assert.False(result.Result);
+            var result = await logic.CreateComment(nc);
+            Assert.False(result);
         }
+
+        [Fact]
+        public async Task GetComment_ShouldReturnComments()
+        {
+            NewComment nc = new() { Discussionid = Guid.NewGuid(), Isspoiler = true, ParentCommentid = "sde", Text = "klo", Userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3" };
+            var discussionId = Guid.NewGuid().ToString();
+            using (var mymock = AutoMock.GetLoose())
+            {
+                mymock.Mock<IRepoLogic>()
+                    .Setup(rep => rep.GetMovieComments("abc"))
+                    .ReturnsAsync(dummyComments());
+
+                var testclass =  mymock.Create<ForumLogic>();
+
+                var expected = dummyComments();
+
+                var actual = await testclass.GetComments(Guid.Parse(discussionId));
+
+                //Assert.True(actual != null);
+               Assert.Equal(expected.Count, actual.Count);
+            }
+        }
+
+        private List<Comment> dummyComments()
+        {
+            List<Comment> dc = new List<Comment>();
+
+            dc.Add(new Comment { CommentId = "abcd" });
+            dc.Add(new Comment { CommentId = "def" });
+
+            return dc;
+        }
+
+
 
         [Fact]
         public void GetDiscussions_WithUnExisintDiscussion_ReturnsNull()
@@ -194,5 +231,78 @@ namespace Testing
 
             Assert.Null(listComments);
         }
+
+        [Fact]
+        public async Task CreateComments_ShouldReturnsTrueIfNewCommentIsPassed()
+        {
+           
+           
+            NewComment newComment = new NewComment();
+           
+          
+            newComment.Discussionid = Guid.NewGuid();
+            newComment.Isspoiler = false;
+        
+            newComment.ParentCommentid = null;
+            newComment.Userid = Guid.NewGuid().ToString();
+          
+            using (var context = new Cinephiliacs_ForumContext(dbOptions))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+              
+               
+                context.SaveChanges();
+            }
+
+            List<GlobalModels.Comment> listComments;
+            using (var context1 = new Cinephiliacs_ForumContext(dbOptions))
+            {
+                context1.Database.EnsureCreated();
+
+                RepoLogic repo = new RepoLogic(context1, repoLogger);
+                ForumLogic logic = new ForumLogic(repo, logicLogger);
+
+                bool result = await logic.CreateComment(newComment);
+
+                Assert.True(result == true);
+            }
+
+          
+        }
+
+        [Fact]
+        public async Task CreateComments_ShouldFalseTrueIfNoCommentIsPassed()
+        {
+
+
+            using (var context = new Cinephiliacs_ForumContext(dbOptions))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+
+
+                context.SaveChanges();
+            }
+
+            List<GlobalModels.Comment> listComments;
+            using (var context1 = new Cinephiliacs_ForumContext(dbOptions))
+            {
+                context1.Database.EnsureCreated();
+
+                RepoLogic repo = new RepoLogic(context1, repoLogger);
+                ForumLogic logic = new ForumLogic(repo, logicLogger);
+
+                bool result = await logic.CreateComment(new NewComment());
+
+                Assert.True(result);
+            }
+
+
+        }
     }
+
+
 }
