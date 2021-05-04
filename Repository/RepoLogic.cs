@@ -350,7 +350,7 @@ namespace Repository
 
         public async Task<List<DiscussionTopic>> GetDiscussionsByTopicId(string topicid)
         {
-            return await _dbContext.DiscussionTopics.Include(dis => dis.Discussion).ThenInclude(c => c.Comments).Where(x => x.TopicId == topicid).ToListAsync<DiscussionTopic>();
+            return await _dbContext.DiscussionTopics.Include(x => x.Discussion).Where(x => x.TopicId == topicid).ToListAsync<DiscussionTopic>();
         }
 
         public async Task<List<Discussion>> GetDiscussionsByUserId(string userId){

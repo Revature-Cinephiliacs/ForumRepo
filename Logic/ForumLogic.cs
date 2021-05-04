@@ -441,7 +441,7 @@ namespace BusinessLogic
 
             foreach(Repository.Models.DiscussionTopic dt in repoDiscussionTopics)
             {
-                globalDiscussions.Add(dt.Discussion);
+                await Task.Run(() => globalDiscussions.Add(dt.Discussion));
             }
 
             List<DiscussionT> newDiscussions = new List<DiscussionT>();
