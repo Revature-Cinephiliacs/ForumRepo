@@ -43,7 +43,9 @@ namespace ForumApi
                                         "http://20.94.137.143/", //Frontend
                                         "http://20.189.29.112/", //Admintools
                                         "http://20.45.2.119/", //User
-                                        "http://localhost:4200/"
+                                        "http://localhost:4200/", //for testing
+                                        "https://cinephiliacsapp.azurewebsites.net",
+                                        "https://cinephiliacs.org"
                                         )
                                        .AllowAnyHeader()
                                        .AllowAnyMethod();

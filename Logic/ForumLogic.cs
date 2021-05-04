@@ -51,12 +51,13 @@ namespace BusinessLogic
             }
             if (commentId != null)
             {
-                CommentNotification cn = new CommentNotification(repoComment.UserId, repoComment.DiscussionId, commentId, followers);
-                await cn.SendNotification();
+                await Mapper.SendCommentNotification(repoComment, followers);
                 return true;
             }
             else
+            {
                 return false;
+            }
         }
 
         public async Task<bool> CreateDiscussion(NewDiscussion discussion)
@@ -76,12 +77,13 @@ namespace BusinessLogic
 
             if (discussionId != null)
             {
-                await Mapper.SendNotification(repoDiscussion, discussionId);
+                await Mapper.SendDiscussionNotification(repoDiscussion, discussionId);
                 return true;
             }
-                
             else
+            {
                 return false;
+            }
         }
 
         public async Task<List<GlobalModels.Comment>> GetComments(Guid discussionid)
@@ -383,7 +385,6 @@ namespace BusinessLogic
                     topic = new Repository.Models.Topic();
                     topic.TopicName = "None";
                 }
-                discussions.Add(await Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
                 tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(repoDiscussion)));
                 
             }
