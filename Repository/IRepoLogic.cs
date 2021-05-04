@@ -60,6 +60,13 @@ namespace Repository
         /// <returns></returns>
         public Task<List<Discussion>> GetMovieDiscussions(string movieid);
 
+        // /// <summary>
+        // /// Gets a topic from the database based on the topic name
+        // /// </summary>
+        // /// <param name="topic"></param>
+        // /// <returns></returns>
+        // public Task<Topic> GetTopicByName(string topic);
+
         /// <summary>
         /// Returns the Topic object from the database that matches the discussionId specified
         /// in the argument. Returns null if the discussionid doesn't exist or that discussion
