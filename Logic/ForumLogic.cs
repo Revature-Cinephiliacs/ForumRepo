@@ -488,16 +488,16 @@ namespace BusinessLogic
 
         public async Task<List<DiscussionT>> GetFollowDiscList(string userid)
         {
-            List<Repository.Models.Discussion> repoFollow = await _repo.GetFollowDiscussionList(userid);
+            List<Repository.Models.DiscussionFollow> repoFollow = await _repo.GetFollowDiscussionList(userid);
             if(repoFollow == null)
             {
                 return null;
             }
             List<DiscussionT> allDisc = new List<DiscussionT>();
             List<Task<DiscussionT>> tasks = new List<Task<DiscussionT>>();
-            foreach(Repository.Models.Discussion disc in repoFollow)
+            foreach(Repository.Models.DiscussionFollow disc in repoFollow)
             {
-                tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(disc)));
+                tasks.Add(Task.Run(() => Mapper.RepoDiscussionToDiscussionT(disc.Discussion)));
             }
             var results = await Task.WhenAll(tasks);
             foreach(var item in results)

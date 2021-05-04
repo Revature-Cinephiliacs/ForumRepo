@@ -152,10 +152,10 @@ namespace Repository
             await _dbContext.SaveChangesAsync();
             return true;
         }
-        public async Task<List<Discussion>> GetFollowDiscussionList(string userid)
+        public async Task<List<DiscussionFollow>> GetFollowDiscussionList(string userid)
         {
-           return await _dbContext.Discussions.Include(d => d.DiscussionFollows.Where(df => df.UserId == userid)).Include(d => d.DiscussionTopics).ThenInclude(dt => dt.Discussion).ToListAsync();
-          //  return await _dbContext.DiscussionFollows.Include(x => x.Discussion).Where(x => x.UserId == userid).ToListAsync();
+           //return await _dbContext.Discussions.Include(d => d.DiscussionFollows.Where(df => df.UserId == userid)).Include(d => d.DiscussionTopics).ThenInclude(dt => dt.Discussion).ToListAsync();
+            return await _dbContext.DiscussionFollows.Include(x => x.Discussion).Where(x => x.UserId == userid).ToListAsync();
         }
 
         public async Task<List<DiscussionFollow>> GetFollowDiscussionListByDiscussionId(string discussionid)
