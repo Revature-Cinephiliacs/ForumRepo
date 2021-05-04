@@ -14,41 +14,19 @@ namespace GlobalModels
     /// <value></value>
     public class DiscussionNotification
     {
-        public string Movieid { get; set; }
-        public string Userid { get; set; }
+        public string Imdbid { get; set; }
+        public string Usernameid { get; set; }
         public string Discussionid { get; set; }
-        
-        static HttpClient client = new HttpClient();
     
         public DiscussionNotification(string movieid, string userid, string discussionid)
         {
-            Movieid = movieid;
-            Userid = userid;
+            Imdbid = movieid;
+            Usernameid = userid;
             Discussionid = discussionid;
         }
 
         public DiscussionNotification()
         {
         }
-        /// <summary>
-        /// posts notifications to Movie Api on given url.
-        /// return the Uri of successful post action
-        /// </summary>
-        /// <value></value>
-        public async Task<Uri> SendNotification()
-        {
-            DiscussionNotification dn = new();
-            dn.Movieid = this.Movieid;
-            dn.Userid = this.Userid;
-            dn.Discussionid = this.Discussionid;
-
-            HttpResponseMessage response = await client.PostAsJsonAsync(
-        "http://20.94.153.81/Movie/notification/discussion", dn);
-            response.EnsureSuccessStatusCode();
-
-            // return URI of the created resource.
-            return response.Headers.Location;
-        }
-
     }
 }

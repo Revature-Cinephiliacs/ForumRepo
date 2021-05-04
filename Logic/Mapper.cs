@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace BusinessLogic
 {
@@ -161,18 +163,55 @@ namespace BusinessLogic
         }
 
         /// <summary>
-        /// Sends a notification to the movie api
+        /// Sends a notification to the movie api for a new discussion
         /// </summary>
         /// <param name="repoDisc"></param>
         /// <param name="discussionid"></param>
         /// <returns></returns>
-        public static async Task<bool> SendNotification(Repository.Models.Discussion repoDisc, string discussionid)
+        public static async Task<bool> SendDiscussionNotification(Repository.Models.Discussion repoDisc, string discussionid)
         {
             DiscussionNotification dn = new DiscussionNotification(repoDisc.MovieId, repoDisc.UserId, discussionid);
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.PostAsJsonAsync($"{_movieapi}discussion/notification", dn);
-            response.EnsureSuccessStatusCode();
-            return true;
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient(clientHandler);
+            string path = $"{_movieapi}discussion/notification";
+            var json = JsonConvert.SerializeObject(dn);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync(path, data);
+            if(response.IsSuccessStatusCode)
+            {   
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Sends a notification to the user api about a new comment
+        /// </summary>
+        /// <param name="repoDisc"></param>
+        /// <param name="discussionid"></param>
+        /// <returns></returns>
+        public static async Task<bool> SendCommentNotification(Repository.Models.Comment repoComment, List<string> followers)
+        {
+            CommentNotification cn = new CommentNotification(repoComment.UserId, repoComment.CommentId, followers);
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient client = new HttpClient(clientHandler);
+            string path = $"{_userapi}notification/comment";
+            var json = JsonConvert.SerializeObject(cn);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync(path, data);
+            if(response.IsSuccessStatusCode)
+            {   
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>

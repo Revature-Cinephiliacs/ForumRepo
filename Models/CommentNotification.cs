@@ -14,47 +14,20 @@ namespace GlobalModels
         /// Facillitates passing of notifications.
         /// </summary>
         /// <value></value>
-       
         public string Usernameid { get; set; }
-        public string DiscussionId { get; set; }
         public string CommentId { get; set; }
         public List<string> Followers { get; set; }
-        static HttpClient client = new HttpClient();
+
         public CommentNotification()
         {
 
         }
-        public CommentNotification(string userid, string discussionid, string commentid, List<string> followers)
+        public CommentNotification(string userid, string commentid, List<string> followers)
         {
            
             Usernameid = userid;
-            DiscussionId = discussionid;
             CommentId = commentid;
             Followers = followers;
-        }
-
-        /// <summary>
-        /// posts notifications to User Api on given url.
-        /// return the Uri of successful post action
-        /// </summary>
-        /// <value></value>
-
-        public async Task<Uri> SendNotification()
-        {
-            CommentNotification cn = new();
-            
-            cn.Usernameid = this.Usernameid;
-            cn.DiscussionId = this.DiscussionId;
-            cn.CommentId = this.CommentId;
-            cn.Followers = this.Followers;
-           
-
-            HttpResponseMessage response = await client.PostAsJsonAsync(
-        "http://20.45.2.119/User/notification/comment", cn);
-            response.EnsureSuccessStatusCode();
-
-            // return URI of the created resource.
-            return response.Headers.Location;
         }
     }
 }
