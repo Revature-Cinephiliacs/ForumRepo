@@ -38,9 +38,9 @@ namespace ForumApi
                                 builder =>
                                 {
                                     builder.WithOrigins(
-                                        "http://20.189.29.112/", //Admintools
-                                        "http://20.45.2.119/", //User
-                                        "http://localhost:4200/", //for testing
+                                        "http://20.189.29.112", //Admintools
+                                        "http://20.45.2.119", //User
+                                        "http://localhost:4200", //for testing
                                         "https://cinephiliacsapp.azurewebsites.net",
                                         "https://cinephiliacs.org"
                                         )
