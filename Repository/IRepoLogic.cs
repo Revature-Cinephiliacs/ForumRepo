@@ -182,7 +182,7 @@ namespace Repository
         /// </summary>
         /// <param name="userid"></param>
         /// <returns></returns>
-        public Task<List<Discussion>> GetFollowDiscussionList(string userid);
+        public Task<List<DiscussionFollow>> GetFollowDiscussionList(string userid);
 
 
         /// <summary>
