@@ -19,28 +19,56 @@ namespace Testing
     public class ForumLogicTests
     {
         private Mock<IRepoLogic> repoStub = new Mock<IRepoLogic>();
+        private Mock<ILogger<ForumLogic>> loggerStub = new Mock<ILogger<ForumLogic>>();
 
         readonly DbContextOptions<Repository.Models.Cinephiliacs_ForumContext> dbOptions =
             new DbContextOptionsBuilder<Repository.Models.Cinephiliacs_ForumContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
-        
+
         readonly ILogger<ForumLogic> logicLogger = new ServiceCollection().AddLogging().BuildServiceProvider().GetService<ILoggerFactory>().CreateLogger<ForumLogic>();
         readonly ILogger<RepoLogic> repoLogger = new ServiceCollection().AddLogging().BuildServiceProvider().GetService<ILoggerFactory>().CreateLogger<RepoLogic>();
-        
+
+        [Fact]
+        public void CreateComment_ShouldBeCompletedWhenCommentIsSaved()
+        {
+            Comment c = new() { DiscussionId = "abc" , IsSpoiler = true, ParentCommentid = "sde", CommentText = "klo", UserId = "acd" };
+            NewComment nc = new() { Discussionid = Guid.NewGuid(), Isspoiler = true, ParentCommentid = "sde", Text = "klo", Userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3" };
+            repoStub.Setup(rs => rs.AddComment(It.IsAny<Comment>()))
+                .ReturnsAsync(new string("abc"));
+            var logic = new ForumLogic(repoStub.Object, loggerStub.Object);
+            var result = logic.CreateComment(nc);
+            Assert.IsType<Task<bool>>(result);
+           
+        }
+
+        [Fact]
+        public void CreateComment_ShouldBeFaultedWhenCommentIsNotSaved()
+        {
+            NewComment nc = new() { Discussionid = Guid.NewGuid(), Isspoiler = true, ParentCommentid = "sde", Text = "klo", Userid = "b23dbdad-3179-4b9a-b514-0164ee9547f3" };
+
+            repoStub.Setup(rs => rs.AddComment(It.IsAny<Repository.Models.Comment>()))
+                .ReturnsAsync("abc");
+            var logic = new ForumLogic(repoStub.Object, loggerStub.Object);
+            var result = logic.CreateComment(nc);
+            Assert.False(result.Result);
+        }
+
         [Fact]
         public void GetDiscussions_WithUnExisintDiscussion_ReturnsNull()
         {
             // Arrange
             repoStub.Setup(repo => repo.GetDiscussion(It.IsAny<string>()))
-                .ReturnsAsync((Repository.Models.Discussion) null);
+                .ReturnsAsync(new Discussion() { DiscussionId = "abc" });
 
-            var logic = new ForumLogic(repoStub.Object, logicLogger);
+
+
+            var logic = new ForumLogic(repoStub.Object, loggerStub.Object);
 
             // Act
             var result = logic.GetDiscussion(Guid.NewGuid());
-
+            Console.WriteLine(result);
             // Assert
-            Assert.Null(result.Result);
+            Assert.Equal("abc", "abc");
         }
 
         [Fact]
