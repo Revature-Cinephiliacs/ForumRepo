@@ -17,6 +17,10 @@ namespace Repository
         private readonly Cinephiliacs_ForumContext _dbContext;
         private readonly ILogger<RepoLogic> _logger;
 
+        public RepoLogic()
+        {
+
+        }
         public RepoLogic(Cinephiliacs_ForumContext dbContext)
         {
             _dbContext = dbContext;

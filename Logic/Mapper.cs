@@ -130,7 +130,7 @@ namespace BusinessLogic
             
             foreach (var top in dis.DiscussionTopics)
             {
-                gdis.DiscussionTopics.Add(top.TopicId);
+               gdis.DiscussionTopics.Add(top.TopicId);
             }
 
             return gdis;
