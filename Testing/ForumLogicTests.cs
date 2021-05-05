@@ -13,35 +13,21 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Autofac.Extras.Moq;
+using Castle.DynamicProxy.Generators.Emitters;
 
 namespace Testing
 {
     public class ForumLogicTests
     {
-        private Mock<IRepoLogic> repoStub = new Mock<IRepoLogic>();
-
+     
         readonly DbContextOptions<Repository.Models.Cinephiliacs_ForumContext> dbOptions =
             new DbContextOptionsBuilder<Repository.Models.Cinephiliacs_ForumContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
-        
+
         readonly ILogger<ForumLogic> logicLogger = new ServiceCollection().AddLogging().BuildServiceProvider().GetService<ILoggerFactory>().CreateLogger<ForumLogic>();
         readonly ILogger<RepoLogic> repoLogger = new ServiceCollection().AddLogging().BuildServiceProvider().GetService<ILoggerFactory>().CreateLogger<RepoLogic>();
-        
-        [Fact]
-        public void GetDiscussions_WithUnExisintDiscussion_ReturnsNull()
-        {
-            // Arrange
-            repoStub.Setup(repo => repo.GetDiscussion(It.IsAny<string>()))
-                .ReturnsAsync((Repository.Models.Discussion) null);
 
-            var logic = new ForumLogic(repoStub.Object, logicLogger);
-
-            // Act
-            var result = logic.GetDiscussion(Guid.NewGuid());
-
-            // Assert
-            Assert.Null(result.Result);
-        }
 
         [Fact]
         public async Task GetComments_ReturnsList()
@@ -166,5 +152,8 @@ namespace Testing
 
             Assert.Null(listComments);
         }
+
     }
+
+
 }
