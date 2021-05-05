@@ -380,21 +380,6 @@ namespace Testing
         }
 
         [Fact]
-        public async Task GetFollowDiscussionList_ReturnsDiscussionTList()
-        {
-            var userid = Guid.NewGuid();
-           
-
-            repoStub.Setup(rp => rp.GetFollowDiscussionList(userid.ToString()))
-                .ReturnsAsync(dummyDiscussion());
-
-
-            var actual = await _sut.GetFollowDiscList(userid.ToString());
-
-            Assert.Equal(2, actual.Count);
-        }
-
-        [Fact]
         public async Task LikeComment_ReturnsFalse()
         {
             var userid = Guid.NewGuid();

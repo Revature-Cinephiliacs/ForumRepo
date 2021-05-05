@@ -320,33 +320,7 @@ namespace Testing
             }
             Assert.False(result);
         }
-        [Fact]
-        public async Task TestListDiscussion()
-        {
-            Discussion discussion1 = new Discussion()
-                {DiscussionId = "123", Totalikes = 23,UserId = "123"};
-            Discussion discussion2 = new Discussion()
-                {DiscussionId = "1234", Totalikes = 234,UserId = "123"};
 
-           
-            using (var context1 = new Cinephiliacs_ForumContext(dbOptions))
-            {
-                context1.Database.EnsureDeleted();
-                context1.Database.EnsureCreated();
-                context1.Discussions.Add(discussion1);
-                context1.Discussions.Add(discussion2);
-                context1.SaveChanges();
-            }
-
-            List<Discussion> result;
-            using (var context2 = new Cinephiliacs_ForumContext(dbOptions))
-            {
-                context2.Database.EnsureCreated();
-                var msr = new RepoLogic(context2, repoLogger);
-                result = await msr.GetFollowDiscussionList("123");
-            }
-            Assert.Equal(2,result.Count);
-        }
         [Fact]
         public async Task TestGetFollowDiscussionByDiscussionId()
         {
