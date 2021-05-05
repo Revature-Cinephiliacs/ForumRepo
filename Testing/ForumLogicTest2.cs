@@ -216,5 +216,199 @@ namespace Testing
             return dt;
         }
 
+        private List<Discussion> dummyDiscussion()
+        {
+            var dt = new List<Discussion>
+            {
+                new Discussion
+                {
+                    DiscussionId = "5ad44605-d029-45b1-8f45-201a8299b634",
+                    MovieId = "tt0848228",
+                    UserId = "TestUser",
+                    CreationTime = DateTime.Now,
+                    Subject = "Running out of Topics",
+                    Totalikes = 0,
+                    Comments = { },
+
+                },
+                new Discussion
+                {
+                    DiscussionId = "4ad44605-d029-45b1-8f45-201a8299b634",
+                    MovieId = "tt0844228",
+                    UserId = "TestUse4r",
+                    CreationTime = DateTime.Now,
+                    Subject = "Running4 out of Topics",
+                    Totalikes = 0,
+                    Comments = { },
+
+                    DiscussionTopics =
+                    { 
+                    }
+
+                },
+
+            };
+
+            return dt;
+        }
+
+        [Fact]
+        public async Task GetSortedDiscussionsByComments_ReturnDiscussions()
+        {
+           
+            repoStub.Setup(rp => rp.GetSortedDiscussionsAscending())
+                .ReturnsAsync(dummyDiscussion());
+           
+            repoStub.Setup(rp => rp.GetSortedDiscussionsDescending())
+                    .ReturnsAsync(dummyDiscussion()); 
+           
+            repoStub.Setup(rp => rp.GetSortedDiscussionsRecent())
+                .ReturnsAsync(dummyDiscussion()); 
+           
+
+            var actuala = await _sut.GetSortedDiscussionsByComments("a");
+            var actuald = await _sut.GetSortedDiscussionsByComments("d");
+            var actualr = await _sut.GetSortedDiscussionsByComments("r");
+
+            Assert.Equal(2, actuala.Count);
+            Assert.Equal(2, actuald.Count);
+            Assert.Equal(2, actualr.Count);
+        }
+
+        private List<DiscussionTopic> dummyDiscussionTopics()
+        {
+            var dtlist = new List<DiscussionTopic>
+            {
+                new DiscussionTopic { TopicId = Guid.NewGuid().ToString(), DiscussionId = Guid.NewGuid().ToString(), Discussion = dummyDiscussion()[0]},
+                new DiscussionTopic { TopicId = Guid.NewGuid().ToString(),  DiscussionId = Guid.NewGuid().ToString(),  Discussion = dummyDiscussion()[1] }
+
+            };
+            return dtlist;
+        }
+
+
+        [Fact]
+        public async Task GetSortedDiscussionsByTopicId_ReturnDiscussions()
+        {
+            var topiclist = new List<Repository.Models.Topic>
+            {
+                new Repository.Models.Topic { TopicId = Guid.NewGuid().ToString(), TopicName = "cde" },
+                new Repository.Models.Topic { TopicId = Guid.NewGuid().ToString(), TopicName = "cde2" }
+
+            };
+
+            repoStub.Setup(rp => rp.GetDiscussionsByTopicId(topiclist[0].TopicId))
+                .ReturnsAsync(dummyDiscussionTopics());
+
+         
+            var actual = await _sut.GetDiscussionsByTopicId(topiclist[0].TopicId);
+           
+            Assert.Equal(2, actual.Count);
+        }
+
+        [Fact]
+        public async Task ChangSpoiler_ReturnsTrue()
+        {
+            var commentid = Guid.NewGuid();
+
+            repoStub.Setup(rp => rp.ChangeCommentSpoiler(commentid.ToString()))
+                .ReturnsAsync(true);
+
+
+            var actual = await _sut.ChangeSpoiler(commentid);
+
+            Assert.True(actual);
+        }
+
+
+        [Fact]
+        public async Task DeleteComment_ReturnsTrue()
+        {
+            var commentid = Guid.NewGuid();
+
+            repoStub.Setup(rp => rp.DeleteComment(commentid.ToString()))
+                .ReturnsAsync(true);
+
+
+            var actual = await _sut.DeleteComment(commentid);
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public async Task DeleteDiscussion_ReturnsTrue()
+        {
+            var discussionid = Guid.NewGuid();
+
+            repoStub.Setup(rp => rp.DeleteDiscussion(discussionid.ToString()))
+                .ReturnsAsync(true);
+
+
+            var actual = await _sut.DeleteDiscussion(discussionid);
+
+            Assert.True(actual);
+        }
+
+
+        [Fact]
+        public async Task DeleteTopic_ReturnsTrue()
+        {
+            var topicid = Guid.NewGuid();
+
+            repoStub.Setup(rp => rp.DeleteTopic(topicid.ToString()))
+                .ReturnsAsync(true);
+
+
+            var actual = await _sut.DeleteTopic(topicid);
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public async Task FollowDiscussion_ReturnsFalse()
+        {
+            var userid = Guid.NewGuid();
+            var discussionid = Guid.NewGuid();
+
+            repoStub.Setup(rp => rp.FollowDiscussion(new DiscussionFollow { DiscussionId = discussionid.ToString(), UserId = userid.ToString() }))
+                .ReturnsAsync(true);
+
+
+            var actual = await _sut.FollowDiscussion(discussionid, userid.ToString());
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        public async Task GetFollowDiscussionList_ReturnsDiscussionTList()
+        {
+            var userid = Guid.NewGuid();
+           
+
+            repoStub.Setup(rp => rp.GetFollowDiscussionList(userid.ToString()))
+                .ReturnsAsync(dummyDiscussion());
+
+
+            var actual = await _sut.GetFollowDiscList(userid.ToString());
+
+            Assert.Equal(2, actual.Count);
+        }
+
+        [Fact]
+        public async Task LikeComment_ReturnsFalse()
+        {
+            var userid = Guid.NewGuid();
+            var commentid = Guid.NewGuid();
+           
+
+
+            repoStub.Setup(rp => rp.LikeComment(new UserLike { CommentId = commentid.ToString(), UserId = userid.ToString() }))
+                .ReturnsAsync(true);
+
+
+            var actual = await _sut.LikeComment(commentid, userid.ToString());
+
+            Assert.False(actual);
+        }
     }
 }
