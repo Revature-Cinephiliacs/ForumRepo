@@ -21,7 +21,6 @@ namespace GlobalModels
         public string Subject { get; set; }
 
         [Required]
-        [StringLength(50)]
         public string Topic { get; set; }
         public NewDiscussion()
         {
