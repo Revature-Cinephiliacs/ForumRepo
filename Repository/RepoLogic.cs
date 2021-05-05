@@ -98,6 +98,15 @@ namespace Repository
             await _dbContext.SaveChangesAsync();
 
             return true;
+        } 
+
+        private async Task DeleteCommentDiscussion(string commentid)
+        {
+            Comment theComment = await _dbContext.Comments.FirstOrDefaultAsync(x => x.CommentId == commentid);
+            List<UserLike> likes = _dbContext.UserLikes.Where(x => x.CommentId == commentid).ToList();
+            _dbContext.UserLikes.RemoveRange(likes);
+            _dbContext.Comments.Remove(theComment);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<bool> DeleteDiscussion(string discussionid)
@@ -113,7 +122,10 @@ namespace Repository
             await _dbContext.SaveChangesAsync();
 
             List<Comment> discComments = await _dbContext.Comments.Where(x => x.DiscussionId == discussionid).ToListAsync();
-            _dbContext.Comments.RemoveRange(discComments);
+            foreach(Comment comm in discComments)
+            {
+                await DeleteCommentDiscussion(comm.CommentId);
+            }
             await _dbContext.SaveChangesAsync();
 
             List<DiscussionFollow> discFollows = await _dbContext.DiscussionFollows.Where(x => x.DiscussionId == discussionid).ToListAsync();
