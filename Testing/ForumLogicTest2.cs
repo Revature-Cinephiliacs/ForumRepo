@@ -395,20 +395,132 @@ namespace Testing
         }
 
         [Fact]
-        public async Task LikeComment_ReturnsFalse()
+        public async Task LikeComment_ReturnsTrue()
         {
             var userid = Guid.NewGuid();
             var commentid = Guid.NewGuid();
            
 
 
-            repoStub.Setup(rp => rp.LikeComment(new UserLike { CommentId = commentid.ToString(), UserId = userid.ToString() }))
+            repoStub.Setup(rp => rp.LikeComment(It.IsAny<UserLike>()))
                 .ReturnsAsync(true);
 
 
             var actual = await _sut.LikeComment(commentid, userid.ToString());
 
-            Assert.False(actual);
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public async Task GetCommentReports_ReturnsComments()
+        {
+            var idlist = new List<string>
+            {
+               "abc",
+               "def"
+            };
+        
+
+            repoStub.Setup(rp => rp.GetCommentReportList(It.IsAny<List<string>>()))
+                .Returns(dummyComments());
+
+
+            var actual = await _sut.GetCommentReports(idlist);
+
+            Assert.Equal(3, actual.Count);
+        }
+
+
+        [Fact]
+        public async Task GetDiscussionReports_ReturnsDiscussionList()
+        {
+            var idlist = new List<string>
+            {
+               "abc",
+               "def"
+            };
+
+
+            repoStub.Setup(rp => rp.GetDiscussionReportList(It.IsAny<List<string>>()))
+                .ReturnsAsync(dummyDiscussion());
+
+
+            var actual = await _sut.GetDiscucssionReports(idlist);
+
+            Assert.Equal(2, actual.Count);
+        }
+
+
+        [Fact]
+        public async Task GetTopicByID_ReturnsGlobalModelTopic()
+        {
+            var topicid = Guid.NewGuid();
+
+
+            repoStub.Setup(rp => rp.GetTopicById(It.IsAny<string>()))
+                .ReturnsAsync(dummyTopics()[0]);
+
+           
+            var actual = await _sut.GetTopicById(topicid);
+
+            Assert.IsType<GlobalModels.Topic>(actual);
+        }
+
+        private List<Repository.Models.Topic> dummyTopics()
+        {
+            var tlist =  new List<Repository.Models.Topic>
+            {
+                new Repository.Models.Topic { TopicId = Guid.NewGuid().ToString(), TopicName="topic1", DiscussionTopics = dummyDiscussionTopics() },
+                 new Repository.Models.Topic { TopicId = Guid.NewGuid().ToString(), TopicName="topic2", DiscussionTopics = dummyDiscussionTopics()}
+            };
+
+            return tlist;
+        }
+
+        [Fact]
+        public async Task GetDiscussionByID_ReturnsDiscussionT()
+        {
+            var discid = Guid.NewGuid();
+
+
+            repoStub.Setup(rp => rp.GetDiscussionsById(It.IsAny<string>()))
+                .ReturnsAsync(dummyDiscussion()[0]);
+
+
+            var actual = await _sut.GetDiscussionById(discid);
+
+            Assert.IsType<GlobalModels.DiscussionT>(actual);
+        }
+
+        [Fact]
+        public async Task GetCommentByID_ReturnsModelComment()
+        {
+            var commentid = Guid.NewGuid();
+            var dummyComment = dummyComments().Result[0];
+
+            repoStub.Setup(rp => rp.GetCommentById(It.IsAny<string>()))
+                .ReturnsAsync(dummyComment);
+
+
+            var actual = await _sut.GetCommentById(commentid);
+
+            Assert.IsType<GlobalModels.Comment>(actual);
+        }
+
+        [Fact]
+        public async Task AddDiscussionTopic_ReturnTrue()
+        {
+            var discussionid = Guid.NewGuid();
+            var topicid = Guid.NewGuid();
+            
+
+            repoStub.Setup(rp => rp.AddDiscussionTopic(discussionid.ToString(), topicid.ToString()))
+                .ReturnsAsync(true);
+
+
+            var actual = await _sut.AddDiscussionTopic(discussionid.ToString(), topicid.ToString());
+
+            Assert.True(actual);
         }
     }
 }
